@@ -6,6 +6,9 @@
 <meta name="theme-color" content="#101722">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Full Body JJB</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <style>
 :root{
   --bg:#f4f1ea; --card:#ffffff; --ink:#151a22; --mute:#5b6270; --line:#d5d0c4;
@@ -551,6 +554,7 @@ function download(name, text, type){
 }
 
 render();
+if("serviceWorker" in navigator){ navigator.serviceWorker.register("sw.js").catch(()=>{}); }
 </script>
 </body>
 </html>
