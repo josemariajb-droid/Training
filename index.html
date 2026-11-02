@@ -111,71 +111,84 @@ nav button[aria-current="true"]{background:var(--ok-bg);text-decoration:underlin
    Bloque "int": intervalos de trabajo/descanso; se cuentan reps por intervalo
    tag: leg / hinge / push / pull / core (se usa en las reglas del día)
    ===================================================================== */
-const TRANS = 60, SIDE = 15, WARM = 300;
+const TRANS = 60, SIDE = 15, WARM = 240;
+/* =====================================================================
+   PLAN v3 · 30 ejercicios de los ejemplos (gymprimes, shainamarie,
+   fabiovallejo, healthfitnessguide) + dominadas de apertura.
+   Cada sesión: Apertura (dominadas) → Bloque 1 (5 ej.) → Bloque 2 (5 ej.)
+   Intervalos 40"/20" (sem 1) → 45"/15" (sem 2–3) × 3 rondas.
+   jump:1 → tiene versión silenciosa (alt) para entrenar temprano.
+   ===================================================================== */
+const DOM = (id,name)=>({t:"sup", name:"Apertura", rounds:3, rest:90, ex:[
+  {id, name, max:1, lo:3, hi:8, tp:4, tag:"pull", cue:"Máximo −2 reps. Bajar en 3 s. Es el único tirón vertical: no lo saltes.", reg:"Banda azul en pie o negativas de 5 s"}]});
 const PLAN = {
   A:{name:"FB-A", day:"Lunes", focus:"Dumbbell Power",
-    warm:"Secuencia primal ×3 (Loaded Beast 10 s → Ape Reach → Crab Reach) · dominada escapular 8 · muñecas 1'",
+    warm:"Secuencia primal ×3 (beast → ape → crab) · rotación de hombros · 10 sentadillas sin peso",
     blocks:[
-      {t:"sup", name:"Fuerza", rounds:3, rest:60, ex:[
-        {id:"A_dom", name:"Dominada", max:1, lo:3, hi:8, tp:4, tag:"pull", cue:"Máximo −2 reps. Bajar en 3 s.", reg:"Banda azul en pie o negativas de 5 s"},
-        {id:"A_bulg", name:"Sentadilla búlgara 2 mancuernas", lo:8, hi:10, tp:3, uni:1, tag:"leg", cue:"Rodilla sobre el pie, bajar controlado.", reg:"Split squat sin elevar el pie"}]},
-      {t:"int", name:"Circuito", rounds:3, rr:60, ex:[
-        {id:"A_front", name:"Sentadilla frontal 2 mancuernas", tag:"leg", cue:"Mancuernas en los hombros, bajar a paralelo.", reg:"Una mancuerna (goblet)"},
-        {id:"A_rdlrow", name:"Peso muerto rumano + remo", tag:"hinge", cue:"Bajas en bisagra, remas abajo, subes.", reg:"Solo RDL"},
-        {id:"A_pusq", name:"Flexión → sentadilla profunda", tag:"push", cue:"Flexión, pies hacia las manos, te levantas desde la sentadilla.", reg:"Flexión con rodillas"},
-        {id:"A_sqlat", name:"Sentadilla + elevación lateral", tag:"leg", cue:"1 mancuerna, elevación lateral al subir, alterna brazo.", reg:"Sin sentadilla"},
-        {id:"A_climb", name:"Mountain climber lento sobre mancuernas", tag:"core", cue:"Rodilla al pecho en 2 s, sin rebote (silencio).", reg:"Manos en el sofá"}]},
-      {t:"int", name:"Core", rounds:2, rr:0, ex:[
-        {id:"A_vup", name:"V-up alterno", tag:"core", cue:"Mano a pie contrario, zona lumbar controlada.", reg:"Crunch con giro"},
-        {id:"A_bike", name:"Bicicleta → elevación de piernas", tag:"core", cue:"4 bicis + 1 elevación. Lumbar pegada.", reg:"Solo bicis"}]}
+      DOM("A_dom","Dominada prona"),
+      {t:"int", name:"Bloque 1 · Pierna + espalda", rounds:3, rr:30, ex:[
+        {id:"A_front", name:"Sentadilla frontal 2 mancuernas", tag:"leg", cue:"Mancuernas en los hombros, codos altos, bajar a paralelo.", reg:"Goblet con una mancuerna"},
+        {id:"A_row", name:"Remo inclinado 2 mancuernas", tag:"pull", cue:"Tronco a 45°, codos pegados, aprieta escápulas arriba.", reg:"Remo a una mano apoyado"},
+        {id:"A_ohp", name:"Press militar de espaldas a la pared", tag:"push", cue:"Espalda y cabeza en la pared, sin arquear la zona lumbar.", reg:"Alterno, una mancuerna"},
+        {id:"A_rdl", name:"Peso muerto rumano 2 mancuernas", tag:"hinge", cue:"Cadera atrás, mancuernas rozando las piernas, espalda neutra.", reg:"Rango hasta la rodilla"},
+        {id:"A_mcdb", name:"Mountain climber sobre mancuernas", tag:"core", cue:"Manos en las mancuernas, rodilla al pecho rápida pero sin rebotar.", reg:"Lento, 2 s por rodilla"}]},
+      {t:"int", name:"Bloque 2 · Hombro + core", rounds:3, rr:30, ex:[
+        {id:"A_sumo", name:"Sentadilla sumo en pared + press al frente", tag:"leg", cue:"Espalda en la pared, mancuerna al pecho y empujas al frente arriba.", reg:"Sin press"},
+        {id:"A_shrug", name:"Encogimientos con mancuernas", tag:"pull", cue:"Hombros a las orejas, pausa 1 s arriba, sin girar.", reg:"Más lento, sin peso extra"},
+        {id:"A_sqlat", name:"Sentadilla + elevación lateral a 1 brazo", tag:"leg", cue:"Al subir, elevación lateral. Alterna brazo cada ronda.", reg:"Solo elevación"},
+        {id:"A_klat", name:"Elevación lateral de rodillas", tag:"push", cue:"De rodillas, sin balanceo, hasta la altura del hombro.", reg:"Con goma o una mancuerna"},
+        {id:"A_vup", name:"V-up", tag:"core", cue:"Brazos y piernas se encuentran arriba. Lumbar controlada.", reg:"V-up con rodillas dobladas"}]}
     ]},
-  B:{name:"FB-B", day:"Miércoles", focus:"Primal Calistenia",
-    warm:"Bear crawl lento 4 pasos ida y vuelta · Venom crawl suave 3/lado · muñecas y hombros 1'",
+  B:{name:"FB-B", day:"Miércoles", focus:"Athletic HIIT", note:"La más dura para las piernas: por eso va el miércoles, lejos del pádel.",
+    warm:"Secuencia primal ×3 · Cossack 5/lado · tobillos y caderas 1'",
     blocks:[
-      {t:"sup", name:"Fuerza", rounds:3, rest:60, ex:[
-        {id:"B_chin", name:"Dominada supina", max:1, lo:3, hi:8, tp:4, tag:"pull", cue:"Máximo −2 reps. Bajar en 3 s.", reg:"Banda azul o negativas de 5 s"},
-        {id:"B_bear", name:"Flexión profunda en oso", lo:10, hi:15, tp:3, tag:"push", cue:"Posición beast, rodillas a 2 cm, cabeza por delante de las manos.", reg:"Flexión normal"}]},
-      {t:"int", name:"Flow", rounds:3, rr:60, ex:[
-        {id:"B_climbpu", name:"Flexión trepa", tag:"push", cue:"Flexión y rodilla al codo al subir, alterna.", reg:"Sin flexión"},
-        {id:"B_pike", name:"Flexión pica + toque de rodilla cruzado", tag:"push", cue:"Pike push-up y rodilla a la mano contraria.", reg:"Pica sin flexión"},
-        {id:"B_venom", name:"Venom crawl + flexión", tag:"push", cue:"Desplazamiento bajo y lateral, flexión, vuelta.", reg:"Bear crawl lateral"},
-        {id:"B_curtsy", name:"Curtsy → zancada lateral", tag:"leg", cue:"Paso cruzado atrás y luego lateral. Sin saltos.", reg:"Solo zancada lateral"},
-        {id:"B_saw", name:"Body saw → elevación de cadera", tag:"core", cue:"Antebrazos, desliza atrás y sube la cadera en pica.", reg:"Plancha con balanceo corto"}]},
-      {t:"int", name:"Primal", rounds:2, rr:0, ex:[
-        {id:"B_primal", name:"Secuencia primal (beast → ape → crab)", tag:"core", cue:"Fluido y sin golpes. Cuenta secuencias.", reg:"Solo beast + ape"},
-        {id:"B_hold", name:"Loaded Beast isométrico", tag:"core", iso:1, cue:"Rodillas a 2 cm del suelo, respira. Anota segundos.", reg:"Apoya rodillas a mitad"}]}
+      DOM("B_dom","Dominada supina"),
+      {t:"int", name:"Bloque 1 · Potencia", rounds:3, rr:30, ex:[
+        {id:"B_sqcurl", name:"Sentadilla profunda + curl", tag:"leg", cue:"Bajas con las 2 mancuernas, al subir curl de una. Alterna.", reg:"Una mancuerna"},
+        {id:"B_dlmc", name:"Peso muerto → mountain climber", tag:"hinge", cue:"Bajas en bisagra, apoyas en las mancuernas, 4 climbers y subes.", reg:"Peso muerto → plancha 3 s"},
+        {id:"B_pop", name:"Pop squats", jump:1, alt:"Sentadilla sumo con pausa y talones arriba", altCue:"Pies juntos → sumo abajo con pausa de 1 s, sin despegar.", tag:"leg", cue:"Saltas de pies juntos a sentadilla abierta. Aterriza suave.", reg:"Versión sin salto"},
+        {id:"B_knee", name:"Rodilla arriba + rotación a 1 pierna", tag:"core", cue:"Mancuerna al frente, giras sobre la pierna de apoyo. Equilibrio de surf.", reg:"Punta del pie apoyada"},
+        {id:"B_kneel", name:"De rodillas a salto", jump:1, alt:"De rodillas a de pie (sin salto)", altCue:"Rodillas → pie → pie → de pie. Explosivo pero sin despegar.", tag:"leg", cue:"Desde rodillas, pies al suelo y salto vertical. Aterriza suave.", reg:"Versión sin salto"}]},
+      {t:"int", name:"Bloque 2 · Metabólico", rounds:3, rr:30, ex:[
+        {id:"B_pusq", name:"Flexión → sentadilla profunda", tag:"push", cue:"Flexión, pies hacia las manos, te levantas desde la sentadilla.", reg:"Flexión con rodillas"},
+        {id:"B_splitj", name:"Zancada partida con salto + rodilla arriba", jump:1, alt:"Zancada atrás + rodilla arriba", altCue:"Zancada atrás y subes llevando la rodilla al pecho. Alterna.", tag:"leg", cue:"Cambio de pierna en el aire y rodilla arriba al caer.", reg:"Versión sin salto"},
+        {id:"B_dl", name:"Peso muerto con mancuernas", tag:"hinge", cue:"Rodillas algo flexionadas, mancuernas por los lados, empuja el suelo.", reg:"Rango corto"},
+        {id:"B_toe", name:"Sentadilla + toque de pie cruzado", tag:"leg", cue:"Sentadilla, y al subir patada al frente y toque con la mano contraria.", reg:"Sin sentadilla"},
+        {id:"B_situp", name:"Sit-up con mancuerna + giro", tag:"core", cue:"Mancuerna al pecho, pies anclados, giras al subir.", reg:"Sin mancuerna"}]}
     ]},
-  C:{name:"FB-C", day:"Viernes", focus:"Athletic Complex", note:"Piernas sin apurar: mañana hay pádel.",
-    warm:"Secuencia primal ×3 · Cossack 5/lado · círculos de muñeca y tobillo",
+  C:{name:"FB-C", day:"Viernes", focus:"Primal Flow", note:"Sin mancuernas y sin saltos: silenciosa.",
+    warm:"Secuencia primal ×3 (Fabio) · bear crawl 4 pasos ida y vuelta · muñecas 1'",
     blocks:[
-      {t:"sup", name:"Fuerza", rounds:3, rest:60, ex:[
-        {id:"C_dom", name:"Dominada neutra", max:1, lo:3, hi:8, tp:4, tag:"pull", cue:"Máximo −2 reps.", reg:"Remo con goma"},
-        {id:"C_ohp", name:"Press militar de espaldas a la pared", lo:10, hi:15, tp:3, tag:"push", cue:"Espalda y cabeza en la pared, sin arquear.", reg:"Alterno, una mancuerna"}]},
-      {t:"int", name:"Complejo", rounds:3, rr:60, ex:[
-        {id:"C_sumo", name:"Sentadilla sumo + press al frente", tag:"leg", cue:"Mancuerna al pecho, al subir empujas al frente.", reg:"Sin press"},
-        {id:"C_dlwalk", name:"Peso muerto → caminata a plancha", tag:"hinge", cue:"RDL, apoyas en las mancuernas, 2 pasos atrás y vuelves.", reg:"Solo RDL"},
-        {id:"C_sqcurl", name:"Sentadilla profunda + curl", tag:"leg", cue:"Bajas, curl de una al subir, alterna.", reg:"Una mancuerna"},
-        {id:"C_knee", name:"Rodilla arriba + rotación a 1 pierna", tag:"core", cue:"Mancuerna al frente, gira sobre la pierna de apoyo. Equilibrio de surf.", reg:"Punta del pie apoyada"},
-        {id:"C_row", name:"Remo inclinado + encogimiento", tag:"pull", cue:"Remas y al bajar encoges hombros 1 s.", reg:"Solo remo"}]},
-      {t:"int", name:"Hombro y core", rounds:2, rr:0, ex:[
-        {id:"C_lat", name:"Elevación lateral de rodillas", tag:"push", cue:"De rodillas, sin balanceo. Banda si 11 kg es mucho.", reg:"Con goma"},
-        {id:"C_russ", name:"Giro ruso con mancuerna", tag:"core", cue:"Pies apoyados, gira desde el tronco.", reg:"Sin mancuerna"}]}
+      DOM("C_dom","Dominada neutra"),
+      {t:"int", name:"Bloque 1 · Calistenia animal", rounds:3, rr:30, ex:[
+        {id:"C_bear", name:"Flexión profunda en oso", tag:"push", cue:"Posición beast, rodillas a 2 cm, cabeza por delante de las manos.", reg:"Flexión normal"},
+        {id:"C_curtsy", name:"Curtsy → zancada lateral", tag:"leg", cue:"Paso cruzado atrás y luego lateral. Alterna lado.", reg:"Solo zancada lateral"},
+        {id:"C_climb", name:"Flexión trepa", tag:"push", cue:"Flexión y rodilla al codo al subir, alterna.", reg:"Sin flexión"},
+        {id:"C_lunge", name:"Zancada atrás + giro + rodilla arriba", tag:"leg", cue:"Zancada atrás, giro del tronco hacia la pierna delantera, subes con rodilla arriba.", reg:"Sin giro"},
+        {id:"C_saw", name:"Body saw → elevación de cadera", tag:"core", cue:"Antebrazos, desliza atrás y sube la cadera en pica.", reg:"Plancha con balanceo corto"}]},
+      {t:"int", name:"Bloque 2 · Flow", rounds:3, rr:30, ex:[
+        {id:"C_venom", name:"Flexión venom con desplazamiento", tag:"push", cue:"Desplazamiento bajo y lateral, flexión, vuelta. 5/lado es una buena referencia.", reg:"Bear crawl lateral"},
+        {id:"C_heel", name:"Sentadilla + toque de talón cruzado", tag:"leg", cue:"Sentadilla y al subir talón atrás a la mano contraria.", reg:"Sentadilla al aire"},
+        {id:"C_pike", name:"Flexión pica + toque de rodilla cruzado", tag:"push", cue:"Pike push-up y rodilla a la mano contraria.", reg:"Pica sin flexión"},
+        {id:"C_commando", name:"Flexión → plancha comando", tag:"push", cue:"Flexión, bajas a antebrazos y vuelves a manos. Alterna el brazo que inicia.", reg:"Rodillas apoyadas"},
+        {id:"C_bike", name:"Bicicleta → elevación de piernas", tag:"core", cue:"4 bicis + 1 elevación de piernas. Lumbar pegada.", reg:"Solo bicis"}]}
     ]}
 };
 for(const k in PLAN) PLAN[k].blocks.forEach(b=>b.ex.forEach(e=>e.mode = b.t==="int"?"time":"reps"));
 
 const MODS = [
+  {id:"silencio", label:"Silencio (temprano)", fx:"Los saltos pasan a su versión sin impacto"},
   {id:"sueno", label:"Dormí menos de 6 h", fx:"−1 ronda en todo y RIR 3"},
   {id:"padel", label:"Pádel intenso ayer", fx:"Fuera los ejercicios de rodilla"},
-  {id:"mar",   label:"Surf o kite de más de 2 h (ayer u hoy)", fx:"Fuerza a 2 rondas y sin bisagra (peso muerto)"},
+  {id:"mar",   label:"Surf o kite de más de 2 h (ayer u hoy)", fx:"Dominadas a 2 series y sin peso muerto"},
   {id:"dolor", label:"Molestia articular > 3/10", fx:"Usa la regresión en lo que moleste"},
-  {id:"t20",   label:"Solo tengo 20 minutos", fx:"Calentamiento 3' + circuito principal 2 rondas"}
+  {id:"t20",   label:"Solo tengo 20 minutos", fx:"Calentamiento 3' + bloque 1, 2 rondas"}
 ];
 // Progresión semanal: una variable por semana
-const WEEK = {1:{w:40,r:20,cr:3,txt:"40\"/20\" × 3 rondas · RIR 3 · anota reps"},
-              2:{w:40,r:20,cr:4,txt:"+1 ronda de circuito (4)"},
-              3:{w:45,r:15,cr:4,txt:"45\"/15\" × 4 rondas"},
-              4:{w:40,r:20,cr:2,txt:"Descarga: 2 rondas, −1 serie de fuerza"}};
+const WEEK = {1:{w:40,r:20,cr:3,dom:3,txt:"40\"/20\" × 3 rondas · anota reps"},
+              2:{w:45,r:15,cr:3,dom:3,txt:"45\"/15\" × 3 rondas (más densidad)"},
+              3:{w:45,r:15,cr:3,dom:4,txt:"45\"/15\" · dominadas a 4 series · sube carga donde marque ▲"},
+              4:{w:40,r:20,cr:2,dom:2,txt:"Descarga: 2 rondas"}};
 
 /* ============ STORAGE ============ */
 const KEY = "fbjjb_v1";
@@ -205,7 +218,7 @@ function repTxt(e){
   if(e.max) return "máx −2 reps";
   return (e.lo===e.hi?e.lo:e.lo+"–"+e.hi)+" reps"+(e.uni?" por lado":"");
 }
-function findEx(id){ for(const k in PLAN) for(const b of PLAN[k].blocks){ const e=b.ex.find(x=>x.id===id); if(e) return e; } return null; }
+function findEx(id){ for(const k in PLAN) for(const b of PLAN[k].blocks){ let e=b.ex.find(x=>x.id===id); if(e) return e; e=b.ex.find(x=>x.jump && x.id+"_s"===id); if(e) return Object.assign({}, e, {id, name:e.alt, cue:e.altCue, jump:0}); } return null; }
 
 /* ============ CONSTRUCCIÓN DEL PLAN DEL DÍA ============ */
 function buildPlan(key, mods){
@@ -213,13 +226,14 @@ function buildPlan(key, mods){
   let warm = WARM;
   let blocks = P.blocks.map(b=>Object.assign({}, b, {ex:b.ex.map(e=>Object.assign({}, e))}));
   // semana
-  blocks.forEach(b=>{ if(b.t==="int" && b.rr) b.rounds = W.cr; });
-  if(wk===4) blocks.forEach(b=>{ if(b.t==="sup") b.rounds = Math.max(1,b.rounds-1); });
+  blocks.forEach(b=>{ if(b.t==="int") b.rounds = W.cr; else b.rounds = W.dom; });
+  // silencio: saltos → versión sin impacto
+  if(mods.includes("silencio")) blocks.forEach(b=>b.ex=b.ex.map(e=>e.jump?Object.assign({}, e, {id:e.id+"_s", name:e.alt, cue:e.altCue, jump:0}):e));
   // reglas del día
   if(mods.includes("sueno")){ blocks.forEach(b=>b.rounds=Math.max(1,b.rounds-1)); notes.push("Mal sueño: −1 ronda en todo, RIR 3"); }
   if(mods.includes("padel")){ blocks.forEach(b=>{ const out=b.ex.filter(e=>e.tag==="leg"); if(out.length) notes.push("Sin "+out.map(e=>e.name).join(" · ")+" (pádel)"); b.ex=b.ex.filter(e=>e.tag!=="leg"); }); }
-  if(mods.includes("mar")){ blocks.forEach(b=>{ const out=b.ex.filter(e=>e.tag==="hinge"); if(out.length) notes.push("Sin "+out.map(e=>e.name).join(" · ")+" (mar)"); b.ex=b.ex.filter(e=>e.tag!=="hinge"); if(b.t==="sup") b.rounds=Math.min(b.rounds,2); }); notes.push("Fuerza a 2 rondas (espalda cargada del mar)"); }
-  if(mods.includes("t20")){ blocks = blocks.filter(b=>b.t==="int").slice(0,1); blocks[0].rounds = Math.min(2, blocks[0].rounds); warm = 180; notes.push("20': solo el circuito principal, 2 rondas"); }
+  if(mods.includes("mar")){ blocks.forEach(b=>{ const out=b.ex.filter(e=>e.tag==="hinge"); if(out.length) notes.push("Sin "+out.map(e=>e.name).join(" · ")+" (mar)"); b.ex=b.ex.filter(e=>e.tag!=="hinge"); if(b.t==="sup") b.rounds=Math.min(b.rounds,2); }); notes.push("Dominadas a 2 series (espalda cargada del mar)"); }
+  if(mods.includes("t20")){ blocks = blocks.filter(b=>b.t==="int").slice(0,1); blocks[0].rounds = Math.min(2, blocks[0].rounds); warm = 180; notes.push("20': solo el bloque 1, 2 rondas"); }
   if(mods.includes("dolor")) notes.push("Molestia: usa la regresión del ejercicio que moleste");
   blocks = blocks.filter(b=>b.ex.length && b.rounds>0);
   const steps = [];
@@ -322,7 +336,7 @@ function renderHome(){
     </div></div>
   <div class="card"><h2>Entrenar</h2><div class="sess">`;
   ["A","B","C"].forEach(k=>{ const p=PLAN[k], pl=buildPlan(k,[]);
-    const fmtTxt = pl.blocks.map(b=>b.t==="sup"?"Fuerza "+b.rounds+"×":b.name+" "+pl.W.w+"/"+pl.W.r+"×"+b.rounds).join(" · ");
+    const fmtTxt = "Dominadas + 2 bloques × 5 ejercicios · "+pl.W.w+"\"/"+pl.W.r+"\" × "+pl.W.cr;
     h += `<button class="sessbtn" data-s="${k}"><span><b>${p.name}</b> · ${p.day}<br><span class="mute">${p.focus}<br>${fmtTxt}</span></span>
       <span class="num">~${mins(estimate(pl))}${k===sug?'<br><span class="tag keep">toca</span>':""}</span></button>`; });
   h += `</div></div>
@@ -336,7 +350,7 @@ function renderHome(){
     <div class="row"><input id="wKg" type="number" step="0.1" inputmode="decimal" placeholder="kg en ayunas" class="grow"><button id="wSave">Guardar</button></div>
     <div class="mute" style="margin-top:6px">${lastW?"Último: "+lastW.kg+" kg ("+lastW.date+")"+trend():"Pésate 1–2 veces por semana, mismo día y hora."}</div></div>`;
   $("#app").innerHTML = h;
-  document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{ VIEW={k:"pre",key:b.dataset.s,mods:[]}; render(); });
+  document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{ VIEW={k:"pre",key:b.dataset.s,mods:new Date().getHours()<10?["silencio"]:[]}; render(); });
   $("#aSave").onclick=()=>{ const m=+$("#aMin").value; if(!m){toast("Pon los minutos");return;}
     DB.acts.push({id:uid(), date:isoDate(new Date()), type:$("#aType").value, min:m, int:$("#aInt").value, note:$("#aNote").value}); save(); toast("Actividad guardada"); render(); };
   $("#wSave").onclick=()=>{ const kg=+$("#wKg").value; if(!kg){toast("Pon el peso");return;}
@@ -364,11 +378,11 @@ function renderPre(key){
   MODS.forEach(m=>{ h+=`<label class="check"><input type="checkbox" data-m="${m.id}" ${sel.includes(m.id)?"checked":""}><span><b>${m.label}</b><br><span class="mute">→ ${m.fx}</span></span></label>`; });
   h += `</div><div class="card"><h3>Calentamiento · ${mins(plan.warm)}</h3><div class="mute">${esc(p.warm)}</div>`;
   plan.blocks.forEach((b,i)=>{
-    const head = b.t==="sup" ? `Bloque ${i+1} · ${b.name} · superserie ${b.rounds} rondas · ${b.rest}" entre ejercicios`
-      : `Bloque ${i+1} · ${b.name} · ${plan.W.w}" trabajo / ${plan.W.r}" descanso × ${b.rounds} rondas${b.rr?" · "+b.rr+"\" extra entre rondas":""}`;
+    const head = b.t==="sup" ? `${b.name} · ${b.rounds} series · ${b.rest}" de descanso`
+      : `${b.name} · ${plan.W.w}" / ${plan.W.r}" × ${b.rounds} rondas${b.rr?" · +"+b.rr+"\" entre rondas":""}`;
     h += `<div class="blk ${b.t==="int"?"int":""}"><h3>${head}</h3></div><table>`;
     b.ex.forEach((e,j)=>{ const pr=progress(e);
-      h += `<tr><td>${String.fromCharCode(65+i)}${j+1}</td><td><b>${esc(e.name)}</b><br><span class="mute">${b.t==="sup"?repTxt(e)+" · ":""}${esc(e.cue)}</span><br><span class="tag ${pr.k}">${esc(pr.t.split(":")[0])}</span></td></tr>`; });
+      h += `<tr><td>${String.fromCharCode(65+i)}${j+1}</td><td><b>${esc(e.name)}</b>${e.jump?' <span class="tag keep">salto</span>':''}<br><span class="mute">${b.t==="sup"?repTxt(e)+" · ":""}${esc(e.cue)}${e.jump?"<br>Silencio: "+esc(e.alt):""}</span><br><span class="tag ${pr.k}">${esc(pr.t.split(":")[0])}</span></td></tr>`; });
     h += `</table>`;
   });
   h += `</div><button class="pri big" id="go">▶ Empezar ${p.name}</button>`;
