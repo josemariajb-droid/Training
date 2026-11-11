@@ -12,12 +12,16 @@
 <style>
 :root{
   --bg:#f4f1ea; --card:#ffffff; --ink:#151a22; --mute:#5b6270; --line:#d5d0c4;
-  --acc:#1747a6; --acc-ink:#ffffff; --warn:#8a5a00; --warn-bg:#fff2d6;
-  --ok-bg:#e3ebfb; --radius:14px;
+  --acc:#0072B2; --acc-ink:#ffffff; --warn:#8a5a00; --warn-bg:#fff2d6;
+  --ok-bg:#e3effa; --radius:14px;
+  /* Paleta Okabe-Ito (apta para daltonismo) */
+  --c-orange:#E69F00; --c-sky:#56B4E9; --c-green:#009E73; --c-yellow:#F0E442;
+  --c-blue:#0072B2; --c-verm:#D55E00; --c-purple:#CC79A7; --c-ink:#111;
 }
 @media (prefers-color-scheme: dark){
   :root{--bg:#0f141c; --card:#18202c; --ink:#eef1f6; --mute:#a3abb8; --line:#2c3644;
-  --acc:#7fa8ff; --acc-ink:#0f141c; --warn:#ffc861; --warn-bg:#3a2e14; --ok-bg:#1d2a44;}
+  --acc:#56B4E9; --acc-ink:#0f141c; --warn:#ffc861; --warn-bg:#3a2e14; --ok-bg:#1b2e40;
+  --c-blue:#2b8fd6;}
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -60,7 +64,20 @@ th{color:var(--mute);font-weight:600}
 nav{position:fixed;bottom:0;left:0;right:0;z-index:6;background:var(--card);border-top:1px solid var(--line);
   display:flex;padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
 nav button{flex:1;border:0;min-height:52px;font-size:14px;border-radius:10px}
-nav button[aria-current="true"]{background:var(--ok-bg);text-decoration:underline;text-underline-offset:4px}
+nav button{border-top:4px solid var(--tc);border-radius:0 0 10px 10px;display:flex;flex-direction:column;align-items:center;gap:0;line-height:1.15}
+nav button .ic{font-size:18px}
+nav button[aria-current="true"]{background:var(--tc);color:var(--tk);text-decoration:underline;text-underline-offset:4px}
+nav [data-tab=hoy]{--tc:var(--c-blue);--tk:#fff} nav [data-tab=lib]{--tc:var(--c-green);--tk:#fff}
+nav [data-tab=hist]{--tc:var(--c-orange);--tk:#111} nav [data-tab=datos]{--tc:var(--c-purple);--tk:#111}
+header{border-bottom:4px solid var(--hc,var(--c-blue))}
+body[data-tab=lib]{--hc:var(--c-green)} body[data-tab=hist]{--hc:var(--c-orange)} body[data-tab=datos]{--hc:var(--c-purple)}
+.card{border-top:4px solid var(--hc,var(--c-blue))}
+/* etiquetas por tipo de actividad: color + texto siempre */
+.tg{display:inline-block;font-size:10px;font-weight:800;border-radius:4px;padding:0 3px;line-height:1.3;border:1px solid var(--c-ink);background:var(--tb);color:var(--tt)}
+.tg.FB{--tb:var(--c-blue);--tt:#fff} .tg.SURF{--tb:var(--c-sky);--tt:#111} .tg.KITE{--tb:var(--c-green);--tt:#fff}
+.tg.PÁD{--tb:var(--c-orange);--tt:#111} .tg.ESQ{--tb:var(--c-purple);--tt:#111} .tg.RUN{--tb:var(--c-verm);--tt:#fff}
+.tg.Z2{--tb:var(--c-yellow);--tt:#111} .tg.INT{--tb:#666;--tt:#fff}
+.kpis .kpi{border-top:4px solid var(--c-sky)} .kpis .kpi:nth-child(2){border-top-color:var(--c-yellow)} .kpis .kpi:nth-child(3){border-top-color:var(--c-orange)} .kpis .kpi:nth-child(4){border-top-color:var(--c-green)}
 .slot{border:2px solid var(--line);border-radius:12px;padding:10px;margin:10px 0}
 .slot .lbl{font-weight:800;font-size:13px;letter-spacing:.5px}
 .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
@@ -109,23 +126,32 @@ nav button[aria-current="true"]{background:var(--ok-bg);text-decoration:underlin
 .cal .hd{font-size:12px;font-weight:800;text-align:center;color:var(--mute)}
 .cal button{min-height:58px;padding:3px 2px;border:1px solid var(--line);border-radius:8px;font-weight:400;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:1px;background:var(--card)}
 .cal button .d{font-size:13px;font-weight:800}
-.cal button .t{font-size:10px;font-weight:800;line-height:1.15;letter-spacing:.2px}
+.cal button .t{font-size:10px;font-weight:800;line-height:1.15;letter-spacing:.2px;margin-top:1px}
 .cal button.act{background:var(--ok-bg);border:2px solid var(--ink)}
 .cal button.hoy{outline:2px dashed var(--ink);outline-offset:1px}
-.cal button.sel{outline:3px solid var(--acc);outline-offset:1px}
+.cal button.sel{outline:3px solid var(--c-orange);outline-offset:1px}
 .cal button.out{visibility:hidden}
 /* ---- mapa del cuerpo ---- */
 .seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
 .seg button{min-height:40px;font-size:14px;padding:4px}
-.seg button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--acc-ink);text-decoration:underline}
+.seg button[aria-pressed="true"]{background:var(--c-orange);border-color:var(--c-ink);color:#111;text-decoration:underline}
 .body svg{width:100%;height:auto;display:block}
 .body .n{fill:var(--line)}
 .body .z{stroke:var(--ink);stroke-width:1.2}
 .body .z0{fill:var(--card)}
-.body .z1{fill:color-mix(in srgb,var(--acc) 25%,var(--card))}
-.body .z2{fill:color-mix(in srgb,var(--acc) 50%,var(--card))}
-.body .z3{fill:color-mix(in srgb,var(--acc) 80%,var(--card))}
+.body{--hz:var(--c-blue)}
+.body .z1{fill:color-mix(in srgb,var(--c-sky) 45%,var(--card))}
+.body .z2{fill:var(--c-sky)}
+.body .z3{fill:var(--c-blue)}
 .body .z4{fill:url(#hatch);stroke-width:2.6}
+/* 7 días: BAJO amarillo · OK verde · ALTO bermellón rayado */
+.body.m-sem{--hz:var(--c-verm)} .body.m-sem .z1{fill:var(--c-yellow)} .body.m-sem .z2,.body.m-sem .z3{fill:var(--c-green)}
+/* Recuperación: listo verde suave · cargado naranja · fatigado bermellón rayado */
+.body.m-rec{--hz:var(--c-verm)} .body.m-rec .z0{fill:color-mix(in srgb,var(--c-green) 35%,var(--card))} .body.m-rec .z2{fill:var(--c-yellow)} .body.m-rec .z3{fill:var(--c-orange)}
+.zl .lv{background:var(--lb,transparent);color:var(--lt,var(--ink))}
+.zl .lv.l1{--lb:color-mix(in srgb,var(--c-sky) 45%,var(--card))} .zl .lv.l2{--lb:var(--c-sky);--lt:#111} .zl .lv.l3{--lb:var(--c-blue);--lt:#fff} .zl .lv.l4{--lb:var(--c-blue);--lt:#fff;border-width:3px}
+.zl.m-sem .lv.l1{--lb:var(--c-yellow);--lt:#111} .zl.m-sem .lv.l2,.zl.m-sem .lv.l3{--lb:var(--c-green);--lt:#fff} .zl.m-sem .lv.l4{--lb:var(--c-verm);--lt:#fff}
+.zl.m-rec .lv.l0{--lb:color-mix(in srgb,var(--c-green) 35%,var(--card));border-style:solid;opacity:1} .zl.m-rec .lv.l2{--lb:var(--c-yellow);--lt:#111} .zl.m-rec .lv.l3{--lb:var(--c-orange);--lt:#111} .zl.m-rec .lv.l4{--lb:var(--c-verm);--lt:#fff}
 .body text{font-size:11px;fill:var(--mute);font-weight:700}
 .zl{display:grid;grid-template-columns:auto 1fr auto;gap:4px 8px;align-items:center;font-size:14px;margin-top:8px}
 .zl .lv{font-weight:800;font-size:12px;border:2px solid var(--ink);border-radius:6px;padding:0 5px;text-align:center;min-width:2.2em}
@@ -145,10 +171,10 @@ details.add[open]>summary::before{content:"− "}
 </header>
 <main id="app"></main>
 <nav>
-  <button data-tab="hoy" aria-current="true">Hoy</button>
-  <button data-tab="lib">Biblioteca</button>
-  <button data-tab="hist">Historial</button>
-  <button data-tab="datos">Datos</button>
+  <button data-tab="hoy" aria-current="true"><span class="ic">▶</span>Hoy</button>
+  <button data-tab="lib"><span class="ic">☰</span>Biblioteca</button>
+  <button data-tab="hist"><span class="ic">▦</span>Historial</button>
+  <button data-tab="datos"><span class="ic">⇅</span>Datos</button>
 </nav>
 <div id="toast" class="toast"></div>
 
@@ -245,6 +271,7 @@ const ACT_LOAD = { // series equivalentes por hora a intensidad media (estimaci�
 const INT_F = {suave:.6, media:1, dura:1.4};
 const FZ_SHORT = {rod:"Cuádriceps", cad:"Glúteo/isquio", peH:"Pecho", peV:"Hombro", tiV:"Dorsal", tiH:"Espalda media", core:"Core/lumbar", gem:"Gemelo", bra:"Brazos"};
 let HIST = {ym:null, sel:null, mode:"dia"};
+function stay(fn){ const y=window.scrollY; fn(); render(); window.scrollTo(0,y); } // re-pinta sin volver arriba
 
 function fmtD(k){ const [y,m,d]=k.split("-"); return d+"/"+m+"/"+y; }
 function longD(k){ const d=new Date(k+"T12:00"); return DIAS[d.getDay()]+" "+d.getDate()+" de "+MESES[d.getMonth()]; }
@@ -290,7 +317,7 @@ const MODE_HELP = {
   dia:"Series hechas ese día por zona. El deporte suma en series equivalentes (1 h de surf ≈ 4 de dorsal).",
   sem:"Series de los últimos 7 días contra el objetivo semanal. BAJO = te falta, ALTO = te pasas.",
   rec:"Horas hasta que la zona vuelve a estar fresca. Una sesión normal de pierna (7–8 series) ≈ 48 h; tren superior ≈ 36 h. Si no te cuadra con cómo te notas, dímelo y lo ajusto."};
-function bodySVG(d){
+function bodySVG(d, m="dia"){
   const c=z=>`z ${"z"+((d[z]||{}).l||0)}`;
   const fig=(ox,front)=>`<g transform="translate(${ox},0)">
     <circle class="n" cx="80" cy="16" r="12"/><rect class="n" x="74" y="27" width="12" height="8" rx="3"/>
@@ -309,22 +336,22 @@ function bodySVG(d){
     <rect class="${c("cad")}" x="57" y="145" width="21" height="50" rx="9"/><rect class="${c("cad")}" x="82" y="145" width="21" height="50" rx="9"/>
     <ellipse class="${c("gem")}" cx="68" cy="214" rx="9" ry="20"/><ellipse class="${c("gem")}" cx="92" cy="214" rx="9" ry="20"/>`}
     <text x="80" y="256" text-anchor="middle">${front?"DELANTE":"DETRÁS"}</text></g>`;
-  return `<div class="body"><svg viewBox="0 0 340 262" role="img" aria-label="Mapa del cuerpo">
+  return `<div class="body m-${m}"><svg viewBox="0 0 340 262" role="img" aria-label="Mapa del cuerpo">
     <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <rect width="6" height="6" fill="var(--acc)"/><line x1="0" y1="0" x2="0" y2="6" stroke="var(--ink)" stroke-width="3"/></pattern></defs>
+      <rect width="6" height="6" style="fill:var(--hz)"/><line x1="0" y1="0" x2="0" y2="6" stroke="var(--ink)" stroke-width="3"/></pattern></defs>
     ${fig(0,true)}${fig(180,false)}</svg></div>`;
 }
-function zoneListHTML(d){
-  return `<div class="zl">${FZ_SHOW.map(z=>{ const x=d[z]; return `<span class="lv l${x.l}">${x.lv}</span><span>${FZ_SHORT[z]}</span><span class="r">${x.txt}</span>`; }).join("")}</div>`;
+function zoneListHTML(d, m="dia"){
+  return `<div class="zl m-${m}">${FZ_SHOW.map(z=>{ const x=d[z]; return `<span class="lv l${x.l}">${x.lv}</span><span>${FZ_SHORT[z]}</span><span class="r">${x.txt}</span>`; }).join("")}</div>`;
 }
 function bodyCardHTML(){
   const m=HIST.mode, d=mapData(m), sel=HIST.sel||isoDate(new Date());
   const title = m==="dia" ? (sel===isoDate(new Date())?"Hoy":longD(sel)) : m==="sem" ? "Últimos 7 días" : "Recuperación ahora";
   return `<div class="card"><h2>Mapa del cuerpo</h2>
     <div class="seg"><button data-md="dia" aria-pressed="${m==="dia"}">Día</button><button data-md="sem" aria-pressed="${m==="sem"}">7 días</button><button data-md="rec" aria-pressed="${m==="rec"}">Recuperación</button></div>
-    <h3>${esc(title)}</h3>${bodySVG(d)}
-    <div class="mute small">Más relleno = más trabajo. Rayado y borde grueso = ${m==="sem"?"te pasas del objetivo":m==="rec"?"muy cargado":"10 series o más"}.</div>
-    ${zoneListHTML(d)}<div class="mute small" style="margin-top:6px">${MODE_HELP[m]}</div></div>`;
+    <h3>${esc(title)}</h3>${bodySVG(d,m)}
+    <div class="mute small">${m==="sem"?"Amarillo = BAJO · verde = OK · rayado y borde grueso = ALTO (te pasas).":m==="rec"?"Verde suave = listo · amarillo/naranja = cargado · rayado y borde grueso = fatigado.":"Más intenso = más series · rayado y borde grueso = 10 series o más."} El texto de la lista manda.</div>
+    ${zoneListHTML(d,m)}<div class="mute small" style="margin-top:6px">${MODE_HELP[m]}</div></div>`;
 }
 
 /* ---- calendario mensual ---- */
@@ -337,19 +364,19 @@ function calendarHTML(){
   for(let d=1; d<=nd; d++){
     const k=ym+"-"+String(d).padStart(2,"0"), e=entriesOn(k);
     if(e.length){ days++; fb+=e.filter(x=>x.k==="s").length; dep+=e.filter(x=>x.k==="a").length; min+=e.reduce((a,x)=>a+x.min,0); }
-    const tags=e.slice(0,2).map(x=>`<span class="t">${x.abbr} ${x.min}'</span>`).join("")+(e.length>2?`<span class="t">+${e.length-2}</span>`:"");
+    const tags=e.slice(0,2).map(x=>`<span class="t tg ${x.abbr}">${x.abbr} ${x.min}'</span>`).join("")+(e.length>2?`<span class="t">+${e.length-2}</span>`:"");
     const cls=[e.length?"act":"", k===today?"hoy":"", k===HIST.sel?"sel":""].join(" ");
     cells+=`<button class="${cls}" data-day="${k}" aria-label="${longD(k)}${e.length?": "+e.map(x=>x.t+" "+x.min+" min").join(", "):""}"><span class="d">${d}</span>${tags}</button>`;
   }
   return `<div class="card"><div class="calnav"><button class="sm" id="calP" aria-label="Mes anterior">◀</button><b>${MESES[M-1]} ${Y}</b><button class="sm" id="calN" aria-label="Mes siguiente">▶</button></div>
     <div class="cal">${cells}</div>
     <div class="mute small" style="margin-top:8px"><b>${days}</b> días activos · <b>${fb}</b> rutinas · <b>${dep}</b> de deporte · <b>${Math.round(min/6)/10} h</b> en total</div>
-    <div class="mute small">FB = rutina · SURF · KITE · PÁD = pádel · ESQ · RUN · Z2 = zona 2 · INT = intervalos</div></div>`;
+    <div class="small" style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px">${["FB","SURF","KITE","PÁD","ESQ","RUN","Z2","INT"].map(a=>`<span class="tg ${a}">${a}</span>`).join("")}<span class="mute">FB = rutina · PÁD = pádel · Z2 = zona 2</span></div></div>`;
 }
 function dayCardHTML(){
   const k=HIST.sel||isoDate(new Date()), e=entriesOn(k);
   return `<div class="card"><h2>${(t=>t[0].toUpperCase()+t.slice(1))(longD(k))}</h2>
-    ${e.length?`<ul class="list reg">${e.map(x=>`<li><span class="grow"><b>${esc(x.t)}</b> · ${x.min}'${x.int?" · "+x.int:""}</span>${x.k==="s"?`<button class="sm" data-open="${x.id}">Ver</button>`:""}<button class="sm icon" data-del="${x.k}:${x.id}" aria-label="Borrar">✕</button></li>`).join("")}</ul>`:`<div class="mute">Sin entrenos este día.</div>`}
+    ${e.length?`<ul class="list reg">${e.map(x=>`<li><span class="tg ${x.abbr}">${x.abbr}</span><span class="grow"><b>${esc(x.t)}</b> · ${x.min}'${x.int?" · "+x.int:""}</span>${x.k==="s"?`<button class="sm" data-open="${x.id}">Ver</button>`:""}<button class="sm icon" data-del="${x.k}:${x.id}" aria-label="Borrar">✕</button></li>`).join("")}</ul>`:`<div class="mute">Sin entrenos este día.</div>`}
     ${addFormHTML(k)}</div>`;
 }
 function addFormHTML(k){
@@ -373,17 +400,17 @@ function saveManual(){
     DB.sessions.push({id:uid(), v:3, manual:true, name:"Rutina", date, start:end-min*6e4, end, durSec:min*60, estSec:0,
       week:weekInfo(new Date(date+"T12:00")).week, mods:[], ex, notes:note, rpe:null});
   } else DB.acts.push({id:uid(), date, type, min, int, note});
-  HIST.sel=date; HIST.ym=date.slice(0,7); save(); toast("Registro guardado"); render();
+  stay(()=>{ HIST.sel=date; HIST.ym=date.slice(0,7); save(); }); toast("Registro guardado");
 }
 function bindHistTop(){
-  $("#calP").onclick=()=>{ const [y,m]=(HIST.ym||isoDate(new Date()).slice(0,7)).split("-").map(Number); const d=new Date(y,m-2,1); HIST.ym=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"); render(); };
-  $("#calN").onclick=()=>{ const [y,m]=(HIST.ym||isoDate(new Date()).slice(0,7)).split("-").map(Number); const d=new Date(y,m,1); HIST.ym=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"); render(); };
-  document.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{ HIST.sel=b.dataset.day; HIST.mode="dia"; render(); });
-  document.querySelectorAll("[data-md]").forEach(b=>b.onclick=()=>{ HIST.mode=b.dataset.md; render(); });
+  $("#calP").onclick=()=>{ const [y,m]=(HIST.ym||isoDate(new Date()).slice(0,7)).split("-").map(Number); const d=new Date(y,m-2,1); stay(()=>HIST.ym=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")); };
+  $("#calN").onclick=()=>{ const [y,m]=(HIST.ym||isoDate(new Date()).slice(0,7)).split("-").map(Number); const d=new Date(y,m,1); stay(()=>HIST.ym=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")); };
+  document.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>stay(()=>{ HIST.sel=b.dataset.day; HIST.mode="dia"; }));
+  document.querySelectorAll("[data-md]").forEach(b=>b.onclick=()=>stay(()=>{ HIST.mode=b.dataset.md; }));
   document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{ VIEW={k:"sum", id:b.dataset.open}; render(); });
   document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{ const [k,id]=b.dataset.del.split(":");
     if(!confirm("¿Borrar este registro?")) return;
-    if(k==="s") DB.sessions=DB.sessions.filter(x=>x.id!==id); else DB.acts=DB.acts.filter(x=>x.id!==id); save(); render(); });
+    stay(()=>{ if(k==="s") DB.sessions=DB.sessions.filter(x=>x.id!==id); else DB.acts=DB.acts.filter(x=>x.id!==id); save(); }); });
   const t=$("#mType"); if(t) t.onchange=()=>{ $("#mZ").style.display = t.value==="FB" ? "block" : "none"; };
   const s=$("#mSave"); if(s) s.onclick=saveManual;
 }
@@ -553,6 +580,7 @@ function render(){
   $("#weekChip").textContent = "Sem "+wi.week+" · ciclo "+wi.cycle;
   $("#weekChip").className = "chip"+(wi.week===4?" dash":"");
   document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-current", String(b.dataset.tab===TAB && !DB.live)));
+  document.body.dataset.tab = DB.live ? "hoy" : TAB;
   if(DB.live){ renderLive(); return; }
   stopTick();
   if(VIEW && VIEW.k==="plan") return renderPlanner();
@@ -940,10 +968,10 @@ function renderSummary(id){
 /* ============ HISTORIAL ============ */
 function renderHist(){
   if(!HIST.sel) HIST.sel=isoDate(new Date());
-  const all=[...DB.sessions.map(x=>({k:"s", id:x.id, date:x.date, t:entryName(x), min:Math.round((x.durSec||0)/60), sub:x.manual?"a mano":x.ex.reduce((a,e)=>a+e.sets.length,0)+" series"})),
-             ...DB.acts.map(a=>({k:"a", id:a.id, date:a.date, t:a.type, min:+a.min||0, sub:a.int+(a.note?" · "+a.note:"")}))].sort((a,b)=>b.date.localeCompare(a.date));
+  const all=[...DB.sessions.map(x=>({k:"s", abbr:"FB", id:x.id, date:x.date, t:entryName(x), min:Math.round((x.durSec||0)/60), sub:x.manual?"a mano":x.ex.reduce((a,e)=>a+e.sets.length,0)+" series"})),
+             ...DB.acts.map(a=>({k:"a", abbr:ACT_ABBR[a.type]||"INT", id:a.id, date:a.date, t:a.type, min:+a.min||0, sub:a.int+(a.note?" · "+a.note:"")}))].sort((a,b)=>b.date.localeCompare(a.date));
   let h = calendarHTML() + dayCardHTML() + bodyCardHTML() + `<div class="card"><h2>Registro (${all.length})</h2>`;
-  h += all.length ? `<ul class="list reg">${all.slice(0,40).map(x=>`<li><span class="grow"><b>${fmtD(x.date)}</b> · ${esc(x.t)} · ${x.min}'<br><span class="mute small">${esc(x.sub)}</span></span>${x.k==="s"?`<button class="sm" data-open="${x.id}">Ver</button>`:""}<button class="sm icon" data-del="${x.k}:${x.id}" aria-label="Borrar">✕</button></li>`).join("")}</ul>` : `<div class="mute">Aún no hay registros. Añade uno desde el día del calendario.</div>`;
+  h += all.length ? `<ul class="list reg">${all.slice(0,40).map(x=>`<li><span class="tg ${x.abbr}">${x.abbr}</span><span class="grow"><b>${fmtD(x.date)}</b> · ${esc(x.t)} · ${x.min}'<br><span class="mute small">${esc(x.sub)}</span></span>${x.k==="s"?`<button class="sm" data-open="${x.id}">Ver</button>`:""}<button class="sm icon" data-del="${x.k}:${x.id}" aria-label="Borrar">✕</button></li>`).join("")}</ul>` : `<div class="mute">Aún no hay registros. Añade uno desde el día del calendario.</div>`;
   const ids = [...new Set(DB.sessions.flatMap(s=>s.ex.map(x=>x.id)))].filter(id=>LIB_BY[id]);
   h += `</div>`;
   if(ids.length){ h += `<div class="card"><h2>Progresión por ejercicio</h2><table><tr><th>Ejercicio</th><th>Últimas</th><th>Decisión</th></tr>`;
