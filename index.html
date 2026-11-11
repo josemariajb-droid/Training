@@ -216,7 +216,7 @@ const WEEK = {1:{w:40,r:20,txt:"Referencias: RIR 3, anota todo"},
 
 /* ============ STORAGE ============ */
 const KEY = "fbjjb_v1";
-const APP_V = "v10 · 11/11/2026";
+const APP_V = "v11 · 11/11/2026";
 let DB = load();
 function blank(){ return {start:null, sessions:[], acts:[], weights:[], tpls:[], live:null, draft:null, settings:{sound:false, vib:true}}; }
 function load(){
@@ -468,22 +468,28 @@ function bindActForm(p, onSave){
 /* ============ COMPOSICIÓN CORPORAL (reloj Samsung, bioimpedancia) ============
    El reloj es ruidoso día a día: comparo medias ponderadas, no mediciones sueltas.
    Coeficiente de fiabilidad: 1 en ayunas por la mañana, 0,5 en otras condiciones. */
+// Mismos datos y orden que el análisis corporal de Samsung Health
 const BC = [
-  {k:"kg",  n:"Peso",               u:"kg", noise:0.6, good:-1, dec:1},
-  {k:"fat", n:"Grasa corporal",     u:"%",  noise:1.5, good:-1, dec:1},
-  {k:"mus", n:"Músculo esquelético",u:"kg", noise:0.8, good:1,  dec:1},
-  {k:"wat", n:"Agua corporal",      u:"kg", noise:1.0, good:0,  dec:1}];
+  {k:"kg",    n:"Peso",                  u:"kg",   noise:0.6, good:-1, ph:"100,0"},
+  {k:"mus",   n:"Masa muscular",         u:"kg",   noise:0.8, good:1,  ph:"40,0"},
+  {k:"fatKg", n:"Masa grasa",            u:"kg",   noise:1.2, good:-1, ph:"25,0"},
+  {k:"wat",   n:"Agua corporal",         u:"kg",   noise:1.0, good:0,  ph:"52,0"},
+  {k:"fat",   n:"Grasa corporal",        u:"%",    noise:1.5, good:-1, ph:"25,0"},
+  {k:"imc",   n:"IMC",                   u:"",     noise:0.2, good:-1, ph:"28,3"},
+  {k:"bmr",   n:"Índice metabólico basal",u:"kcal", noise:30,  good:0,  ph:"2143", int:true}];
+const H_M = 1.88; // altura para calcular el IMC si no lo apuntas
 function bcPoints(k){ return DB.weights.filter(w=>w[k]!=null && w[k]!=="" && !isNaN(+w[k])).map(w=>({d:w.date, v:+w[k], c:w.std===false?.5:1})).sort((a,b)=>a.d.localeCompare(b.d)); }
 function bcAvg(pts, end, days=10){ const from=isoDate(new Date(new Date(end+"T12:00").getTime()-days*864e5));
   const w=pts.filter(p=>p.d>from && p.d<=end); const c=w.reduce((s,p)=>s+p.c,0); return c? {v:w.reduce((s,p)=>s+p.v*p.c,0)/c, n:w.length, c} : null; }
 function nf(v,d=1){ return v.toFixed(d).replace(".",","); }
+function bcFmt(m,v){ return m.int ? String(Math.round(v)) : nf(v); }
 function bcStatus(m){
   const pts=bcPoints(m.k), today=isoDate(new Date()); if(!pts.length) return null;
   const cur=bcAvg(pts,today), prev=bcAvg(pts,isoDate(new Date(Date.now()-28*864e5)), 14), last=pts[pts.length-1];
   let verdict="Necesito 4 semanas de datos para ver la tendencia", cls="keep";
   if(cur && prev){ const d=cur.v-prev.v, real=Math.abs(d)>=m.noise;
-    if(!real){ verdict=`Estable: ${d>=0?"+":""}${nf(d)} ${m.u} en 4 sem, dentro del margen del reloj (±${nf(m.noise)})`; cls="keep"; }
-    else { const up=d>0; verdict=`${up?"SUBE":"BAJA"} de verdad: ${up?"+":""}${nf(d)} ${m.u} en 4 sem${m.good?((up?1:-1)===m.good?" · bien":" · vigilar"):""}`; cls=up?"up":"down"; } }
+    if(!real){ verdict=`Estable: ${d>=0?"+":""}${bcFmt(m,d)} ${m.u} en 4 sem, dentro del margen del reloj (±${bcFmt(m,m.noise)})`; cls="keep"; }
+    else { const up=d>0; verdict=`${up?"SUBE":"BAJA"} de verdad: ${up?"+":""}${bcFmt(m,d)} ${m.u} en 4 sem${m.good?((up?1:-1)===m.good?" · bien":" · vigilar"):""}`; cls=up?"up":"down"; } }
   return {pts, cur, last, verdict, cls};
 }
 function sparkSVG(pts, m){
@@ -494,35 +500,37 @@ function sparkSVG(pts, m){
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;margin:4px 0" role="img" aria-label="Evolución de ${m.n}">
     <polyline points="${avg}" fill="none" stroke="var(--c-blue)" stroke-width="3" stroke-linejoin="round"/>
     ${P.map(p=>`<circle cx="${x(p.d).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="3" ${p.c<1?'fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"':'fill="var(--ink)"'}/>`).join("")}
-    <text x="${W-4}" y="10" text-anchor="end" style="font-size:10px;fill:var(--mute)">${nf(hi)}</text><text x="${W-4}" y="${H-1}" text-anchor="end" style="font-size:10px;fill:var(--mute)">${nf(lo)}</text></svg>`;
+    <text x="${W-4}" y="10" text-anchor="end" style="font-size:10px;fill:var(--mute)">${bcFmt(m,hi)}</text><text x="${W-4}" y="${H-1}" text-anchor="end" style="font-size:10px;fill:var(--mute)">${bcFmt(m,lo)}</text></svg>`;
 }
 function bodyCompHTML(){
   const rows=BC.map(m=>{ const s=bcStatus(m); if(!s) return "";
-    return `<div style="padding:8px 0;border-top:1px solid var(--line)"><div class="row"><b class="grow">${m.n}</b><span class="num"><b>${nf(s.last.v)} ${m.u}</b> <span class="mute small">último · media ${s.cur?nf(s.cur.v):"–"}</span></span></div>
+    return `<div style="padding:8px 0;border-top:1px solid var(--line)"><div class="row"><b class="grow">${m.n}</b><span class="num"><b>${bcFmt(m,s.last.v)} ${m.u}</b> <span class="mute small">último · media ${s.cur?bcFmt(m,s.cur.v):"–"}</span></span></div>
       ${sparkSVG(s.pts,m)}<span class="tag ${s.cls}" style="white-space:normal">${esc(s.verdict)}</span></div>`; }).join("");
-  if(!rows) return `<div class="card"><h2>Composición corporal</h2><div class="mute">Aún no hay mediciones. Regístralas en Hoy.</div></div>`;
-  const kg=bcStatus(BC[0]), fat=bcStatus(BC[1]); let mass="";
-  if(kg&&fat&&kg.cur&&fat.cur){ const g=kg.cur.v*fat.cur.v/100; mass=`<div class="kpis" style="margin:8px 0"><div class="kpi"><b>${nf(g)} kg</b><span class="mute">masa grasa (media)</span></div><div class="kpi"><b>${nf(kg.cur.v-g)} kg</b><span class="mute">masa magra (media)</span></div></div>`; }
-  return `<div class="card"><h2>Composición corporal</h2>${mass}${rows}
+  if(!rows) return `<div class="card"><h2>Análisis corporal</h2><div class="mute">Aún no hay mediciones. Regístralas en Hoy.</div></div>`;
+  const kg=bcStatus(BC[0]), fk=bcStatus(BC[2]), mu=bcStatus(BC[1]); let mass="";
+  if(kg&&fk&&kg.cur&&fk.cur){ const lean=kg.cur.v-fk.cur.v;
+    mass=`<div class="kpis" style="margin:8px 0"><div class="kpi"><b>${nf(lean)} kg</b><span class="mute">masa magra (peso − grasa, media)</span></div>${mu&&mu.cur?`<div class="kpi"><b>${nf(mu.cur.v/fk.cur.v,2)}</b><span class="mute">músculo por kg de grasa (sube = bien)</span></div>`:""}</div>`; }
+  return `<div class="card"><h2>Análisis corporal</h2>${mass}${rows}
     <div class="mute small" style="margin-top:6px">Línea = media ponderada de 10 días · punto relleno = medición en ayunas por la mañana (vale 1) · punto hueco = otra hora (vale 0,5). El reloj puede variar ±1,5 puntos de grasa de un día a otro sin cambio real: por eso solo marco SUBE/BAJA si la media de 4 semanas se mueve más que ese margen.</div></div>`;
 }
 function bodyCompFormHTML(){
   const l=DB.weights.slice().sort((a,b)=>a.date.localeCompare(b.date)).slice(-1)[0];
-  return `<div class="card"><h2>Composición corporal</h2>
-    <div class="grid2"><div><label>Peso (kg)</label><input id="bKg" type="number" step="0.1" inputmode="decimal" placeholder="100,0"></div>
-      <div><label>Grasa corporal (%)</label><input id="bFat" type="number" step="0.1" inputmode="decimal" placeholder="25,0"></div>
-      <div><label>Músculo esquelético (kg)</label><input id="bMus" type="number" step="0.1" inputmode="decimal" placeholder="40,0"></div>
-      <div><label>Agua corporal (kg)</label><input id="bWat" type="number" step="0.1" inputmode="decimal" placeholder="52,0"></div></div>
+  return `<div class="card"><h2>Análisis corporal</h2>
+    <div class="mute small">Cópialo tal cual de Samsung Health. Rellena lo que tengas.</div>
+    <div class="grid2">${BC.map(m=>`<div><label>${m.n}${m.u?" ("+m.u+")":""}</label><input id="bc_${m.k}" type="number" step="${m.int?1:0.1}" inputmode="decimal" placeholder="${m.ph}"></div>`).join("")}</div>
     <label class="check"><input type="checkbox" id="bStd" checked><span>En ayunas, por la mañana (medición fiable)</span></label>
     <button class="pri big" id="bSave">Guardar medición</button>
-    <div class="mute small" style="margin-top:6px">${l?"Última ("+fmtD(l.date)+"): "+[l.kg?nf(+l.kg)+" kg":"", l.fat?nf(+l.fat)+" % grasa":"", l.mus?nf(+l.mus)+" kg músculo":"", l.wat?nf(+l.wat)+" kg agua":""].filter(Boolean).join(" · ")+". La tendencia está en Historial.":"Mide siempre en las mismas condiciones: en ayunas, tras ir al baño."}</div></div>`;
+    <div class="mute small" style="margin-top:6px">${l?"Última ("+fmtD(l.date)+"): "+BC.filter(m=>l[m.k]!=null).map(m=>bcFmt(m,+l[m.k])+(m.u?" "+m.u:"")+" "+(m.k==="imc"?"IMC":m.n.toLowerCase().replace("índice metabólico basal","basal"))).join(" · ")+". La tendencia está en Historial.":"Mide siempre en las mismas condiciones: en ayunas, tras ir al baño."}</div></div>`;
 }
 function bindBodyComp(){
   const b=$("#bSave"); if(!b) return;
   b.onclick=()=>{ const g=id=>{ const v=String($(id).value).replace(",","."); return v===""?null:+v; };
     const e={date:isoDate(new Date()), std:$("#bStd").checked}; let any=false;
-    [["kg","#bKg"],["fat","#bFat"],["mus","#bMus"],["wat","#bWat"]].forEach(([k,id])=>{ const v=g(id); if(v){ e[k]=v; any=true; } });
+    BC.forEach(m=>{ const v=g("#bc_"+m.k); if(v){ e[m.k]=v; any=true; } });
     if(!any){ toast("Rellena al menos un dato"); return; }
+    if(e.kg && !e.imc) e.imc=Math.round(e.kg/(H_M*H_M)*10)/10;            // IMC calculado si no lo apuntas
+    if(e.kg && e.fat && !e.fatKg) e.fatKg=Math.round(e.kg*e.fat)/100;      // masa grasa calculada si falta
+    if(e.kg && e.fatKg && !e.fat) e.fat=Math.round(e.fatKg/e.kg*1000)/10;  // % grasa calculado si falta
     const i=DB.weights.findIndex(w=>w.date===e.date); if(i>=0) DB.weights[i]=Object.assign(DB.weights[i], e); else DB.weights.push(e);
     save(); toast("Medición guardada"); render(); };
 }
@@ -1149,8 +1157,8 @@ function renderData(){
     DB.sessions.forEach(s=>s.ex.forEach(x=>x.sets.forEach((z,i)=>rows.push([s.date,sessionName(s),s.week,x.name,ZONES[(LIB_BY[x.id]||{}).z]||"",x.mode||"reps",x.presc||"",z.round||i+1,z.reps,z.rir??"",z.var,s.durSec]))));
     download("series_"+isoDate(new Date())+".csv", toCSV(rows), "text/csv"); };
   $("#expA").onclick=()=>{ const rows=[["fecha","tipo","minutos","intensidad","modo","fc_media","fc_max","km","nota"]]; DB.acts.forEach(a=>rows.push([a.date,a.type,a.min,a.int,a.modo||"",a.hr||"",a.hrMax||"",a.km||"",a.note]));
-    rows.push([]); rows.push(["fecha","peso_kg","grasa_%","musculo_kg","agua_kg","en_ayunas"]);
-    DB.weights.forEach(w=>rows.push([w.date,w.kg??"",w.fat??"",w.mus??"",w.wat??"",w.std===false?"no":"sí"]));
+    rows.push([]); rows.push(["fecha","peso_kg","masa_muscular_kg","masa_grasa_kg","agua_kg","grasa_%","imc","metabolismo_basal_kcal","en_ayunas"]);
+    DB.weights.forEach(w=>rows.push([w.date,w.kg??"",w.mus??"",w.fatKg??"",w.wat??"",w.fat??"",w.imc??"",w.bmr??"",w.std===false?"no":"sí"]));
     download("actividades_"+isoDate(new Date())+".csv", toCSV(rows), "text/csv"); };
   $("#reset").onclick=()=>{ if(!confirm("Se descargará una copia y se borrarán todos los registros. ¿Seguir?")) return;
     download("fullbody_jjb_antes_de_borrar_"+isoDate(new Date())+".json", JSON.stringify(Object.assign({}, DB, {live:null}), null, 1), "application/json");
