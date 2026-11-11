@@ -102,27 +102,40 @@ nav button[aria-current="true"]{background:var(--ok-bg);text-decoration:underlin
 .sticky{position:sticky;bottom:calc(70px + env(safe-area-inset-bottom));z-index:4;background:var(--bg);padding:8px 0}
 .sticky button:not(.pri){background:var(--card)}
 .exsel{font-weight:700}
-/* ---- mapa de calor (actividad) · rampa de luminosidad de un solo tono + detalle en texto ---- */
-.hm-wrap{overflow-x:auto;padding-bottom:4px}
-.hm{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,13px);gap:3px;width:max-content}
-.hm i{width:13px;height:13px;border-radius:3px;border:1px solid var(--line);background:var(--card);display:block}
-.hm i.l1{background:color-mix(in srgb,var(--acc) 22%,var(--card))}
-.hm i.l2{background:color-mix(in srgb,var(--acc) 48%,var(--card))}
-.hm i.l3{background:color-mix(in srgb,var(--acc) 75%,var(--card))}
-.hm i.l4{background:var(--acc);border:2px solid var(--ink)}
-.hm i.mar::after{content:"";display:block;width:5px;height:5px;margin:3px auto 0;border-radius:50%;background:var(--ink)}
-.hm i.hoy{outline:2px dashed var(--ink);outline-offset:1px}
-.hm i.fut{visibility:hidden}
-.hm i.sel{outline:3px solid var(--ink);outline-offset:1px}
-.hm-leg{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--mute);margin-top:6px;flex-wrap:wrap}
-.hm-leg i{width:13px;height:13px;border-radius:3px;border:1px solid var(--line);display:inline-block}
-/* ---- mapa de carga por zona ---- */
-.fz{display:grid;grid-template-columns:7.2em 1fr auto;gap:6px;align-items:center;font-size:14px;padding:4px 0;border-top:1px solid var(--line)}
-.fz:first-of-type{border-top:0}
-.fz .b{height:12px;border:2px solid var(--ink);border-radius:6px;overflow:hidden}
-.fz .b i{display:block;height:100%;background:var(--acc)}
-.fz .st{font-weight:800;font-size:13px;text-align:right;white-space:nowrap}
-.fz .st.f2{text-decoration:underline}
+/* ---- calendario · texto en cada día, nunca solo color ---- */
+.calnav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.calnav b{font-size:17px;text-transform:capitalize}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .hd{font-size:12px;font-weight:800;text-align:center;color:var(--mute)}
+.cal button{min-height:58px;padding:3px 2px;border:1px solid var(--line);border-radius:8px;font-weight:400;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:1px;background:var(--card)}
+.cal button .d{font-size:13px;font-weight:800}
+.cal button .t{font-size:10px;font-weight:800;line-height:1.15;letter-spacing:.2px}
+.cal button.act{background:var(--ok-bg);border:2px solid var(--ink)}
+.cal button.hoy{outline:2px dashed var(--ink);outline-offset:1px}
+.cal button.sel{outline:3px solid var(--acc);outline-offset:1px}
+.cal button.out{visibility:hidden}
+/* ---- mapa del cuerpo ---- */
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.seg button{min-height:40px;font-size:14px;padding:4px}
+.seg button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--acc-ink);text-decoration:underline}
+.body svg{width:100%;height:auto;display:block}
+.body .n{fill:var(--line)}
+.body .z{stroke:var(--ink);stroke-width:1.2}
+.body .z0{fill:var(--card)}
+.body .z1{fill:color-mix(in srgb,var(--acc) 25%,var(--card))}
+.body .z2{fill:color-mix(in srgb,var(--acc) 50%,var(--card))}
+.body .z3{fill:color-mix(in srgb,var(--acc) 80%,var(--card))}
+.body .z4{fill:url(#hatch);stroke-width:2.6}
+.body text{font-size:11px;fill:var(--mute);font-weight:700}
+.zl{display:grid;grid-template-columns:auto 1fr auto;gap:4px 8px;align-items:center;font-size:14px;margin-top:8px}
+.zl .lv{font-weight:800;font-size:12px;border:2px solid var(--ink);border-radius:6px;padding:0 5px;text-align:center;min-width:2.2em}
+.zl .lv.l0{border-style:dotted;opacity:.6}
+.zl .r{text-align:right;font-weight:700;white-space:nowrap}
+.reg li{display:flex;gap:8px;align-items:center}
+.reg .grow{min-width:0}
+details.add>summary{font-weight:800;cursor:pointer;padding:6px 0;list-style:none}
+details.add>summary::before{content:"＋ "}
+details.add[open]>summary::before{content:"− "}
 </style>
 </head>
 <body>
@@ -209,88 +222,174 @@ function lastUsed(){ // id → fecha más reciente
 function daysAgo(date){ return Math.round((new Date(isoDate(new Date())) - new Date(date))/864e5); }
 function weekVolume(){ // series hechas por zona esta semana
   const m=mondayOf(new Date()), v={};
-  DB.sessions.filter(s=>s.date>=m).forEach(s=>s.ex.forEach(x=>{ const L=LIB_BY[x.id]; if(L) v[L.z]=(v[L.z]||0)+x.sets.length; }));
+  DB.sessions.filter(s=>s.date>=m).forEach(s=>s.ex.forEach(x=>{ const z=(LIB_BY[x.id]||{}).z||x.zone; if(z) v[z]=(v[z]||0)+x.sets.length; }));
   return v;
 }
 
 
-/* ============ MAPA DE CALOR + CARGA POR ZONA ============
-   Idea tomada de openGym (heatmap anual + mapa de fatiga con vida media), reescrita
-   para esta app: cuenta surf/kite/pádel/esquí y nunca transmite información solo por color. */
+/* ============ CALENDARIO + MAPA DEL CUERPO + RECUPERACIÓN ============
+   Idea de openGym (mapa muscular y fatiga con vida media), reescrita para esta app.
+   Daltónico: cada dato va en texto o con trama; el color es solo refuerzo. */
 const MAR = ["Surf","Kite"];
-function dayAgg(){ // fecha → {min, fb, acts:[...]}
-  const a={};
-  const g=d=>a[d]=a[d]||{min:0, fb:0, acts:[]};
-  DB.sessions.forEach(s=>{ const x=g(s.date); x.min+=Math.round((s.durSec||0)/60); x.fb++; });
-  DB.acts.forEach(t=>{ const x=g(t.date); x.min+=(+t.min||0); x.acts.push(t); });
-  return a;
-}
-function heatmapHTML(weeks=26, sel=null){
-  const agg=dayAgg(), today=isoDate(new Date());
-  const vals=Object.values(agg).map(x=>x.min).filter(v=>v>0).sort((a,b)=>a-b);
-  const q=p=>vals.length?vals[Math.min(vals.length-1,Math.floor(p*vals.length))]:0;
-  const t1=q(.25), t2=q(.5), t3=q(.75);
-  const lvl=m=>!m?0:m>=t3?4:m>=t2?3:m>=t1?2:1;
-  const start=new Date(mondayOf(new Date())); start.setDate(start.getDate()-(weeks-1)*7);
-  let cells="", months="";
-  for(let w=0; w<weeks; w++){
-    const c0=new Date(start); c0.setDate(start.getDate()+w*7);
-    months += `<span style="width:16px;display:inline-block">${c0.getDate()<=7?["E","F","M","A","M","J","J","A","S","O","N","D"][c0.getMonth()]:""}</span>`;
-    for(let d=0; d<7; d++){
-      const day=new Date(c0); day.setDate(c0.getDate()+d); const k=isoDate(day), x=agg[k];
-      const cls=["l"+lvl(x&&x.min)]; if(x&&x.acts.some(t=>MAR.includes(t.type))) cls.push("mar");
-      if(k===today) cls.push("hoy"); if(k>today) cls.push("fut"); if(k===sel) cls.push("sel");
-      cells += `<i class="${cls.join(" ")}" data-hm="${k}" title="${k}${x?" · "+x.min+"'":""}"></i>`;
-    }
-  }
-  const tot=w=>{ const from=isoDate(new Date(Date.now()-w*7*864e5)); return Object.entries(agg).filter(([k])=>k>from).reduce((s,[,x])=>s+x.min,0); };
-  const days=Object.entries(agg).filter(([k,x])=>k>isoDate(new Date(Date.now()-28*864e5))&&x.min>0).length;
-  return `<div class="hm-wrap" id="hmWrap"><div class="small mute" style="white-space:nowrap">${months}</div><div class="hm">${cells}</div></div>
-    <div class="hm-leg">Menos <i></i><i class="l1" style="background:color-mix(in srgb,var(--acc) 22%,var(--card))"></i><i style="background:color-mix(in srgb,var(--acc) 48%,var(--card))"></i><i style="background:color-mix(in srgb,var(--acc) 75%,var(--card))"></i><i style="background:var(--acc);border:2px solid var(--ink)"></i> Más · ● = surf/kite · contorno discontinuo = hoy</div>
-    <div class="kpis" style="margin-top:8px"><div class="kpi"><b>${days}/28</b><span class="mute">días activos (4 sem)</span></div><div class="kpi"><b>${Math.round(tot(1)/6)/10} h</b><span class="mute">últimos 7 días</span></div></div>
-    <div id="hmDet" class="hint" style="display:${sel?"block":"none"}">${sel?hmDetail(sel,agg):""}</div>`;
-}
-function hmDetail(k, agg){
-  const x=agg[k]; if(!x) return `<b>${k}</b> · descanso`;
-  const ss=DB.sessions.filter(s=>s.date===k).map(s=>esc(sessionName(s))+" "+Math.round(s.durSec/60)+"'");
-  const aa=x.acts.map(t=>esc(t.type)+" "+t.min+"' ("+t.int+")");
-  return `<b>${k}</b> · ${x.min}' en total<br>${[...ss,...aa].join(" · ")}`;
-}
-function bindHeatmap(){
-  const w=$("#hmWrap"); if(!w) return; w.scrollLeft=w.scrollWidth;
-  const agg=dayAgg();
-  w.querySelectorAll("[data-hm]").forEach(c=>c.onclick=()=>{ w.querySelectorAll(".sel").forEach(e=>e.classList.remove("sel")); c.classList.add("sel");
-    const d=$("#hmDet"); d.style.display="block"; d.innerHTML=hmDetail(c.dataset.hm, agg); });
-}
-
-/* Carga por zona: series efectivas con vida media exponencial (8 series = 1,0).
-   Las vidas medias y la carga de los deportes son estimaciones iniciales: JJB las corrige con feedback. */
-const FZ_HL = {rod:48, cad:48, core:30, peH:30, tiV:30, tiH:30, peV:24, bra:24, gem:24}; // horas
-const FZ_SHOW = ["rod","cad","peH","peV","tiV","tiH","core","gem"];
-const ACT_LOAD = { // series equivalentes por hora de deporte a intensidad media
+const ACT_TYPES = ["Surf","Kite","Pádel","Esquí","Running","Zona 2","Intervalos"];
+const ACT_ABBR = {Surf:"SURF", Kite:"KITE", "Pádel":"PÁD", "Esquí":"ESQ", Running:"RUN", "Zona 2":"Z2", Intervalos:"INT"};
+const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const DIAS = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const FZ_HL = {rod:24, cad:24, core:20, peH:20, tiV:20, tiH:20, peV:16, bra:16, gem:16}; // horas de vida media (pierna: una sesión de 7–8 series ≈ 48 h hasta fresca)
+const FZ_SHOW = ["rod","cad","peH","peV","tiV","tiH","core","gem","bra"];
+const MAN_ZONES = ["rod","cad","peH","peV","tiV","tiH","core"];
+const ACT_LOAD = { // series equivalentes por hora a intensidad media (estimación inicial: JJB la corrige)
   Surf:{tiV:4, peV:2, core:2, cad:1}, Kite:{cad:3, rod:3, core:3, tiH:1},
   "Pádel":{rod:3, gem:3, peV:1, core:1}, "Esquí":{rod:5, cad:2, core:1}, Running:{rod:2, gem:3, cad:1},
   Intervalos:{rod:2, cad:1, gem:1}, "Zona 2":{} };
 const INT_F = {suave:.6, media:1, dura:1.4};
-const FZ_SHORT = {rod:"Cuádriceps", cad:"Glúteo/isquio", peH:"Pecho", peV:"Hombro", tiV:"Dorsal", tiH:"Espalda media", core:"Core/lumbar", gem:"Gemelo/pie", bra:"Brazos"};
+const FZ_SHORT = {rod:"Cuádriceps", cad:"Glúteo/isquio", peH:"Pecho", peV:"Hombro", tiV:"Dorsal", tiH:"Espalda media", core:"Core/lumbar", gem:"Gemelo", bra:"Brazos"};
+let HIST = {ym:null, sel:null, mode:"dia"};
+
+function fmtD(k){ const [y,m,d]=k.split("-"); return d+"/"+m+"/"+y; }
+function longD(k){ const d=new Date(k+"T12:00"); return DIAS[d.getDay()]+" "+d.getDate()+" de "+MESES[d.getMonth()]; }
+function entryName(s){ return s.manual ? (s.name||"Rutina") : sessionName(s); }
+function entriesOn(k){
+  return [...DB.sessions.filter(s=>s.date===k).map(s=>({k:"s", id:s.id, t:entryName(s), min:Math.round((s.durSec||0)/60), abbr:"FB"})),
+          ...DB.acts.filter(a=>a.date===k).map(a=>({k:"a", id:a.id, t:a.type, min:+a.min||0, abbr:ACT_ABBR[a.type]||a.type.slice(0,3).toUpperCase(), int:a.int}))];
+}
+function sessZones(s){ const per={}; s.ex.forEach(x=>{ const z=(LIB_BY[x.id]||{}).z||x.zone; if(z) per[z]=(per[z]||0)+x.sets.length; }); return per; }
+function actZones(a){ const L=ACT_LOAD[a.type]||{}, k=(+a.min||0)/60*(INT_F[a.int]||1), o={}; Object.entries(L).forEach(([z,n])=>o[z]=n*k); return o; }
+function zoneSets(from, to){ // series por zona entre dos fechas (incluidas); deporte en series equivalentes
+  const v={}, add=o=>Object.entries(o).forEach(([z,n])=>v[z]=(v[z]||0)+n);
+  DB.sessions.filter(s=>s.date>=from && s.date<=to).forEach(s=>add(sessZones(s)));
+  DB.acts.filter(a=>a.date>=from && a.date<=to).forEach(a=>add(actZones(a)));
+  return v;
+}
 function fatigueMap(now=Date.now()){
   const f={}, add=(z,sets,t)=>{ if(!FZ_HL[z]||t>now) return; const h=(now-t)/36e5; if(h>24*30) return; f[z]=(f[z]||0)+(sets/8)*Math.pow(.5,h/FZ_HL[z]); };
-  DB.sessions.forEach(s=>{ const per={}; s.ex.forEach(x=>{ const z=(LIB_BY[x.id]||{}).z||x.zone; if(z) per[z]=(per[z]||0)+x.sets.length; });
-    Object.entries(per).forEach(([z,n])=>add(z, Math.min(12,n), s.end||new Date(s.date+"T19:00").getTime())); });
-  DB.acts.forEach(a=>{ const L=ACT_LOAD[a.type]; if(!L) return; const k=(+a.min||0)/60*(INT_F[a.int]||1);
-    Object.entries(L).forEach(([z,n])=>add(z, Math.min(12,n*k), new Date(a.date+"T13:00").getTime())); });
+  DB.sessions.forEach(s=>Object.entries(sessZones(s)).forEach(([z,n])=>add(z, Math.min(12,n), s.end||new Date(s.date+"T19:00").getTime())));
+  DB.acts.forEach(a=>Object.entries(actZones(a)).forEach(([z,n])=>add(z, Math.min(12,n), new Date(a.date+"T13:00").getTime())));
   return f;
 }
-function fzState(v){ return v>.5?{t:"FATIGADO",c:"f2"}:v>.25?{t:"Cargado",c:"f1"}:{t:"Fresco",c:"f0"}; }
-function fatigueHTML(){
-  const f=fatigueMap();
-  return FZ_SHOW.map(z=>{ const v=f[z]||0, st=fzState(v);
-    return `<div class="fz"><span>${FZ_SHORT[z]}</span><span class="b"><i style="width:${Math.min(100,Math.round(v*100))}%"></i></span><span class="st ${st.c}">${st.t} ${Math.round(v*100)}</span></div>`; }).join("")
-    + `<div class="mute small" style="margin-top:6px">100 = una sesión completa (8 series) aún sin recuperar. Pierna y glúteo se recuperan en ~48 h, el resto en 24–30 h. Surf, kite, pádel y esquí cuentan.</div>`;
+function readyIn(z, v){ return v<=.25 ? 0 : Math.ceil(FZ_HL[z]*Math.log2(v/.25)); } // horas hasta quedar fresco
+function readyTxt(h){ return !h ? "Listo" : h<24 ? "Listo en ~"+h+" h" : "Listo en ~"+Math.round(h/24*2)/2+" días"; }
+
+/* ---- datos de cada modo del mapa: nivel 0–4 + texto por zona ---- */
+function mapData(mode){
+  const out={};
+  if(mode==="dia"){ const k=HIST.sel||isoDate(new Date()), v=zoneSets(k,k);
+    FZ_SHOW.forEach(z=>{ const n=v[z]||0, r=Math.round(n); out[z]={l:!n?0:n<4?1:n<7?2:n<10?3:4, lv:r||"–", txt:n?r+" series"+(n%1?" (incl. deporte)":""):"sin trabajo"}; });
+  } else if(mode==="sem"){ const to=isoDate(new Date()), v=zoneSets(isoDate(new Date(Date.now()-6*864e5)), to);
+    FZ_SHOW.forEach(z=>{ const n=Math.round(v[z]||0), t=VOL_TARGET[z];
+      if(!t){ out[z]={l:!n?0:n<6?2:3, lv:n||"–", txt:n+" series"}; return; }
+      const st = n<t[0]?"BAJO":n>t[1]?"ALTO":"OK";
+      out[z]={l:!n?0:n<t[0]?1:n>t[1]?4:3, lv:n, txt:n+" de "+t[0]+"–"+t[1]+" · "+st}; });
+  } else { const f=fatigueMap();
+    FZ_SHOW.forEach(z=>{ const v=f[z]||0, h=readyIn(z,v);
+      out[z]={l:v<=.25?0:v<.5?2:v<.8?3:4, lv:h?h+"h":"OK", txt:readyTxt(h)}; });
+  }
+  return out;
+}
+const MODE_HELP = {
+  dia:"Series hechas ese día por zona. El deporte suma en series equivalentes (1 h de surf ≈ 4 de dorsal).",
+  sem:"Series de los últimos 7 días contra el objetivo semanal. BAJO = te falta, ALTO = te pasas.",
+  rec:"Horas hasta que la zona vuelve a estar fresca. Una sesión normal de pierna (7–8 series) ≈ 48 h; tren superior ≈ 36 h. Si no te cuadra con cómo te notas, dímelo y lo ajusto."};
+function bodySVG(d){
+  const c=z=>`z ${"z"+((d[z]||{}).l||0)}`;
+  const fig=(ox,front)=>`<g transform="translate(${ox},0)">
+    <circle class="n" cx="80" cy="16" r="12"/><rect class="n" x="74" y="27" width="12" height="8" rx="3"/>
+    <ellipse class="${c("peV")}" cx="53" cy="45" rx="13" ry="10"/><ellipse class="${c("peV")}" cx="107" cy="45" rx="13" ry="10"/>
+    <rect class="${c("bra")}" x="34" y="55" width="13" height="42" rx="6"/><rect class="${c("bra")}" x="113" y="55" width="13" height="42" rx="6"/>
+    <rect class="${c("bra")}" x="31" y="99" width="12" height="38" rx="6"/><rect class="${c("bra")}" x="117" y="99" width="12" height="38" rx="6"/>
+    ${front?`<rect class="${c("peH")}" x="58" y="38" width="21" height="28" rx="7"/><rect class="${c("peH")}" x="81" y="38" width="21" height="28" rx="7"/>
+    <rect class="${c("core")}" x="61" y="68" width="38" height="46" rx="8"/>
+    <rect class="n" x="58" y="116" width="44" height="14" rx="6"/>
+    <rect class="${c("rod")}" x="57" y="132" width="21" height="62" rx="9"/><rect class="${c("rod")}" x="82" y="132" width="21" height="62" rx="9"/>
+    <rect class="n" x="60" y="198" width="16" height="44" rx="7"/><rect class="n" x="84" y="198" width="16" height="44" rx="7"/>`
+    :`<path class="${c("tiH")}" d="M64 36 L96 36 L104 58 L80 74 L56 58 Z"/>
+    <path class="${c("tiV")}" d="M55 60 L79 76 L79 100 L62 104 Z"/><path class="${c("tiV")}" d="M105 60 L81 76 L81 100 L98 104 Z"/>
+    <rect class="${c("core")}" x="64" y="102" width="32" height="16" rx="5"/>
+    <ellipse class="${c("cad")}" cx="69" cy="131" rx="12" ry="12"/><ellipse class="${c("cad")}" cx="91" cy="131" rx="12" ry="12"/>
+    <rect class="${c("cad")}" x="57" y="145" width="21" height="50" rx="9"/><rect class="${c("cad")}" x="82" y="145" width="21" height="50" rx="9"/>
+    <ellipse class="${c("gem")}" cx="68" cy="214" rx="9" ry="20"/><ellipse class="${c("gem")}" cx="92" cy="214" rx="9" ry="20"/>`}
+    <text x="80" y="256" text-anchor="middle">${front?"DELANTE":"DETRÁS"}</text></g>`;
+  return `<div class="body"><svg viewBox="0 0 340 262" role="img" aria-label="Mapa del cuerpo">
+    <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="6" height="6" fill="var(--acc)"/><line x1="0" y1="0" x2="0" y2="6" stroke="var(--ink)" stroke-width="3"/></pattern></defs>
+    ${fig(0,true)}${fig(180,false)}</svg></div>`;
+}
+function zoneListHTML(d){
+  return `<div class="zl">${FZ_SHOW.map(z=>{ const x=d[z]; return `<span class="lv l${x.l}">${x.lv}</span><span>${FZ_SHORT[z]}</span><span class="r">${x.txt}</span>`; }).join("")}</div>`;
+}
+function bodyCardHTML(){
+  const m=HIST.mode, d=mapData(m), sel=HIST.sel||isoDate(new Date());
+  const title = m==="dia" ? (sel===isoDate(new Date())?"Hoy":longD(sel)) : m==="sem" ? "Últimos 7 días" : "Recuperación ahora";
+  return `<div class="card"><h2>Mapa del cuerpo</h2>
+    <div class="seg"><button data-md="dia" aria-pressed="${m==="dia"}">Día</button><button data-md="sem" aria-pressed="${m==="sem"}">7 días</button><button data-md="rec" aria-pressed="${m==="rec"}">Recuperación</button></div>
+    <h3>${esc(title)}</h3>${bodySVG(d)}
+    <div class="mute small">Más relleno = más trabajo. Rayado y borde grueso = ${m==="sem"?"te pasas del objetivo":m==="rec"?"muy cargado":"10 series o más"}.</div>
+    ${zoneListHTML(d)}<div class="mute small" style="margin-top:6px">${MODE_HELP[m]}</div></div>`;
+}
+
+/* ---- calendario mensual ---- */
+function calendarHTML(){
+  const today=isoDate(new Date()), ym=HIST.ym||today.slice(0,7), [Y,M]=ym.split("-").map(Number);
+  const first=new Date(Y,M-1,1), lead=(first.getDay()+6)%7, nd=new Date(Y,M,0).getDate();
+  let cells=["L","M","X","J","V","S","D"].map(x=>`<span class="hd">${x}</span>`).join("");
+  for(let i=0;i<lead;i++) cells+=`<button class="out" tabindex="-1"></button>`;
+  let days=0, fb=0, dep=0, min=0;
+  for(let d=1; d<=nd; d++){
+    const k=ym+"-"+String(d).padStart(2,"0"), e=entriesOn(k);
+    if(e.length){ days++; fb+=e.filter(x=>x.k==="s").length; dep+=e.filter(x=>x.k==="a").length; min+=e.reduce((a,x)=>a+x.min,0); }
+    const tags=e.slice(0,2).map(x=>`<span class="t">${x.abbr} ${x.min}'</span>`).join("")+(e.length>2?`<span class="t">+${e.length-2}</span>`:"");
+    const cls=[e.length?"act":"", k===today?"hoy":"", k===HIST.sel?"sel":""].join(" ");
+    cells+=`<button class="${cls}" data-day="${k}" aria-label="${longD(k)}${e.length?": "+e.map(x=>x.t+" "+x.min+" min").join(", "):""}"><span class="d">${d}</span>${tags}</button>`;
+  }
+  return `<div class="card"><div class="calnav"><button class="sm" id="calP" aria-label="Mes anterior">◀</button><b>${MESES[M-1]} ${Y}</b><button class="sm" id="calN" aria-label="Mes siguiente">▶</button></div>
+    <div class="cal">${cells}</div>
+    <div class="mute small" style="margin-top:8px"><b>${days}</b> días activos · <b>${fb}</b> rutinas · <b>${dep}</b> de deporte · <b>${Math.round(min/6)/10} h</b> en total</div>
+    <div class="mute small">FB = rutina · SURF · KITE · PÁD = pádel · ESQ · RUN · Z2 = zona 2 · INT = intervalos</div></div>`;
+}
+function dayCardHTML(){
+  const k=HIST.sel||isoDate(new Date()), e=entriesOn(k);
+  return `<div class="card"><h2>${(t=>t[0].toUpperCase()+t.slice(1))(longD(k))}</h2>
+    ${e.length?`<ul class="list reg">${e.map(x=>`<li><span class="grow"><b>${esc(x.t)}</b> · ${x.min}'${x.int?" · "+x.int:""}</span>${x.k==="s"?`<button class="sm" data-open="${x.id}">Ver</button>`:""}<button class="sm icon" data-del="${x.k}:${x.id}" aria-label="Borrar">✕</button></li>`).join("")}</ul>`:`<div class="mute">Sin entrenos este día.</div>`}
+    ${addFormHTML(k)}</div>`;
+}
+function addFormHTML(k){
+  return `<details class="add" style="margin-top:8px"><summary>Añadir registro a mano</summary>
+    <div class="grid2"><div><label>Fecha</label><input id="mDate" type="date" value="${k}" max="${isoDate(new Date())}"></div>
+      <div><label>Tipo</label><select id="mType"><option value="FB">Rutina full body</option>${ACT_TYPES.map(t=>`<option>${t}</option>`).join("")}</select></div>
+      <div><label>Minutos</label><input id="mMin" type="number" inputmode="numeric" placeholder="43"></div>
+      <div><label>Intensidad</label><select id="mInt"><option value="suave">Suave</option><option value="media" selected>Media</option><option value="dura">Dura</option></select></div></div>
+    <div id="mZ"><label>Zonas trabajadas (series por zona)</label>
+      ${MAN_ZONES.map(z=>`<div class="row" style="margin:4px 0"><label class="chk grow" style="margin:0"><input type="checkbox" data-mz="${z}" checked> ${FZ_SHORT[z]}</label><input type="number" inputmode="numeric" data-ms="${z}" value="3" style="width:4.5em;text-align:center" aria-label="Series de ${FZ_SHORT[z]}"></div>`).join("")}</div>
+    <label>Nota (opcional)</label><input id="mNote" placeholder="Ej.: circuito 4 rondas">
+    <button class="pri big" id="mSave" style="margin-top:10px">Guardar registro</button></details>`;
+}
+function saveManual(){
+  const date=$("#mDate").value, type=$("#mType").value, min=+$("#mMin").value, int=$("#mInt").value, note=$("#mNote").value;
+  if(!date){ toast("Pon la fecha"); return; } if(!min){ toast("Pon los minutos"); return; }
+  if(type==="FB"){
+    const ex=MAN_ZONES.filter(z=>$(`[data-mz="${z}"]`).checked).map(z=>{ const n=Math.max(1,Math.min(20,+$(`[data-ms="${z}"]`).value||1));
+      return {id:"man_"+z, name:FZ_SHORT[z]+" (manual)", zone:z, mode:"manual", sets:Array.from({length:n},(_,i)=>({round:i+1, reps:0}))}; });
+    const end=new Date(date+"T19:00").getTime();
+    DB.sessions.push({id:uid(), v:3, manual:true, name:"Rutina", date, start:end-min*6e4, end, durSec:min*60, estSec:0,
+      week:weekInfo(new Date(date+"T12:00")).week, mods:[], ex, notes:note, rpe:null});
+  } else DB.acts.push({id:uid(), date, type, min, int, note});
+  HIST.sel=date; HIST.ym=date.slice(0,7); save(); toast("Registro guardado"); render();
+}
+function bindHistTop(){
+  $("#calP").onclick=()=>{ const [y,m]=(HIST.ym||isoDate(new Date()).slice(0,7)).split("-").map(Number); const d=new Date(y,m-2,1); HIST.ym=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"); render(); };
+  $("#calN").onclick=()=>{ const [y,m]=(HIST.ym||isoDate(new Date()).slice(0,7)).split("-").map(Number); const d=new Date(y,m,1); HIST.ym=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"); render(); };
+  document.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{ HIST.sel=b.dataset.day; HIST.mode="dia"; render(); });
+  document.querySelectorAll("[data-md]").forEach(b=>b.onclick=()=>{ HIST.mode=b.dataset.md; render(); });
+  document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{ VIEW={k:"sum", id:b.dataset.open}; render(); });
+  document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{ const [k,id]=b.dataset.del.split(":");
+    if(!confirm("¿Borrar este registro?")) return;
+    if(k==="s") DB.sessions=DB.sessions.filter(x=>x.id!==id); else DB.acts=DB.acts.filter(x=>x.id!==id); save(); render(); });
+  const t=$("#mType"); if(t) t.onchange=()=>{ $("#mZ").style.display = t.value==="FB" ? "block" : "none"; };
+  const s=$("#mSave"); if(s) s.onclick=saveManual;
 }
 function fatigueLine(){
-  const f=fatigueMap(), bad=FZ_SHOW.filter(z=>(f[z]||0)>.5).map(z=>FZ_SHORT[z]);
-  return bad.length ? `<div class="warn"><b>Hoy evita cargar:</b> ${bad.join(", ")} (fatigado).</div>` : `<div class="okbox">Todas las zonas recuperadas o con carga baja.</div>`;
+  const f=fatigueMap(), bad=FZ_SHOW.filter(z=>(f[z]||0)>.5).map(z=>FZ_SHORT[z]+" ("+readyTxt(readyIn(z,f[z])).toLowerCase()+")");
+  return bad.length ? `<div class="warn"><b>Hoy evita cargar:</b> ${bad.join(", ")}.</div>` : `<div class="okbox">Todas las zonas listas o con carga baja.</div>`;
 }
 
 /* ============ PRESCRIPCIÓN (criterio de entrenador) ============ */
@@ -816,14 +915,16 @@ function renderSummary(id){
   const diff = s.durSec - s.estSec;
   let h = `<div class="card"><h2>${esc(sessionName(s))} · ${s.date}</h2>
     <div class="kpis"><div class="kpi"><b>${fmt(s.durSec)}</b><span class="mute">real</span></div>
-      <div class="kpi"><b>${fmt(s.estSec||0)}</b><span class="mute">calculado (${diff>=0?"+":""}${Math.round(diff/60)}')</span></div></div>
+      ${s.manual?`<div class="kpi"><b>A mano</b><span class="mute">registro manual</span></div>`:`<div class="kpi"><b>${fmt(s.estSec||0)}</b><span class="mute">calculado (${diff>=0?"+":""}${Math.round(diff/60)}')</span></div>`}</div>
     ${s.mods&&s.mods.length?`<div class="mute" style="margin-top:6px">Reglas aplicadas: ${s.mods.map(m=>MODS.find(x=>x.id===m)?.label).join(" · ")}</div>`:""}</div>
-  <div class="card"><h3>Registro</h3><table><tr><th>Ejercicio</th><th>Por serie</th><th class="num">Total</th></tr>`;
-  s.ex.forEach(x=>{ const pr = progress(x.id);
+  <div class="card"><h3>Zonas trabajadas</h3>${(()=>{ const per=sessZones(s), d={}; FZ_SHOW.forEach(z=>{ const n=per[z]||0; d[z]={l:!n?0:n<4?1:n<7?2:n<10?3:4, lv:n||"–", txt:n?n+" series":"sin trabajo"}; }); return bodySVG(d)+zoneListHTML(d); })()}</div>
+  ${s.manual?"":`<div class="card"><h3>Registro</h3><table><tr><th>Ejercicio</th><th>Por serie</th><th class="num">Total</th></tr>`}`;
+  if(!s.manual) s.ex.forEach(x=>{ const pr = progress(x.id);
     const per = x.sets.map(z=>z.reps+(z.rir!=null?"@"+z.rir:"")).join(" · ");
     h += `<tr><td><b>${esc(x.name)}</b>${x.presc?` <span class="mute small">(${esc(x.presc)})</span>`:""}<br><span class="mute">${esc(x.sets.slice(-1)[0].var||"")}</span><br><span class="tag ${pr.k}">${esc(pr.t)}</span></td>
       <td>${per}</td><td class="num">${x.sets.reduce((a,z)=>a+(+z.reps||0),0)}</td></tr>`; });
-  h += `</table></div>
+  if(!s.manual) h += `</table></div>`;
+  h += `
   <div class="card"><label>Esfuerzo de la sesión (1–10)</label>
     <div class="rir" style="grid-template-columns:repeat(5,1fr)">${[6,7,8,9,10].map(r=>`<button data-rpe="${r}" aria-pressed="${s.rpe===r}">${r}</button>`).join("")}</div>
     <label>Notas (molestias, sensaciones, cambios)</label><textarea id="notes" rows="3">${esc(s.notes)}</textarea>
@@ -832,31 +933,24 @@ function renderSummary(id){
   $("#app").innerHTML = h; window.scrollTo(0,0);
   document.querySelectorAll("[data-rpe]").forEach(b=>b.onclick=()=>{ s.rpe=+b.dataset.rpe; save(); document.querySelectorAll("[data-rpe]").forEach(x=>x.setAttribute("aria-pressed", String(x===b))); });
   $("#saveN").onclick=()=>{ s.notes=$("#notes").value; save(); toast("Guardado"); };
-  $("#back").onclick=()=>{ VIEW=null; render(); };
+  $("#back").onclick=()=>{ VIEW=null; TAB="hist"; render(); };
   $("#del").onclick=()=>{ if(confirm("¿Borrar esta sesión del registro?")){ DB.sessions=DB.sessions.filter(x=>x.id!==id); save(); VIEW=null; render(); } };
 }
 
 /* ============ HISTORIAL ============ */
 function renderHist(){
-  const ss = DB.sessions.slice().sort((a,b)=>b.end-a.end);
-  let h = `<div class="card"><h2>Actividad · 6 meses</h2>${heatmapHTML(26)}</div>
-    <div class="card"><h2>Carga por zona ahora</h2>${fatigueHTML()}</div>
-    <div class="card"><h2>Sesiones (${ss.length})</h2>`;
-  if(!ss.length) h += `<div class="mute">Aún no hay sesiones.</div>`;
-  else { h+=`<ul class="list">`; ss.forEach(s=>{
-    h+=`<li><button class="sessbtn" data-id="${s.id}"><span><b>${esc(sessionName(s))}</b> · ${s.date}<br><span class="mute">Sem ${s.week} · ${s.ex.length} ejercicios · ${s.ex.reduce((a,x)=>a+x.sets.length,0)} series${s.rpe?" · esfuerzo "+s.rpe:""}</span></span>
-      <span class="num">${fmt(s.durSec)}</span></button></li>`; }); h+=`</ul>`; }
-  const ids = [...new Set(ss.flatMap(s=>s.ex.map(x=>x.id)))].filter(id=>LIB_BY[id]);
-  h += `</div><div class="card"><h2>Progresión por ejercicio</h2><table><tr><th>Ejercicio</th><th>Últimas</th><th>Decisión</th></tr>`;
-  ids.forEach(id=>{ const L=logsFor(id).slice(0,3), pr=progress(id);
-    h+=`<tr><td>${esc(LIB_BY[id].n)}</td><td class="mute">${L.map(l=>l.sets.map(s=>s.reps).join("·")).join("<br>")}</td><td><span class="tag ${pr.k}">${esc(pr.t.split(":")[0])}</span></td></tr>`; });
-  h += `</table></div><div class="card"><h2>Deporte y cardio</h2>`;
-  const aa = DB.acts.slice().reverse().slice(0,30);
-  h += aa.length ? `<table>${aa.map(a=>`<tr><td>${a.date.slice(5)}</td><td><b>${esc(a.type)}</b><br><span class="mute">${esc(a.note||"")}</span></td><td class="num">${a.min}'</td><td>${a.int}</td><td><button class="sm" data-da="${a.id}" aria-label="Borrar">✕</button></td></tr>`).join("")}</table>` : `<div class="mute">Sin actividades registradas.</div>`;
+  if(!HIST.sel) HIST.sel=isoDate(new Date());
+  const all=[...DB.sessions.map(x=>({k:"s", id:x.id, date:x.date, t:entryName(x), min:Math.round((x.durSec||0)/60), sub:x.manual?"a mano":x.ex.reduce((a,e)=>a+e.sets.length,0)+" series"})),
+             ...DB.acts.map(a=>({k:"a", id:a.id, date:a.date, t:a.type, min:+a.min||0, sub:a.int+(a.note?" · "+a.note:"")}))].sort((a,b)=>b.date.localeCompare(a.date));
+  let h = calendarHTML() + dayCardHTML() + bodyCardHTML() + `<div class="card"><h2>Registro (${all.length})</h2>`;
+  h += all.length ? `<ul class="list reg">${all.slice(0,40).map(x=>`<li><span class="grow"><b>${fmtD(x.date)}</b> · ${esc(x.t)} · ${x.min}'<br><span class="mute small">${esc(x.sub)}</span></span>${x.k==="s"?`<button class="sm" data-open="${x.id}">Ver</button>`:""}<button class="sm icon" data-del="${x.k}:${x.id}" aria-label="Borrar">✕</button></li>`).join("")}</ul>` : `<div class="mute">Aún no hay registros. Añade uno desde el día del calendario.</div>`;
+  const ids = [...new Set(DB.sessions.flatMap(s=>s.ex.map(x=>x.id)))].filter(id=>LIB_BY[id]);
   h += `</div>`;
-  $("#app").innerHTML = h; bindHeatmap();
-  document.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>{ VIEW={k:"sum", id:b.dataset.id}; render(); });
-  document.querySelectorAll("[data-da]").forEach(b=>b.onclick=()=>{ if(confirm("¿Borrar actividad?")){ DB.acts=DB.acts.filter(a=>a.id!==b.dataset.da); save(); render(); } });
+  if(ids.length){ h += `<div class="card"><h2>Progresión por ejercicio</h2><table><tr><th>Ejercicio</th><th>Últimas</th><th>Decisión</th></tr>`;
+    ids.forEach(id=>{ const L=logsFor(id).slice(0,3), pr=progress(id);
+      h+=`<tr><td>${esc(LIB_BY[id].n)}</td><td class="mute">${L.map(l=>l.sets.map(s=>s.reps).join("·")).join("<br>")}</td><td><span class="tag ${pr.k}">${esc(pr.t.split(":")[0])}</span></td></tr>`; });
+    h += `</table></div>`; }
+  $("#app").innerHTML = h; bindHistTop();
 }
 
 /* ============ INFORME SEMANAL (para que Claude lo valore) ============ */
@@ -865,7 +959,7 @@ function weeklyReport(){
   const ss = DB.sessions.filter(s=>s.date>=from).sort((a,b)=>a.start-b.start);
   const vol = {}; ss.forEach(s=>s.ex.forEach(x=>{ const z=(LIB_BY[x.id]||{}).z||x.zone; if(z) vol[ZONES[z]||z]=(vol[ZONES[z]||z]||0)+x.sets.length; }));
   return {
-    carga_por_zona_hoy: Object.fromEntries(FZ_SHOW.map(z=>[FZ_SHORT[z], Math.round((fatigueMap()[z]||0)*100)])),
+    recuperacion_hoy: (f=>Object.fromEntries(FZ_SHOW.map(z=>[FZ_SHORT[z], readyTxt(readyIn(z,f[z]||0))])))(fatigueMap()),
     tipo:"informe_semanal_fullbody_jjb", generado:new Date().toISOString(), periodo:{desde:from, hasta:to},
     semana_del_ciclo:weekInfo().week, ciclo:weekInfo().cycle, inicio_ciclo:DB.start,
     sesiones: ss.map(s=>({fecha:s.date, nombre:sessionName(s), objetivo:OBJ[s.obj]||s.obj, formato:FMT[s.fmt]||s.fmt,
@@ -896,7 +990,10 @@ function renderData(){
     <div class="mute">Todo: sesiones, plantillas, actividades y peso. Exporta cada semana.</div>
     <button class="pri big" id="expJ" style="margin-top:10px">Exportar copia (JSON)</button>
     <div class="row" style="margin-top:8px"><button class="grow" id="expC">Series (CSV)</button><button class="grow" id="expA">Actividades (CSV)</button></div>
-    <label style="margin-top:12px">Importar copia (JSON)</label><input id="imp" type="file" accept="application/json,.json"></div>`;
+    <label style="margin-top:12px">Importar copia (JSON) · se suma a lo que hay, sin duplicar</label><input id="imp" type="file" accept="application/json,.json"></div>
+  <div class="card"><h2>Empezar de cero</h2>
+    <div class="mute">Borra sesiones, deporte y peso, y reinicia el ciclo en la semana 1 desde este lunes. Las sesiones guardadas del planificador se conservan. Antes descarga una copia automáticamente.</div>
+    <button class="big" id="reset" style="margin-top:10px">Borrar registros y empezar de cero</button></div>`;
   $("#app").innerHTML = h;
   $("#copyR").onclick=async()=>{ const txt=JSON.stringify(weeklyReport(), null, 1);
     try{ await navigator.clipboard.writeText(txt); toast("Informe copiado: pégalo en el chat"); }
@@ -912,6 +1009,11 @@ function renderData(){
   $("#expA").onclick=()=>{ const rows=[["fecha","tipo","minutos","intensidad","nota"]]; DB.acts.forEach(a=>rows.push([a.date,a.type,a.min,a.int,a.note]));
     DB.weights.forEach(w=>rows.push([w.date,"Peso corporal",w.kg,"",""]));
     download("actividades_"+isoDate(new Date())+".csv", toCSV(rows), "text/csv"); };
+  $("#reset").onclick=()=>{ if(!confirm("Se descargará una copia y se borrarán todos los registros. ¿Seguir?")) return;
+    download("fullbody_jjb_antes_de_borrar_"+isoDate(new Date())+".json", JSON.stringify(Object.assign({}, DB, {live:null}), null, 1), "application/json");
+    if(!confirm("Último aviso: ¿borrar los registros ahora?")) return;
+    DB.sessions=[]; DB.acts=[]; DB.weights=[]; DB.live=null; DB.draft=null; DB.start=mondayOf(new Date()); HIST={ym:null, sel:null, mode:"dia"};
+    save(); toast("Registros borrados · semana 1"); TAB="hoy"; render(); };
   $("#imp").onchange=e=>{ const f=e.target.files[0]; if(!f) return; const r=new FileReader();
     r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!d.sessions) throw 0;
       const merge=(a,b,k)=>{ const ids=new Set(a.map(x=>x[k])); b.forEach(x=>{ if(!ids.has(x[k])) a.push(x); }); };
