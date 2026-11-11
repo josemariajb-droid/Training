@@ -76,7 +76,7 @@ body[data-tab=lib]{--hc:var(--c-green)} body[data-tab=hist]{--hc:var(--c-orange)
 .tg{display:inline-block;font-size:10px;font-weight:800;border-radius:4px;padding:0 3px;line-height:1.3;border:1px solid var(--c-ink);background:var(--tb);color:var(--tt)}
 .tg.FB{--tb:var(--c-blue);--tt:#fff} .tg.SURF{--tb:var(--c-sky);--tt:#111} .tg.KITE{--tb:var(--c-green);--tt:#fff}
 .tg.PÁD{--tb:var(--c-orange);--tt:#111} .tg.ESQ{--tb:var(--c-purple);--tt:#111} .tg.RUN{--tb:var(--c-verm);--tt:#fff}
-.tg.Z2{--tb:var(--c-yellow);--tt:#111} .tg.INT{--tb:#666;--tt:#fff}
+.tg.ELÍP{--tb:var(--c-yellow);--tt:#111} .tg.PAS{--tb:#b9b9b9;--tt:#111} .tg.OTR{--tb:#666;--tt:#fff}
 .kpis .kpi{border-top:4px solid var(--c-sky)} .kpis .kpi:nth-child(2){border-top-color:var(--c-yellow)} .kpis .kpi:nth-child(3){border-top-color:var(--c-orange)} .kpis .kpi:nth-child(4){border-top-color:var(--c-green)}
 .slot{border:2px solid var(--line);border-radius:12px;padding:10px;margin:10px 0}
 .slot .lbl{font-weight:800;font-size:13px;letter-spacing:.5px}
@@ -158,6 +158,11 @@ body[data-tab=lib]{--hc:var(--c-green)} body[data-tab=hist]{--hc:var(--c-orange)
 .zl .lv.l0{border-style:dotted;opacity:.6}
 .zl .r{text-align:right;font-weight:700;white-space:nowrap}
 .reg li{display:flex;gap:8px;align-items:center}
+.fz{display:grid;grid-template-columns:4.4em 1fr auto;gap:8px;align-items:center;font-size:14px;padding:5px 0;border-top:1px solid var(--line)}
+.fz .b{height:14px;border:2px solid var(--ink);border-radius:6px;overflow:hidden;display:block}
+.fz .b i{display:block;height:100%}
+.fz .st{font-weight:700;font-size:13px;text-align:right;white-space:nowrap}
+.fz .b i.tg{display:block;border:0;padding:0;border-radius:0;height:100%}
 .reg .grow{min-width:0}
 details.add>summary{font-weight:800;cursor:pointer;padding:6px 0;list-style:none}
 details.add>summary::before{content:"＋ "}
@@ -211,11 +216,13 @@ const WEEK = {1:{w:40,r:20,txt:"Referencias: RIR 3, anota todo"},
 
 /* ============ STORAGE ============ */
 const KEY = "fbjjb_v1";
-const APP_V = "v9 · 11/11/2026";
+const APP_V = "v10 · 11/11/2026";
 let DB = load();
 function blank(){ return {start:null, sessions:[], acts:[], weights:[], tpls:[], live:null, draft:null, settings:{sound:false, vib:true}}; }
 function load(){
-  try{ const d = JSON.parse(localStorage.getItem(KEY)); if(d && d.sessions){ const o=Object.assign(blank(), d); if(o.live && o.live.v!==3) o.live=null; o.tpls=o.tpls||[]; return o; } }catch(e){}
+  try{ const d = JSON.parse(localStorage.getItem(KEY)); if(d && d.sessions){ const o=Object.assign(blank(), d); if(o.live && o.live.v!==3) o.live=null; o.tpls=o.tpls||[];
+    (o.acts||[]).forEach(a=>{ if(a.type==="Running") a.type="Carrera"; else if(a.type==="Zona 2"){ a.type="Elíptica"; a.modo=a.modo||"continuo"; } else if(a.type==="Intervalos"){ a.type="Elíptica"; a.modo="intervalos"; } });
+    return o; } }catch(e){}
   return blank();
 }
 function save(){ try{ localStorage.setItem(KEY, JSON.stringify(DB)); }catch(e){ toast("No se pudo guardar en este navegador"); } }
@@ -258,8 +265,8 @@ function weekVolume(){ // series hechas por zona esta semana
    Idea de openGym (mapa muscular y fatiga con vida media), reescrita para esta app.
    Daltónico: cada dato va en texto o con trama; el color es solo refuerzo. */
 const MAR = ["Surf","Kite"];
-const ACT_TYPES = ["Surf","Kite","Pádel","Esquí","Running","Zona 2","Intervalos"];
-const ACT_ABBR = {Surf:"SURF", Kite:"KITE", "Pádel":"PÁD", "Esquí":"ESQ", Running:"RUN", "Zona 2":"Z2", Intervalos:"INT"};
+const ACT_TYPES = ["Elíptica","Carrera","Paseo","Pádel","Surf","Kite","Esquí"];
+const ACT_ABBR = {Surf:"SURF", Kite:"KITE", "Pádel":"PÁD", "Esquí":"ESQ", Carrera:"RUN", "Elíptica":"ELÍP", Paseo:"PAS"};
 const MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const DIAS = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
 const FZ_HL = {rod:24, cad:24, core:20, peH:20, tiV:20, tiH:20, peV:16, bra:16, gem:16}; // horas de vida media (pierna: una sesión de 7–8 series ≈ 48 h hasta fresca)
@@ -267,8 +274,8 @@ const FZ_SHOW = ["rod","cad","peH","peV","tiV","tiH","core","gem","bra"];
 const MAN_ZONES = ["rod","cad","peH","peV","tiV","tiH","core"];
 const ACT_LOAD = { // series equivalentes por hora a intensidad media (estimación inicial: JJB la corrige)
   Surf:{tiV:4, peV:2, core:2, cad:1}, Kite:{cad:3, rod:3, core:3, tiH:1},
-  "Pádel":{rod:3, gem:3, peV:1, core:1}, "Esquí":{rod:5, cad:2, core:1}, Running:{rod:2, gem:3, cad:1},
-  Intervalos:{rod:2, cad:1, gem:1}, "Zona 2":{} };
+  "Pádel":{rod:3, gem:3, peV:1, core:1}, "Esquí":{rod:5, cad:2, core:1}, Carrera:{rod:2, gem:3, cad:1},
+  "Elíptica":{rod:2, cad:1}, Paseo:{gem:1} };
 const INT_F = {suave:.6, media:1, dura:1.4};
 const FZ_SHORT = {rod:"Cuádriceps", cad:"Glúteo/isquio", peH:"Pecho", peV:"Hombro", tiV:"Dorsal", tiH:"Espalda media", core:"Core/lumbar", gem:"Gemelo", bra:"Brazos"};
 let HIST = {ym:null, sel:null, mode:"dia"};
@@ -279,7 +286,7 @@ function longD(k){ const d=new Date(k+"T12:00"); return DIAS[d.getDay()]+" "+d.g
 function entryName(s){ return s.manual ? (s.name||"Rutina") : sessionName(s); }
 function entriesOn(k){
   return [...DB.sessions.filter(s=>s.date===k).map(s=>({k:"s", id:s.id, t:entryName(s), min:Math.round((s.durSec||0)/60), abbr:"FB"})),
-          ...DB.acts.filter(a=>a.date===k).map(a=>({k:"a", id:a.id, t:a.type, min:+a.min||0, abbr:ACT_ABBR[a.type]||a.type.slice(0,3).toUpperCase(), int:a.int}))];
+          ...DB.acts.filter(a=>a.date===k).map(a=>({k:"a", id:a.id, t:a.type, min:+a.min||0, abbr:ACT_ABBR[a.type]||a.type.slice(0,3).toUpperCase(), int:a.int, det:cardioDet(a)}))];
 }
 function sessZones(s){ const per={}; s.ex.forEach(x=>{ const z=(LIB_BY[x.id]||{}).z||x.zone; if(z) per[z]=(per[z]||0)+x.sets.length; }); return per; }
 function actZones(a){ const L=ACT_LOAD[a.type]||{}, k=(+a.min||0)/60*(INT_F[a.int]||1), o={}; Object.entries(L).forEach(([z,n])=>o[z]=n*k); return o; }
@@ -372,36 +379,16 @@ function calendarHTML(){
   return `<div class="card"><div class="calnav"><button class="sm" id="calP" aria-label="Mes anterior">◀</button><b>${MESES[M-1]} ${Y}</b><button class="sm" id="calN" aria-label="Mes siguiente">▶</button></div>
     <div class="cal">${cells}</div>
     <div class="mute small" style="margin-top:8px"><b>${days}</b> días activos · <b>${fb}</b> rutinas · <b>${dep}</b> de deporte · <b>${Math.round(min/6)/10} h</b> en total</div>
-    <div class="small" style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px">${["FB","SURF","KITE","PÁD","ESQ","RUN","Z2","INT"].map(a=>`<span class="tg ${a}">${a}</span>`).join("")}<span class="mute">FB = rutina · PÁD = pádel · Z2 = zona 2</span></div></div>`;
+    <div class="small" style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px">${["FB","ELÍP","RUN","PAS","PÁD","SURF","KITE","ESQ"].map(a=>`<span class="tg ${a}">${a}</span>`).join("")}<span class="mute">FB = rutina · ELÍP = elíptica · RUN = carrera · PAS = paseo · PÁD = pádel · ESQ = esquí</span></div></div>`;
 }
 function dayCardHTML(){
   const k=HIST.sel||isoDate(new Date()), e=entriesOn(k);
   return `<div class="card"><h2>${(t=>t[0].toUpperCase()+t.slice(1))(longD(k))}</h2>
-    ${e.length?`<ul class="list reg">${e.map(x=>`<li><span class="tg ${x.abbr}">${x.abbr}</span><span class="grow"><b>${esc(x.t)}</b> · ${x.min}'${x.int?" · "+x.int:""}</span>${x.k==="s"?`<button class="sm" data-open="${x.id}">Ver</button>`:""}<button class="sm icon" data-del="${x.k}:${x.id}" aria-label="Borrar">✕</button></li>`).join("")}</ul>`:`<div class="mute">Sin entrenos este día.</div>`}
+    ${e.length?`<ul class="list reg">${e.map(x=>`<li><span class="tg ${x.abbr}">${x.abbr}</span><span class="grow"><b>${esc(x.t)}</b> · ${x.min}'${x.int?" · "+x.int:""}${x.det?`<br><span class="mute small">${esc(x.det)}</span>`:""}</span>${x.k==="s"?`<button class="sm" data-open="${x.id}">Ver</button>`:""}<button class="sm icon" data-del="${x.k}:${x.id}" aria-label="Borrar">✕</button></li>`).join("")}</ul>`:`<div class="mute">Sin entrenos este día.</div>`}
     ${addFormHTML(k)}</div>`;
 }
 function addFormHTML(k){
-  return `<details class="add" style="margin-top:8px"><summary>Añadir registro a mano</summary>
-    <div class="grid2"><div><label>Fecha</label><input id="mDate" type="date" value="${k}" max="${isoDate(new Date())}"></div>
-      <div><label>Tipo</label><select id="mType"><option value="FB">Rutina full body</option>${ACT_TYPES.map(t=>`<option>${t}</option>`).join("")}</select></div>
-      <div><label>Minutos</label><input id="mMin" type="number" inputmode="numeric" placeholder="43"></div>
-      <div><label>Intensidad</label><select id="mInt"><option value="suave">Suave</option><option value="media" selected>Media</option><option value="dura">Dura</option></select></div></div>
-    <div id="mZ"><label>Zonas trabajadas (series por zona)</label>
-      ${MAN_ZONES.map(z=>`<div class="row" style="margin:4px 0"><label class="chk grow" style="margin:0"><input type="checkbox" data-mz="${z}" checked> ${FZ_SHORT[z]}</label><input type="number" inputmode="numeric" data-ms="${z}" value="3" style="width:4.5em;text-align:center" aria-label="Series de ${FZ_SHORT[z]}"></div>`).join("")}</div>
-    <label>Nota (opcional)</label><input id="mNote" placeholder="Ej.: circuito 4 rondas">
-    <button class="pri big" id="mSave" style="margin-top:10px">Guardar registro</button></details>`;
-}
-function saveManual(){
-  const date=$("#mDate").value, type=$("#mType").value, min=+$("#mMin").value, int=$("#mInt").value, note=$("#mNote").value;
-  if(!date){ toast("Pon la fecha"); return; } if(!min){ toast("Pon los minutos"); return; }
-  if(type==="FB"){
-    const ex=MAN_ZONES.filter(z=>$(`[data-mz="${z}"]`).checked).map(z=>{ const n=Math.max(1,Math.min(20,+$(`[data-ms="${z}"]`).value||1));
-      return {id:"man_"+z, name:FZ_SHORT[z]+" (manual)", zone:z, mode:"manual", sets:Array.from({length:n},(_,i)=>({round:i+1, reps:0}))}; });
-    const end=new Date(date+"T19:00").getTime();
-    DB.sessions.push({id:uid(), v:3, manual:true, name:"Rutina", date, start:end-min*6e4, end, durSec:min*60, estSec:0,
-      week:weekInfo(new Date(date+"T12:00")).week, mods:[], ex, notes:note, rpe:null});
-  } else DB.acts.push({id:uid(), date, type, min, int, note});
-  stay(()=>{ HIST.sel=date; HIST.ym=date.slice(0,7); save(); }); toast("Registro guardado");
+  return `<details class="add" style="margin-top:8px"><summary>Añadir registro a mano</summary>${actFormHTML("m", k, true)}</details>`;
 }
 function bindHistTop(){
   $("#calP").onclick=()=>{ const [y,m]=(HIST.ym||isoDate(new Date()).slice(0,7)).split("-").map(Number); const d=new Date(y,m-2,1); stay(()=>HIST.ym=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")); };
@@ -412,12 +399,163 @@ function bindHistTop(){
   document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{ const [k,id]=b.dataset.del.split(":");
     if(!confirm("¿Borrar este registro?")) return;
     stay(()=>{ if(k==="s") DB.sessions=DB.sessions.filter(x=>x.id!==id); else DB.acts=DB.acts.filter(x=>x.id!==id); save(); }); });
-  const t=$("#mType"); if(t) t.onchange=()=>{ $("#mZ").style.display = t.value==="FB" ? "block" : "none"; };
-  const s=$("#mSave"); if(s) s.onclick=saveManual;
+  bindActForm("m", date=>{ stay(()=>{ HIST.sel=date; HIST.ym=date.slice(0,7); save(); }); toast("Registro guardado"); });
+  document.querySelectorAll("[data-per]").forEach(b=>b.onclick=()=>stay(()=>{ HIST.per=b.dataset.per; }));
 }
 function fatigueLine(){
   const f=fatigueMap(), bad=FZ_SHOW.filter(z=>(f[z]||0)>.5).map(z=>FZ_SHORT[z]+" ("+readyTxt(readyIn(z,f[z])).toLowerCase()+")");
   return bad.length ? `<div class="warn"><b>Hoy evita cargar:</b> ${bad.join(", ")}.</div>` : `<div class="okbox">Todas las zonas listas o con carga baja.</div>`;
+}
+
+/* ============ FORMULARIO DE ACTIVIDAD (compartido Hoy / Historial) ============ */
+const CARDIO = ["Elíptica","Carrera","Paseo"];
+function paceTxt(min, km){ if(!min||!km) return ""; const p=min/km, m=Math.floor(p), s=Math.round((p-m)*60);
+  return (s===60?(m+1)+":00":m+":"+String(s).padStart(2,"0"))+" /km · "+(km/(min/60)).toFixed(1).replace(".",",")+" km/h"; }
+function cardioDet(a){
+  const p=[];
+  if(a.modo==="intervalos") p.push("intervalos");
+  if(a.hr) p.push("FC media "+a.hr+(a.hrMax?" · máx "+a.hrMax:""));
+  else if(a.hrMax) p.push("FC máx "+a.hrMax);
+  if(a.km) p.push(String(a.km).replace(".",",")+" km");
+  if(a.km && a.min && a.type!=="Elíptica") p.push(paceTxt(+a.min, +a.km));
+  return p.join(" · ");
+}
+function actFormHTML(p, date, withFB){
+  return `${withFB?`<div class="grid2"><div><label>Fecha</label><input id="${p}Date" type="date" value="${date}" max="${isoDate(new Date())}"></div><div>`:"<div>"}
+      <label>Tipo</label><select id="${p}Type">${withFB?`<option value="FB">Rutina full body</option>`:""}${ACT_TYPES.map(t=>`<option>${t}</option>`).join("")}</select></div>${withFB?"</div>":""}
+    <div class="grid2"><div><label>Minutos</label><input id="${p}Min" type="number" inputmode="numeric" placeholder="45"></div>
+      <div><label>Intensidad</label><select id="${p}Int"><option value="suave">Suave</option><option value="media" selected>Media</option><option value="dura">Dura</option></select></div></div>
+    <div id="${p}Car" style="display:none">
+      <div class="grid2"><div><label>FC media (ppm)</label><input id="${p}Hr" type="number" inputmode="numeric" placeholder="135"></div>
+        <div><label>FC máxima (ppm)</label><input id="${p}HrMax" type="number" inputmode="numeric" placeholder="165"></div>
+        <div><label id="${p}KmL">Distancia (km)</label><input id="${p}Km" type="number" step="0.01" inputmode="decimal" placeholder="6,2"></div>
+        <div id="${p}ModoW"><label>Modo</label><select id="${p}Modo"><option value="continuo">Continuo</option><option value="intervalos">Intervalos</option></select></div></div>
+      <div class="hint" id="${p}Pace" style="display:none"></div></div>
+    ${withFB?`<div id="${p}Z"><label>Zonas trabajadas (series por zona)</label>
+      ${MAN_ZONES.map(z=>`<div class="row" style="margin:4px 0"><label class="chk grow" style="margin:0"><input type="checkbox" data-mz="${z}" checked> ${FZ_SHORT[z]}</label><input type="number" inputmode="numeric" data-ms="${z}" value="3" style="width:4.5em;text-align:center" aria-label="Series de ${FZ_SHORT[z]}"></div>`).join("")}</div>`:""}
+    <label>Nota (opcional)</label><input id="${p}Note" placeholder="Ej.: olas de 1 m, viento flojo">
+    <button class="pri big" id="${p}Save" style="margin-top:10px">Guardar</button>`;
+}
+function bindActForm(p, onSave){
+  const t=$("#"+p+"Type"); if(!t) return;
+  const upd=()=>{ const v=t.value, c=CARDIO.includes(v);
+    $("#"+p+"Car").style.display=c?"block":"none";
+    const z=$("#"+p+"Z"); if(z) z.style.display=v==="FB"?"block":"none";
+    $("#"+p+"ModoW").style.visibility = v==="Paseo"?"hidden":"visible";
+    $("#"+p+"KmL").textContent = v==="Elíptica" ? "Distancia (km, opcional)" : "Distancia (km)";
+    const km=+String($("#"+p+"Km").value).replace(",","."), mn=+$("#"+p+"Min").value, pc=$("#"+p+"Pace");
+    const show = c && v!=="Elíptica" && km && mn; pc.style.display=show?"block":"none"; if(show) pc.textContent="Ritmo: "+paceTxt(mn,km); };
+  t.onchange=upd; $("#"+p+"Km").oninput=upd; $("#"+p+"Min").oninput=upd; upd();
+  $("#"+p+"Save").onclick=()=>{
+    const dEl=$("#"+p+"Date"), date=dEl?dEl.value:isoDate(new Date()), type=t.value, min=+$("#"+p+"Min").value, int=$("#"+p+"Int").value, note=$("#"+p+"Note").value;
+    if(!date){ toast("Pon la fecha"); return; } if(!min){ toast("Pon los minutos"); return; }
+    if(type==="FB"){
+      const ex=MAN_ZONES.filter(z=>$(`[data-mz="${z}"]`).checked).map(z=>{ const n=Math.max(1,Math.min(20,+$(`[data-ms="${z}"]`).value||1));
+        return {id:"man_"+z, name:FZ_SHORT[z]+" (manual)", zone:z, mode:"manual", sets:Array.from({length:n},(_,i)=>({round:i+1, reps:0}))}; });
+      const end=new Date(date+"T19:00").getTime();
+      DB.sessions.push({id:uid(), v:3, manual:true, name:"Rutina", date, start:end-min*6e4, end, durSec:min*60, estSec:0,
+        week:weekInfo(new Date(date+"T12:00")).week, mods:[], ex, notes:note, rpe:null});
+    } else {
+      const a={id:uid(), date, type, min, int, note};
+      if(CARDIO.includes(type)){ const hr=+$("#"+p+"Hr").value, hm=+$("#"+p+"HrMax").value, km=+String($("#"+p+"Km").value).replace(",",".");
+        if(hr) a.hr=hr; if(hm) a.hrMax=hm; if(km) a.km=km; if(type!=="Paseo") a.modo=$("#"+p+"Modo").value; }
+      DB.acts.push(a);
+    }
+    onSave(date);
+  };
+}
+
+/* ============ COMPOSICIÓN CORPORAL (reloj Samsung, bioimpedancia) ============
+   El reloj es ruidoso día a día: comparo medias ponderadas, no mediciones sueltas.
+   Coeficiente de fiabilidad: 1 en ayunas por la mañana, 0,5 en otras condiciones. */
+const BC = [
+  {k:"kg",  n:"Peso",               u:"kg", noise:0.6, good:-1, dec:1},
+  {k:"fat", n:"Grasa corporal",     u:"%",  noise:1.5, good:-1, dec:1},
+  {k:"mus", n:"Músculo esquelético",u:"kg", noise:0.8, good:1,  dec:1},
+  {k:"wat", n:"Agua corporal",      u:"kg", noise:1.0, good:0,  dec:1}];
+function bcPoints(k){ return DB.weights.filter(w=>w[k]!=null && w[k]!=="" && !isNaN(+w[k])).map(w=>({d:w.date, v:+w[k], c:w.std===false?.5:1})).sort((a,b)=>a.d.localeCompare(b.d)); }
+function bcAvg(pts, end, days=10){ const from=isoDate(new Date(new Date(end+"T12:00").getTime()-days*864e5));
+  const w=pts.filter(p=>p.d>from && p.d<=end); const c=w.reduce((s,p)=>s+p.c,0); return c? {v:w.reduce((s,p)=>s+p.v*p.c,0)/c, n:w.length, c} : null; }
+function nf(v,d=1){ return v.toFixed(d).replace(".",","); }
+function bcStatus(m){
+  const pts=bcPoints(m.k), today=isoDate(new Date()); if(!pts.length) return null;
+  const cur=bcAvg(pts,today), prev=bcAvg(pts,isoDate(new Date(Date.now()-28*864e5)), 14), last=pts[pts.length-1];
+  let verdict="Necesito 4 semanas de datos para ver la tendencia", cls="keep";
+  if(cur && prev){ const d=cur.v-prev.v, real=Math.abs(d)>=m.noise;
+    if(!real){ verdict=`Estable: ${d>=0?"+":""}${nf(d)} ${m.u} en 4 sem, dentro del margen del reloj (±${nf(m.noise)})`; cls="keep"; }
+    else { const up=d>0; verdict=`${up?"SUBE":"BAJA"} de verdad: ${up?"+":""}${nf(d)} ${m.u} en 4 sem${m.good?((up?1:-1)===m.good?" · bien":" · vigilar"):""}`; cls=up?"up":"down"; } }
+  return {pts, cur, last, verdict, cls};
+}
+function sparkSVG(pts, m){
+  const from=isoDate(new Date(Date.now()-60*864e5)), P=pts.filter(p=>p.d>=from); if(P.length<2) return "";
+  const vs=P.map(p=>p.v), lo=Math.min(...vs), hi=Math.max(...vs), span=Math.max(hi-lo, m.noise), W=300, H=56;
+  const t0=new Date(from+"T12:00").getTime(), x=d=>8+(new Date(d+"T12:00").getTime()-t0)/(60*864e5)*(W-16), y=v=>H-8-(v-lo)/span*(H-16);
+  const avg=P.map(p=>{ const a=bcAvg(pts,p.d); return `${x(p.d).toFixed(1)},${y(a.v).toFixed(1)}`; }).join(" ");
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block;margin:4px 0" role="img" aria-label="Evolución de ${m.n}">
+    <polyline points="${avg}" fill="none" stroke="var(--c-blue)" stroke-width="3" stroke-linejoin="round"/>
+    ${P.map(p=>`<circle cx="${x(p.d).toFixed(1)}" cy="${y(p.v).toFixed(1)}" r="3" ${p.c<1?'fill="var(--card)" stroke="var(--ink)" stroke-width="1.5"':'fill="var(--ink)"'}/>`).join("")}
+    <text x="${W-4}" y="10" text-anchor="end" style="font-size:10px;fill:var(--mute)">${nf(hi)}</text><text x="${W-4}" y="${H-1}" text-anchor="end" style="font-size:10px;fill:var(--mute)">${nf(lo)}</text></svg>`;
+}
+function bodyCompHTML(){
+  const rows=BC.map(m=>{ const s=bcStatus(m); if(!s) return "";
+    return `<div style="padding:8px 0;border-top:1px solid var(--line)"><div class="row"><b class="grow">${m.n}</b><span class="num"><b>${nf(s.last.v)} ${m.u}</b> <span class="mute small">último · media ${s.cur?nf(s.cur.v):"–"}</span></span></div>
+      ${sparkSVG(s.pts,m)}<span class="tag ${s.cls}" style="white-space:normal">${esc(s.verdict)}</span></div>`; }).join("");
+  if(!rows) return `<div class="card"><h2>Composición corporal</h2><div class="mute">Aún no hay mediciones. Regístralas en Hoy.</div></div>`;
+  const kg=bcStatus(BC[0]), fat=bcStatus(BC[1]); let mass="";
+  if(kg&&fat&&kg.cur&&fat.cur){ const g=kg.cur.v*fat.cur.v/100; mass=`<div class="kpis" style="margin:8px 0"><div class="kpi"><b>${nf(g)} kg</b><span class="mute">masa grasa (media)</span></div><div class="kpi"><b>${nf(kg.cur.v-g)} kg</b><span class="mute">masa magra (media)</span></div></div>`; }
+  return `<div class="card"><h2>Composición corporal</h2>${mass}${rows}
+    <div class="mute small" style="margin-top:6px">Línea = media ponderada de 10 días · punto relleno = medición en ayunas por la mañana (vale 1) · punto hueco = otra hora (vale 0,5). El reloj puede variar ±1,5 puntos de grasa de un día a otro sin cambio real: por eso solo marco SUBE/BAJA si la media de 4 semanas se mueve más que ese margen.</div></div>`;
+}
+function bodyCompFormHTML(){
+  const l=DB.weights.slice().sort((a,b)=>a.date.localeCompare(b.date)).slice(-1)[0];
+  return `<div class="card"><h2>Composición corporal</h2>
+    <div class="grid2"><div><label>Peso (kg)</label><input id="bKg" type="number" step="0.1" inputmode="decimal" placeholder="100,0"></div>
+      <div><label>Grasa corporal (%)</label><input id="bFat" type="number" step="0.1" inputmode="decimal" placeholder="25,0"></div>
+      <div><label>Músculo esquelético (kg)</label><input id="bMus" type="number" step="0.1" inputmode="decimal" placeholder="40,0"></div>
+      <div><label>Agua corporal (kg)</label><input id="bWat" type="number" step="0.1" inputmode="decimal" placeholder="52,0"></div></div>
+    <label class="check"><input type="checkbox" id="bStd" checked><span>En ayunas, por la mañana (medición fiable)</span></label>
+    <button class="pri big" id="bSave">Guardar medición</button>
+    <div class="mute small" style="margin-top:6px">${l?"Última ("+fmtD(l.date)+"): "+[l.kg?nf(+l.kg)+" kg":"", l.fat?nf(+l.fat)+" % grasa":"", l.mus?nf(+l.mus)+" kg músculo":"", l.wat?nf(+l.wat)+" kg agua":""].filter(Boolean).join(" · ")+". La tendencia está en Historial.":"Mide siempre en las mismas condiciones: en ayunas, tras ir al baño."}</div></div>`;
+}
+function bindBodyComp(){
+  const b=$("#bSave"); if(!b) return;
+  b.onclick=()=>{ const g=id=>{ const v=String($(id).value).replace(",","."); return v===""?null:+v; };
+    const e={date:isoDate(new Date()), std:$("#bStd").checked}; let any=false;
+    [["kg","#bKg"],["fat","#bFat"],["mus","#bMus"],["wat","#bWat"]].forEach(([k,id])=>{ const v=g(id); if(v){ e[k]=v; any=true; } });
+    if(!any){ toast("Rellena al menos un dato"); return; }
+    const i=DB.weights.findIndex(w=>w.date===e.date); if(i>=0) DB.weights[i]=Object.assign(DB.weights[i], e); else DB.weights.push(e);
+    save(); toast("Medición guardada"); render(); };
+}
+
+/* ============ RESUMEN DE ACTIVIDAD (semana / mes / 8 semanas) ============ */
+function periodEntries(from, to){
+  return [...DB.sessions.filter(s=>s.date>=from&&s.date<=to).map(s=>({abbr:"FB", t:"Rutina", min:Math.round((s.durSec||0)/60), date:s.date})),
+          ...DB.acts.filter(a=>a.date>=from&&a.date<=to).map(a=>({abbr:ACT_ABBR[a.type]||"OTR", t:a.type, min:+a.min||0, date:a.date, a}))];
+}
+function hTxt(min){ return min<60 ? min+"'" : nf(min/60)+" h"; }
+function summaryHTML(){
+  const per=HIST.per||"sem", today=isoDate(new Date());
+  const seg=`<div class="seg"><button data-per="sem" aria-pressed="${per==="sem"}">Semana</button><button data-per="mes" aria-pressed="${per==="mes"}">Mes</button><button data-per="8s" aria-pressed="${per==="8s"}">8 semanas</button></div>`;
+  let body="";
+  if(per==="8s"){
+    const rows=[]; for(let i=7;i>=0;i--){ const m=new Date(mondayOf(new Date())+"T12:00"); m.setDate(m.getDate()-7*i);
+      const f=isoDate(m), e=new Date(m); e.setDate(e.getDate()+6); const to=isoDate(e), E=periodEntries(f,to);
+      rows.push({lbl:m.getDate()+"/"+(m.getMonth()+1), min:E.reduce((s,x)=>s+x.min,0), fb:E.filter(x=>x.abbr==="FB").length, dep:E.filter(x=>x.abbr!=="FB").length, now:i===0}); }
+    const mx=Math.max(60,...rows.map(r=>r.min)), avg=rows.slice(0,7).reduce((s,r)=>s+r.min,0)/7;
+    body=`<div class="mute small">Semana que empieza el… · barra = horas totales</div>
+      ${rows.map(r=>`<div class="fz"><span>${r.now?"<b>Esta</b>":r.lbl}</span><span class="b"><i style="width:${Math.round(r.min/mx*100)}%;background:var(--c-orange)"></i></span><span class="st">${hTxt(r.min)} · ${r.fb} FB · ${r.dep} dep.</span></div>`).join("")}
+      <div class="okbox">Media de las 7 semanas anteriores: <b>${hTxt(Math.round(avg))}</b> por semana.</div>`;
+  } else {
+    const from = per==="sem" ? mondayOf(new Date()) : today.slice(0,7)+"-01", E=periodEntries(from, today);
+    const by={}; E.forEach(x=>{ const b=by[x.abbr]=by[x.abbr]||{t:x.abbr==="FB"?"Rutina":x.t, n:0, min:0}; b.n++; b.min+=x.min; });
+    const mx=Math.max(1,...Object.values(by).map(b=>b.min)), tot=E.reduce((s,x)=>s+x.min,0), days=new Set(E.map(x=>x.date)).size;
+    const car=E.filter(x=>x.a && CARDIO.includes(x.a.type)), km=car.reduce((s,x)=>s+(+x.a.km||0),0), hrs=car.filter(x=>x.a.hr);
+    const hrAvg = hrs.length ? Math.round(hrs.reduce((s,x)=>s+x.a.hr*x.min,0)/hrs.reduce((s,x)=>s+x.min,0)) : 0;
+    body=`<div class="kpis"><div class="kpi"><b>${hTxt(tot)}</b><span class="mute">en total</span></div><div class="kpi"><b>${days}</b><span class="mute">días activos</span></div>
+      <div class="kpi"><b>${E.filter(x=>x.abbr==="FB").length}</b><span class="mute">rutinas</span></div><div class="kpi"><b>${km?nf(km)+" km":"–"}</b><span class="mute">carrera, paseo y elíptica${hrAvg?" · FC media "+hrAvg:""}</span></div></div>
+      ${Object.entries(by).sort((a,b)=>b[1].min-a[1].min).map(([ab,b])=>`<div class="fz"><span><span class="tg ${ab}">${ab}</span></span><span class="b"><i style="width:${Math.round(b.min/mx*100)}%;background:var(--tb)" class="tg ${ab}"></i></span><span class="st">${b.n}× · ${hTxt(b.min)}</span></div>`).join("") || `<div class="mute" style="margin-top:8px">Sin actividad en este periodo.</div>`}`;
+  }
+  return `<div class="card"><h2>Resumen de actividad</h2>${seg}${body}</div>`;
 }
 
 /* ============ PRESCRIPCIÓN (criterio de entrenador) ============ */
@@ -592,22 +730,12 @@ function render(){
 }
 
 /* ============ HOY ============ */
-function weekStats(){
-  const m=mondayOf(new Date());
-  const ss = DB.sessions.filter(s=>s.date>=m), aa = DB.acts.filter(a=>a.date>=m);
-  const sum = t=>aa.filter(a=>a.type===t).reduce((x,a)=>x+(+a.min||0),0);
-  return {fuerza:ss.length, z2:sum("Zona 2"), padel:aa.filter(a=>a.type==="Pádel").length, mar:sum("Surf")+sum("Kite")};
-}
 function renderHome(){
-  const wi = weekInfo(), st = weekStats(), lastW = DB.weights.slice(-1)[0];
-  let h = `<div class="card"><h2>Semana ${wi.week} de 4</h2>
-    <div class="mute">${WEEK[wi.week].txt} · RIR objetivo <b>${rirTarget(wi.week)}</b></div>
-    <div class="kpis" style="margin-top:10px">
-      <div class="kpi"><b>${st.fuerza}</b><span class="mute">sesiones full body</span></div>
-      <div class="kpi"><b>${st.z2}'</b><span class="mute">zona 2</span></div>
-      <div class="kpi"><b>${st.padel}</b><span class="mute">pádel</span></div>
-      <div class="kpi"><b>${st.mar}'</b><span class="mute">surf / kite</span></div>
-    </div></div>
+  const wi = weekInfo(), today=isoDate(new Date()), e=entriesOn(today);
+  let h = `<div class="card"><h2>Hoy · ${longD(today)}</h2>
+    <div class="mute small">Semana ${wi.week} de 4 · ${WEEK[wi.week].txt} · RIR objetivo <b>${rirTarget(wi.week)}</b></div>
+    ${e.length?`<ul class="list reg" style="margin-top:6px">${e.map(x=>`<li><span class="tg ${x.abbr}">${x.abbr}</span><span class="grow"><b>${esc(x.t)}</b> · ${x.min}'${x.int?" · "+x.int:""}${x.det?`<br><span class="mute small">${esc(x.det)}</span>`:""}</span>${x.k==="s"?`<button class="sm" data-open="${x.id}">Ver</button>`:""}</li>`).join("")}</ul>`
+      :`<div class="mute" style="margin-top:6px">Aún no has registrado nada hoy.</div>`}</div>
   ${fatigueLine()}
   <button class="pri big" id="newS">＋ Crear sesión de hoy</button>
   ${DB.draft?`<button class="big" id="contD" style="margin-top:8px">✎ Seguir con el borrador</button>`:""}
@@ -618,33 +746,17 @@ function renderHome(){
       <button class="sm pri" data-go="${t.id}">▶</button><button class="sm icon" data-ed="${t.id}" aria-label="Editar">✎</button><button class="sm icon" data-dl="${t.id}" aria-label="Borrar">✕</button></div></li>`; });
     h += `</ul>`; }
   h += `</div>
-  <div class="card"><h2>Registrar deporte o cardio</h2>
-    <select id="aType"><option>Zona 2</option><option>Pádel</option><option>Surf</option><option>Kite</option><option>Esquí</option><option>Running</option><option>Intervalos</option></select>
-    <div class="row" style="margin-top:8px"><input id="aMin" type="number" inputmode="numeric" placeholder="Minutos" class="grow">
-      <select id="aInt" class="grow"><option value="suave">Suave</option><option value="media" selected>Media</option><option value="dura">Dura</option></select></div>
-    <input id="aNote" placeholder="Nota (opcional)" style="margin-top:8px">
-    <button class="pri big" id="aSave" style="margin-top:10px">Guardar actividad</button></div>
-  <div class="card"><h2>Peso corporal</h2>
-    <div class="row"><input id="wKg" type="number" step="0.1" inputmode="decimal" placeholder="kg en ayunas" class="grow"><button id="wSave">Guardar</button></div>
-    <div class="mute" style="margin-top:6px">${lastW?"Último: "+lastW.kg+" kg ("+lastW.date+")"+trend():"Pésate 1–2 veces por semana, mismo día y hora."}</div></div>`;
+  <div class="card"><h2>Registrar cardio o deporte</h2>${actFormHTML("a", today, false)}</div>
+  ${bodyCompFormHTML()}`;
   $("#app").innerHTML = h;
   $("#newS").onclick=()=>{ if(DB.draft && !confirm("Hay un borrador sin terminar. ¿Empezar uno nuevo?")) return; DB.draft=newDraft(); const d=DB.draft; d.slots.forEach((s,i)=>autoPick(d,s,i)); save(); VIEW={k:"plan"}; render(); };
   const cd=$("#contD"); if(cd) cd.onclick=()=>{ VIEW={k:"plan"}; render(); };
+  document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{ VIEW={k:"sum", id:b.dataset.open}; render(); });
   document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{ VIEW={k:"pre", tplId:b.dataset.go, mods:[]}; render(); });
   document.querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>{ const t=DB.tpls.find(x=>x.id===b.dataset.ed); DB.draft=JSON.parse(JSON.stringify(t)); save(); VIEW={k:"plan"}; render(); });
   document.querySelectorAll("[data-dl]").forEach(b=>b.onclick=()=>{ if(confirm("¿Borrar esta sesión guardada? El historial no se toca.")){ DB.tpls=DB.tpls.filter(x=>x.id!==b.dataset.dl); save(); render(); } });
-  $("#aSave").onclick=()=>{ const m=+$("#aMin").value; if(!m){toast("Pon los minutos");return;}
-    DB.acts.push({id:uid(), date:isoDate(new Date()), type:$("#aType").value, min:m, int:$("#aInt").value, note:$("#aNote").value}); save(); toast("Actividad guardada"); render(); };
-  $("#wSave").onclick=()=>{ const kg=+$("#wKg").value; if(!kg){toast("Pon el peso");return;}
-    DB.weights.push({date:isoDate(new Date()), kg}); save(); toast("Peso guardado"); render(); };
-}
-function trend(){
-  if(DB.weights.length<2) return "";
-  const a=DB.weights[0], b=DB.weights[DB.weights.length-1];
-  const wk = Math.max(1,(new Date(b.date)-new Date(a.date))/6048e5);
-  const r = (b.kg-a.kg)/wk;
-  const ok = r<=-0.4 && r>=-0.9 ? "ritmo correcto" : r>-0.4 ? "por debajo del objetivo (0,5–0,8)" : "demasiado rápido: riesgo de perder fuerza";
-  return " · "+(r>0?"+":"")+r.toFixed(2)+" kg/sem → "+ok;
+  bindActForm("a", ()=>{ save(); toast("Actividad guardada"); render(); });
+  bindBodyComp();
 }
 
 /* ============ PLANIFICADOR ============ */
@@ -970,8 +1082,8 @@ function renderSummary(id){
 function renderHist(){
   if(!HIST.sel) HIST.sel=isoDate(new Date());
   const all=[...DB.sessions.map(x=>({k:"s", abbr:"FB", id:x.id, date:x.date, t:entryName(x), min:Math.round((x.durSec||0)/60), sub:x.manual?"a mano":x.ex.reduce((a,e)=>a+e.sets.length,0)+" series"})),
-             ...DB.acts.map(a=>({k:"a", abbr:ACT_ABBR[a.type]||"INT", id:a.id, date:a.date, t:a.type, min:+a.min||0, sub:a.int+(a.note?" · "+a.note:"")}))].sort((a,b)=>b.date.localeCompare(a.date));
-  let h = calendarHTML() + dayCardHTML() + bodyCardHTML() + `<div class="card"><h2>Registro (${all.length})</h2>`;
+             ...DB.acts.map(a=>({k:"a", abbr:ACT_ABBR[a.type]||"OTR", id:a.id, date:a.date, t:a.type, min:+a.min||0, sub:[a.int, cardioDet(a), a.note].filter(Boolean).join(" · ")}))].sort((a,b)=>b.date.localeCompare(a.date));
+  let h = summaryHTML() + calendarHTML() + dayCardHTML() + bodyCardHTML() + bodyCompHTML() + `<div class="card"><h2>Registro (${all.length})</h2>`;
   h += all.length ? `<ul class="list reg">${all.slice(0,40).map(x=>`<li><span class="tg ${x.abbr}">${x.abbr}</span><span class="grow"><b>${fmtD(x.date)}</b> · ${esc(x.t)} · ${x.min}'<br><span class="mute small">${esc(x.sub)}</span></span>${x.k==="s"?`<button class="sm" data-open="${x.id}">Ver</button>`:""}<button class="sm icon" data-del="${x.k}:${x.id}" aria-label="Borrar">✕</button></li>`).join("")}</ul>` : `<div class="mute">Aún no hay registros. Añade uno desde el día del calendario.</div>`;
   const ids = [...new Set(DB.sessions.flatMap(s=>s.ex.map(x=>x.id)))].filter(id=>LIB_BY[id]);
   h += `</div>`;
@@ -996,8 +1108,9 @@ function weeklyReport(){
       ejercicios:s.ex.map(x=>({nombre:x.name, zona:ZONES[(LIB_BY[x.id]||{}).z]||x.zone, prescrito:x.presc, modo:x.mode==="time"?"intervalos":"series",
         series:x.sets.map(z=>({reps:z.reps, rir:z.rir, variante:z.var})), decision_app:progress(x.id).t}))})),
     series_por_zona: vol,
-    deporte_y_cardio: DB.acts.filter(a=>a.date>=from).map(a=>({fecha:a.date, tipo:a.type, minutos:a.min, intensidad:a.int, nota:a.note})),
-    peso_kg: DB.weights.filter(w=>w.date>=isoDate(new Date(Date.now()-27*864e5))),
+    deporte_y_cardio: DB.acts.filter(a=>a.date>=from).map(a=>({fecha:a.date, tipo:a.type, minutos:a.min, intensidad:a.int, modo:a.modo, fc_media:a.hr, fc_max:a.hrMax, km:a.km, ritmo:(a.km&&a.type!=="Elíptica")?paceTxt(+a.min,+a.km):undefined, nota:a.note})),
+    composicion_corporal: { mediciones_28d: DB.weights.filter(w=>w.date>=isoDate(new Date(Date.now()-27*864e5))),
+      tendencia_4_semanas: Object.fromEntries(BC.map(m=>{ const st=bcStatus(m); return [m.n, st?st.verdict:"sin datos"]; })) },
     plantillas_guardadas: DB.tpls.map(t=>({nombre:t.name, objetivo:OBJ[t.obj], formato:FMT[t.fmt], ejercicios:tplItems(t).map(e=>e.n+" "+(e.iv?ivTxt(e.iv):e.sets+"×"+repTxt(e)))}))
   };
 }
@@ -1035,8 +1148,9 @@ function renderData(){
   $("#expC").onclick=()=>{ const rows=[["fecha","sesion","semana","ejercicio","zona","modo","prescrito","serie","reps","rir","variante","duracion_sesion_s"]];
     DB.sessions.forEach(s=>s.ex.forEach(x=>x.sets.forEach((z,i)=>rows.push([s.date,sessionName(s),s.week,x.name,ZONES[(LIB_BY[x.id]||{}).z]||"",x.mode||"reps",x.presc||"",z.round||i+1,z.reps,z.rir??"",z.var,s.durSec]))));
     download("series_"+isoDate(new Date())+".csv", toCSV(rows), "text/csv"); };
-  $("#expA").onclick=()=>{ const rows=[["fecha","tipo","minutos","intensidad","nota"]]; DB.acts.forEach(a=>rows.push([a.date,a.type,a.min,a.int,a.note]));
-    DB.weights.forEach(w=>rows.push([w.date,"Peso corporal",w.kg,"",""]));
+  $("#expA").onclick=()=>{ const rows=[["fecha","tipo","minutos","intensidad","modo","fc_media","fc_max","km","nota"]]; DB.acts.forEach(a=>rows.push([a.date,a.type,a.min,a.int,a.modo||"",a.hr||"",a.hrMax||"",a.km||"",a.note]));
+    rows.push([]); rows.push(["fecha","peso_kg","grasa_%","musculo_kg","agua_kg","en_ayunas"]);
+    DB.weights.forEach(w=>rows.push([w.date,w.kg??"",w.fat??"",w.mus??"",w.wat??"",w.std===false?"no":"sí"]));
     download("actividades_"+isoDate(new Date())+".csv", toCSV(rows), "text/csv"); };
   $("#reset").onclick=()=>{ if(!confirm("Se descargará una copia y se borrarán todos los registros. ¿Seguir?")) return;
     download("fullbody_jjb_antes_de_borrar_"+isoDate(new Date())+".json", JSON.stringify(Object.assign({}, DB, {live:null}), null, 1), "application/json");
