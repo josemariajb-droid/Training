@@ -86,6 +86,24 @@ body[data-tab=lib]{--hc:var(--c-green)} body[data-tab=hist]{--hc:var(--c-orange)
 .blk{border-left:4px solid var(--ink);padding-left:10px;margin:12px 0 4px}
 .blk.int{border-left-style:dashed}
 .live{text-align:center}
+/* ---- estado de hoy ---- */
+.stat3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.stat3>div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 9px;box-shadow:var(--shadow);border-top:5px solid var(--sc);display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat3 .k{font-size:11px;font-weight:800;color:var(--mute);text-transform:uppercase;letter-spacing:.5px}
+.stat3 b{font-size:20px;line-height:1.1;font-weight:900}
+.stat3 b small{font-size:12px;color:var(--mute)}
+.stat3 .d{font-size:11.5px;color:var(--mute);line-height:1.25}
+.stat3 .st-ok{--sc:var(--c-green)} .stat3 .st-mid{--sc:var(--c-orange)} .stat3 .st-bad{--sc:var(--c-verm);border-top-style:dashed} .stat3 .st-na{--sc:var(--line);border-top-style:dotted}
+.bar2{display:block;height:8px;border:1.5px solid var(--ink);border-radius:5px;overflow:hidden;margin:3px 0}
+.bar2 i{display:block;height:100%;background:var(--c-sky)}
+/* ---- biblioteca con ficha ---- */
+.libx>summary{list-style:none;cursor:pointer}
+.libx>summary::-webkit-details-marker{display:none}
+.libx>summary::after{content:"▾ ficha";float:right;font-size:12px;color:var(--mute);font-weight:700}
+.libx[open]>summary::after{content:"▴ cerrar"}
+.libx .fi{display:grid;grid-template-columns:120px 1fr;gap:10px;margin-top:8px;align-items:start}
+.libx .fi .body svg{max-width:120px}
+.libx dl{margin:0;font-size:14px}.libx dt{font-weight:800;font-size:12px;color:var(--mute);margin-top:4px}.libx dd{margin:0}
 /* ---- V14 · capa visual sport-tech sobria (claro y oscuro) ---- */
 :root{--shadow:0 4px 16px rgba(15,25,40,.08);--radius:16px}
 @media (prefers-color-scheme: dark){:root{--shadow:0 10px 28px rgba(0,0,0,.30)}}
@@ -186,15 +204,16 @@ body.livemode main{padding:8px 12px 0;max-width:680px}
 .body .z{stroke:var(--ink);stroke-width:1.2}
 .body .z0{fill:var(--card)}
 .body{--hz:var(--c-blue)}
-.body .sil{fill:color-mix(in srgb,var(--ink) 10%,var(--bg));stroke:var(--mute);stroke-width:1}
+.body .sil{fill:color-mix(in srgb,var(--ink) 8%,var(--bg));stroke:color-mix(in srgb,var(--ink) 35%,var(--bg));stroke-width:1}
 .body .nz{fill:color-mix(in srgb,var(--ink) 16%,var(--bg));stroke:var(--bg);stroke-width:1.2}
-.body .z{stroke:var(--bg);stroke-width:1.4;stroke-linejoin:round}
+.body .z{stroke:var(--bg);stroke-width:1;stroke-linejoin:round}
+.body svg{max-width:420px;margin:0 auto}
 .body text{font-size:11px;fill:var(--mute);font-weight:800;letter-spacing:1px}
 /* niveles: Día = de claro a azul intenso */
 .z0,.l0{--f:color-mix(in srgb,var(--ink) 22%,var(--bg))}
 .l1{--f:color-mix(in srgb,var(--c-sky) 45%,var(--bg))} .l2{--f:var(--c-sky)} .l3{--f:var(--c-blue)} .l4{--f:url(#hatch)}
 .body .z0{fill:color-mix(in srgb,var(--ink) 22%,var(--bg))}
-.body .z1{fill:color-mix(in srgb,var(--c-sky) 45%,var(--bg))} .body .z2{fill:var(--c-sky)} .body .z3{fill:var(--c-blue)} .body .z4{fill:url(#hatch);stroke:var(--ink);stroke-width:2}
+.body .z1{fill:color-mix(in srgb,var(--c-sky) 45%,var(--bg))} .body .z2{fill:var(--c-sky)} .body .z3{fill:var(--c-blue)} .body .z4{fill:url(#hatch);stroke:var(--ink);stroke-width:1.4}
 /* Semana: BAJO amarillo · OK verde · ALTO bermellón rayado */
 .body.m-sem{--hz:var(--c-verm)} .body.m-sem .z1{fill:var(--c-yellow)} .body.m-sem .z3{fill:var(--c-green)}
 /* ¿Listo hoy?: LISTO verde · CARGADO naranja · FATIGADO bermellón rayado */
@@ -212,6 +231,7 @@ body.livemode main{padding:8px 12px 0;max-width:680px}
 .zl{display:grid;grid-template-columns:auto auto 1fr;gap:6px 8px;align-items:center;font-size:14px;margin-top:6px}
 .zl .r{text-align:right}
 .reg li{display:flex;gap:8px;align-items:center}
+.btnlike{display:flex;align-items:center;justify-content:center;min-height:48px;border:2px solid var(--ink);border-radius:12px;font-weight:800;cursor:pointer;padding:6px 10px;text-align:center}
 .fz{display:grid;grid-template-columns:4.4em 1fr auto;gap:8px;align-items:center;font-size:14px;padding:5px 0;border-top:1px solid var(--line)}
 .fz .b{height:14px;border:2px solid var(--ink);border-radius:6px;overflow:hidden;display:block}
 .fz .b i{display:block;height:100%}
@@ -270,7 +290,7 @@ const WEEK = {1:{w:40,r:20,txt:"Referencias: RIR 3, anota todo"},
 
 /* ============ STORAGE ============ */
 const KEY = "fbjjb_v1";
-const APP_V = "v14 · 11/11/2026";
+const APP_V = "v15 · 11/11/2026";
 let DB = load();
 function blank(){ return {start:null, sessions:[], acts:[], weights:[], tpls:[], live:null, draft:null, settings:{sound:true, vib:true}}; }
 function migrateActs(list){ (list||[]).forEach(a=>{ if(a.type==="Running") a.type="Carrera"; else if(a.type==="Zona 2"){ a.type="Elíptica"; a.modo=a.modo||"continuo"; } else if(a.type==="Intervalos"){ a.type="Elíptica"; a.modo="intervalos"; } }); return list; }
@@ -403,7 +423,7 @@ function mapData(mode){
   }
   return out;
 }
-const BODY = {"sil": "M86.0 33.0 C90.3 34.2 95.5 38.0 100.0 40.0 C104.5 42.0 109.7 42.3 113.0 45.0 C116.3 47.7 118.5 50.5 120.0 56.0 C121.5 61.5 121.3 70.8 122.0 78.0 C122.7 85.2 123.3 91.8 124.0 99.0 C124.7 106.2 125.5 114.3 126.0 121.0 C126.5 127.7 126.5 134.0 127.0 139.0 C127.5 144.0 129.5 147.5 129.0 151.0 C128.5 154.5 126.0 159.3 124.0 160.0 C122.0 160.7 118.3 158.5 117.0 155.0 C115.7 151.5 116.5 145.2 116.0 139.0 C115.5 132.8 115.0 125.0 114.0 118.0 C113.0 111.0 111.3 104.3 110.0 97.0 C108.7 89.7 107.0 74.8 106.0 74.0 C105.0 73.2 105.0 85.7 104.0 92.0 C103.0 98.3 100.0 106.0 100.0 112.0 C100.0 118.0 102.8 121.3 104.0 128.0 C105.2 134.7 107.2 140.7 107.0 152.0 C106.8 163.3 103.3 184.5 103.0 196.0 C102.7 207.5 105.7 210.0 105.0 221.0 C104.3 232.0 99.3 253.5 99.0 262.0 C98.7 270.5 104.7 269.8 103.0 272.0 C101.3 274.2 91.5 276.7 89.0 275.0 C86.5 273.3 88.5 270.5 88.0 262.0 C87.5 253.5 86.3 234.7 86.0 224.0 C85.7 213.3 86.5 208.3 86.0 198.0 C85.5 187.7 84.0 171.3 83.0 162.0 C82.0 152.7 80.5 145.3 80.0 142.0 C79.5 138.7 80.5 138.7 80.0 142.0 C79.5 145.3 78.0 152.7 77.0 162.0 C76.0 171.3 74.5 187.7 74.0 198.0 C73.5 208.3 74.3 213.3 74.0 224.0 C73.7 234.7 72.5 253.5 72.0 262.0 C71.5 270.5 73.5 273.3 71.0 275.0 C68.5 276.7 58.7 274.2 57.0 272.0 C55.3 269.8 61.3 270.5 61.0 262.0 C60.7 253.5 55.7 232.0 55.0 221.0 C54.3 210.0 57.3 207.5 57.0 196.0 C56.7 184.5 53.2 163.3 53.0 152.0 C52.8 140.7 54.8 134.7 56.0 128.0 C57.2 121.3 60.0 118.0 60.0 112.0 C60.0 106.0 57.0 98.3 56.0 92.0 C55.0 85.7 55.0 73.2 54.0 74.0 C53.0 74.8 51.3 89.7 50.0 97.0 C48.7 104.3 47.0 111.0 46.0 118.0 C45.0 125.0 44.5 132.8 44.0 139.0 C43.5 145.2 44.3 151.5 43.0 155.0 C41.7 158.5 38.0 160.7 36.0 160.0 C34.0 159.3 31.5 154.5 31.0 151.0 C30.5 147.5 32.5 144.0 33.0 139.0 C33.5 134.0 33.5 127.7 34.0 121.0 C34.5 114.3 35.3 106.2 36.0 99.0 C36.7 91.8 37.3 85.2 38.0 78.0 C38.7 70.8 38.5 61.5 40.0 56.0 C41.5 50.5 43.7 47.7 47.0 45.0 C50.3 42.3 55.5 42.0 60.0 40.0 C64.5 38.0 69.7 34.2 74.0 33.0 C78.3 31.8 81.7 31.8 86.0 33.0 Z", "head": "M80 4 C89 4 94 11 94 20 C94 29 88 34 80 34 C72 34 66 29 66 20 C66 11 71 4 80 4 Z", "f": [["peV", "M99.0 42.0 C100.5 40.5 108.5 42.5 112.0 45.0 C115.5 47.5 119.0 52.7 120.0 57.0 C121.0 61.3 119.7 69.5 118.0 71.0 C116.3 72.5 112.5 68.8 110.0 66.0 C107.5 63.2 104.8 58.0 103.0 54.0 C101.2 50.0 97.5 43.5 99.0 42.0 Z"], ["peV", "M61.0 42.0 C59.5 40.5 51.5 42.5 48.0 45.0 C44.5 47.5 41.0 52.7 40.0 57.0 C39.0 61.3 40.3 69.5 42.0 71.0 C43.7 72.5 47.5 68.8 50.0 66.0 C52.5 63.2 55.2 58.0 57.0 54.0 C58.8 50.0 62.5 43.5 61.0 42.0 Z"], ["peH", "M83.0 49.0 C85.7 44.5 95.0 44.7 99.0 46.0 C103.0 47.3 106.0 53.0 107.0 57.0 C108.0 61.0 107.2 66.8 105.0 70.0 C102.8 73.2 97.7 75.5 94.0 76.0 C90.3 76.5 84.8 77.5 83.0 73.0 C81.2 68.5 80.3 53.5 83.0 49.0 Z"], ["peH", "M77.0 49.0 C74.3 44.5 65.0 44.7 61.0 46.0 C57.0 47.3 54.0 53.0 53.0 57.0 C52.0 61.0 52.8 66.8 55.0 70.0 C57.2 73.2 62.3 75.5 66.0 76.0 C69.7 76.5 75.2 77.5 77.0 73.0 C78.8 68.5 79.7 53.5 77.0 49.0 Z"], ["bra", "M109.0 71.0 C110.2 67.3 115.0 67.7 117.0 71.0 C119.0 74.3 121.2 86.2 121.0 91.0 C120.8 95.8 117.8 99.7 116.0 100.0 C114.2 100.3 111.2 97.8 110.0 93.0 C108.8 88.2 107.8 74.7 109.0 71.0 Z"], ["bra", "M51.0 71.0 C49.8 67.3 45.0 67.7 43.0 71.0 C41.0 74.3 38.8 86.2 39.0 91.0 C39.2 95.8 42.2 99.7 44.0 100.0 C45.8 100.3 48.8 97.8 50.0 93.0 C51.2 88.2 52.2 74.7 51.0 71.0 Z"], ["bra", "M114.0 104.0 C115.3 101.2 121.2 99.5 123.0 104.0 C124.8 108.5 125.7 125.5 125.0 131.0 C124.3 136.5 120.7 138.7 119.0 137.0 C117.3 135.3 115.8 126.5 115.0 121.0 C114.2 115.5 112.7 106.8 114.0 104.0 Z"], ["bra", "M46.0 104.0 C44.7 101.2 38.8 99.5 37.0 104.0 C35.2 108.5 34.3 125.5 35.0 131.0 C35.7 136.5 39.3 138.7 41.0 137.0 C42.7 135.3 44.2 126.5 45.0 121.0 C45.8 115.5 47.3 106.8 46.0 104.0 Z"], ["core", "M72.0 79.0 C75.2 73.8 84.8 73.8 88.0 79.0 C91.2 84.2 91.3 101.3 91.0 110.0 C90.7 118.7 88.8 127.5 86.0 131.0 C83.2 134.5 76.8 134.5 74.0 131.0 C71.2 127.5 69.3 118.7 69.0 110.0 C68.7 101.3 68.8 84.2 72.0 79.0 Z"], ["core", "M92.0 80.0 C93.7 78.3 99.5 84.7 101.0 90.0 C102.5 95.3 102.0 106.7 101.0 112.0 C100.0 117.3 96.7 124.0 95.0 122.0 C93.3 120.0 91.5 107.0 91.0 100.0 C90.5 93.0 90.3 81.7 92.0 80.0 Z"], ["core", "M68.0 80.0 C66.3 78.3 60.5 84.7 59.0 90.0 C57.5 95.3 58.0 106.7 59.0 112.0 C60.0 117.3 63.3 124.0 65.0 122.0 C66.7 120.0 68.5 107.0 69.0 100.0 C69.5 93.0 69.7 81.7 68.0 80.0 Z"], ["rod", "M85.0 142.0 C87.8 135.8 98.5 130.7 102.0 133.0 C105.5 135.3 106.0 146.3 106.0 156.0 C106.0 165.7 104.3 184.3 102.0 191.0 C99.7 197.7 94.8 199.5 92.0 196.0 C89.2 192.5 86.2 179.0 85.0 170.0 C83.8 161.0 82.2 148.2 85.0 142.0 Z"], ["rod", "M75.0 142.0 C72.2 135.8 61.5 130.7 58.0 133.0 C54.5 135.3 54.0 146.3 54.0 156.0 C54.0 165.7 55.7 184.3 58.0 191.0 C60.3 197.7 65.2 199.5 68.0 196.0 C70.8 192.5 73.8 179.0 75.0 170.0 C76.2 161.0 77.8 148.2 75.0 142.0 Z"], [null, "M88.0 206.0 C89.8 199.3 98.7 200.3 101.0 204.0 C103.3 207.7 102.7 219.3 102.0 228.0 C101.3 236.7 99.0 253.3 97.0 256.0 C95.0 258.7 91.5 252.3 90.0 244.0 C88.5 235.7 86.2 212.7 88.0 206.0 Z"], [null, "M72.0 206.0 C70.2 199.3 61.3 200.3 59.0 204.0 C56.7 207.7 57.3 219.3 58.0 228.0 C58.7 236.7 61.0 253.3 63.0 256.0 C65.0 258.7 68.5 252.3 70.0 244.0 C71.5 235.7 73.8 212.7 72.0 206.0 Z"]], "b": [["tiH", "M80.0 33.0 C85.0 33.0 91.0 38.7 95.0 41.0 C99.0 43.3 104.7 43.5 104.0 47.0 C103.3 50.5 95.0 55.5 91.0 62.0 C87.0 68.5 83.7 86.0 80.0 86.0 C76.3 86.0 73.0 68.5 69.0 62.0 C65.0 55.5 56.7 50.5 56.0 47.0 C55.3 43.5 61.0 43.3 65.0 41.0 C69.0 38.7 75.0 33.0 80.0 33.0 Z"], ["peV", "M99.0 42.0 C100.5 40.5 108.5 42.5 112.0 45.0 C115.5 47.5 119.0 52.7 120.0 57.0 C121.0 61.3 119.7 69.5 118.0 71.0 C116.3 72.5 112.5 68.8 110.0 66.0 C107.5 63.2 104.8 58.0 103.0 54.0 C101.2 50.0 97.5 43.5 99.0 42.0 Z"], ["peV", "M61.0 42.0 C59.5 40.5 51.5 42.5 48.0 45.0 C44.5 47.5 41.0 52.7 40.0 57.0 C39.0 61.3 40.3 69.5 42.0 71.0 C43.7 72.5 47.5 68.8 50.0 66.0 C52.5 63.2 55.2 58.0 57.0 54.0 C58.8 50.0 62.5 43.5 61.0 42.0 Z"], ["tiV", "M89.0 64.0 C92.3 58.5 101.2 54.8 104.0 57.0 C106.8 59.2 106.7 69.2 106.0 77.0 C105.3 84.8 102.7 98.2 100.0 104.0 C97.3 109.8 92.7 114.3 90.0 112.0 C87.3 109.7 84.2 98.0 84.0 90.0 C83.8 82.0 85.7 69.5 89.0 64.0 Z"], ["tiV", "M71.0 64.0 C67.7 58.5 58.8 54.8 56.0 57.0 C53.2 59.2 53.3 69.2 54.0 77.0 C54.7 84.8 57.3 98.2 60.0 104.0 C62.7 109.8 67.3 114.3 70.0 112.0 C72.7 109.7 75.8 98.0 76.0 90.0 C76.2 82.0 74.3 69.5 71.0 64.0 Z"], ["bra", "M109.0 71.0 C110.3 67.8 115.8 67.3 118.0 71.0 C120.2 74.7 122.5 88.2 122.0 93.0 C121.5 97.8 117.0 100.5 115.0 100.0 C113.0 99.5 111.0 94.8 110.0 90.0 C109.0 85.2 107.7 74.2 109.0 71.0 Z"], ["bra", "M51.0 71.0 C49.7 67.8 44.2 67.3 42.0 71.0 C39.8 74.7 37.5 88.2 38.0 93.0 C38.5 97.8 43.0 100.5 45.0 100.0 C47.0 99.5 49.0 94.8 50.0 90.0 C51.0 85.2 52.3 74.2 51.0 71.0 Z"], ["bra", "M114.0 104.0 C115.3 101.2 121.2 99.5 123.0 104.0 C124.8 108.5 125.7 125.5 125.0 131.0 C124.3 136.5 120.7 138.7 119.0 137.0 C117.3 135.3 115.8 126.5 115.0 121.0 C114.2 115.5 112.7 106.8 114.0 104.0 Z"], ["bra", "M46.0 104.0 C44.7 101.2 38.8 99.5 37.0 104.0 C35.2 108.5 34.3 125.5 35.0 131.0 C35.7 136.5 39.3 138.7 41.0 137.0 C42.7 135.3 44.2 126.5 45.0 121.0 C45.8 115.5 47.3 106.8 46.0 104.0 Z"], ["core", "M71.0 100.0 C74.3 96.2 85.7 96.2 89.0 100.0 C92.3 103.8 92.5 118.2 91.0 123.0 C89.5 127.8 83.7 129.0 80.0 129.0 C76.3 129.0 70.5 127.8 69.0 123.0 C67.5 118.2 67.7 103.8 71.0 100.0 Z"], ["cad", "M81.0 128.0 C84.0 123.2 96.8 120.8 101.0 123.0 C105.2 125.2 106.3 135.7 106.0 141.0 C105.7 146.3 102.8 153.2 99.0 155.0 C95.2 156.8 86.0 156.5 83.0 152.0 C80.0 147.5 78.0 132.8 81.0 128.0 Z"], ["cad", "M79.0 128.0 C76.0 123.2 63.2 120.8 59.0 123.0 C54.8 125.2 53.7 135.7 54.0 141.0 C54.3 146.3 57.2 153.2 61.0 155.0 C64.8 156.8 74.0 156.5 77.0 152.0 C80.0 147.5 82.0 132.8 79.0 128.0 Z"], ["cad", "M85.0 158.0 C87.3 154.0 98.8 150.7 102.0 156.0 C105.2 161.3 105.3 183.3 104.0 190.0 C102.7 196.7 96.7 197.7 94.0 196.0 C91.3 194.3 89.5 186.3 88.0 180.0 C86.5 173.7 82.7 162.0 85.0 158.0 Z"], ["cad", "M75.0 158.0 C72.7 154.0 61.2 150.7 58.0 156.0 C54.8 161.3 54.7 183.3 56.0 190.0 C57.3 196.7 63.3 197.7 66.0 196.0 C68.7 194.3 70.5 186.3 72.0 180.0 C73.5 173.7 77.3 162.0 75.0 158.0 Z"], ["gem", "M88.0 205.0 C90.2 200.2 99.3 199.5 102.0 203.0 C104.7 206.5 105.0 218.7 104.0 226.0 C103.0 233.3 98.5 246.0 96.0 247.0 C93.5 248.0 90.3 239.0 89.0 232.0 C87.7 225.0 85.8 209.8 88.0 205.0 Z"], ["gem", "M72.0 205.0 C69.8 200.2 60.7 199.5 58.0 203.0 C55.3 206.5 55.0 218.7 56.0 226.0 C57.0 233.3 61.5 246.0 64.0 247.0 C66.5 248.0 69.7 239.0 71.0 232.0 C72.3 225.0 74.2 209.8 72.0 205.0 Z"]]};
+const BODY = {"sil": "M85.0 31.0 C88.5 32.0 92.2 35.3 96.0 37.0 C99.8 38.7 104.8 38.8 108.0 41.0 C111.2 43.2 113.5 45.2 115.0 50.0 C116.5 54.8 116.3 63.3 117.0 70.0 C117.7 76.7 118.3 83.3 119.0 90.0 C119.7 96.7 120.5 104.0 121.0 110.0 C121.5 116.0 121.5 121.3 122.0 126.0 C122.5 130.7 124.3 134.7 124.0 138.0 C123.7 141.3 121.5 145.5 120.0 146.0 C118.5 146.5 116.2 144.3 115.0 141.0 C113.8 137.7 113.8 131.8 113.0 126.0 C112.2 120.2 111.2 112.7 110.0 106.0 C108.8 99.3 107.2 92.3 106.0 86.0 C104.8 79.7 104.0 68.0 103.0 68.0 C102.0 68.0 101.0 80.0 100.0 86.0 C99.0 92.0 97.0 98.7 97.0 104.0 C97.0 109.3 99.2 112.0 100.0 118.0 C100.8 124.0 102.2 129.0 102.0 140.0 C101.8 151.0 99.3 173.0 99.0 184.0 C98.7 195.0 100.5 195.3 100.0 206.0 C99.5 216.7 96.2 239.3 96.0 248.0 C95.8 256.7 100.3 256.0 99.0 258.0 C97.7 260.0 90.0 261.7 88.0 260.0 C86.0 258.3 87.5 256.0 87.0 248.0 C86.5 240.0 85.3 222.3 85.0 212.0 C84.7 201.7 85.5 196.3 85.0 186.0 C84.5 175.7 82.8 159.3 82.0 150.0 C81.2 140.7 80.3 133.3 80.0 130.0 C79.7 126.7 80.3 126.7 80.0 130.0 C79.7 133.3 78.8 140.7 78.0 150.0 C77.2 159.3 75.5 175.7 75.0 186.0 C74.5 196.3 75.3 201.7 75.0 212.0 C74.7 222.3 73.5 240.0 73.0 248.0 C72.5 256.0 74.0 258.3 72.0 260.0 C70.0 261.7 62.3 260.0 61.0 258.0 C59.7 256.0 64.2 256.7 64.0 248.0 C63.8 239.3 60.5 216.7 60.0 206.0 C59.5 195.3 61.3 195.0 61.0 184.0 C60.7 173.0 58.2 151.0 58.0 140.0 C57.8 129.0 59.2 124.0 60.0 118.0 C60.8 112.0 63.0 109.3 63.0 104.0 C63.0 98.7 61.0 92.0 60.0 86.0 C59.0 80.0 58.0 68.0 57.0 68.0 C56.0 68.0 55.2 79.7 54.0 86.0 C52.8 92.3 51.2 99.3 50.0 106.0 C48.8 112.7 47.8 120.2 47.0 126.0 C46.2 131.8 46.2 137.7 45.0 141.0 C43.8 144.3 41.5 146.5 40.0 146.0 C38.5 145.5 36.3 141.3 36.0 138.0 C35.7 134.7 37.5 130.7 38.0 126.0 C38.5 121.3 38.5 116.0 39.0 110.0 C39.5 104.0 40.3 96.7 41.0 90.0 C41.7 83.3 42.3 76.7 43.0 70.0 C43.7 63.3 43.5 54.8 45.0 50.0 C46.5 45.2 48.8 43.2 52.0 41.0 C55.2 38.8 60.2 38.7 64.0 37.0 C67.8 35.3 71.5 32.0 75.0 31.0 C78.5 30.0 81.5 30.0 85.0 31.0 Z", "head": "M80 5 C88 5 92 11 92 19 C92 27 87 31 80 31 C73 31 68 27 68 19 C68 11 72 5 80 5 Z", "f": [["tiH", "M86.0 36.0 C87.5 35.5 93.8 37.7 95.0 39.0 C96.2 40.3 94.5 43.5 93.0 44.0 C91.5 44.5 87.2 43.3 86.0 42.0 C84.8 40.7 84.5 36.5 86.0 36.0 Z"], ["tiH", "M74.0 36.0 C72.5 35.5 66.2 37.7 65.0 39.0 C63.8 40.3 65.5 43.5 67.0 44.0 C68.5 44.5 72.8 43.3 74.0 42.0 C75.2 40.7 75.5 36.5 74.0 36.0 Z"], ["peV", "M99.0 41.0 C100.3 39.8 106.3 41.2 109.0 43.0 C111.7 44.8 114.2 48.7 115.0 52.0 C115.8 55.3 115.3 61.8 114.0 63.0 C112.7 64.2 109.2 61.2 107.0 59.0 C104.8 56.8 102.3 53.0 101.0 50.0 C99.7 47.0 97.7 42.2 99.0 41.0 Z"], ["peV", "M61.0 41.0 C59.7 39.8 53.7 41.2 51.0 43.0 C48.3 44.8 45.8 48.7 45.0 52.0 C44.2 55.3 44.7 61.8 46.0 63.0 C47.3 64.2 50.8 61.2 53.0 59.0 C55.2 56.8 57.7 53.0 59.0 50.0 C60.3 47.0 62.3 42.2 61.0 41.0 Z"], ["peH", "M82.0 47.0 C84.3 44.0 92.5 44.2 96.0 45.0 C99.5 45.8 102.2 49.2 103.0 52.0 C103.8 54.8 102.8 59.7 101.0 62.0 C99.2 64.3 95.2 65.8 92.0 66.0 C88.8 66.2 83.7 66.2 82.0 63.0 C80.3 59.8 79.7 50.0 82.0 47.0 Z"], ["peH", "M78.0 47.0 C75.7 44.0 67.5 44.2 64.0 45.0 C60.5 45.8 57.8 49.2 57.0 52.0 C56.2 54.8 57.2 59.7 59.0 62.0 C60.8 64.3 64.8 65.8 68.0 66.0 C71.2 66.2 76.3 66.2 78.0 63.0 C79.7 59.8 80.3 50.0 78.0 47.0 Z"], ["bra", "M107.0 64.0 C107.8 61.0 111.5 61.0 113.0 64.0 C114.5 67.0 116.2 77.7 116.0 82.0 C115.8 86.3 113.3 90.0 112.0 90.0 C110.7 90.0 108.8 86.3 108.0 82.0 C107.2 77.7 106.2 67.0 107.0 64.0 Z"], ["bra", "M53.0 64.0 C52.2 61.0 48.5 61.0 47.0 64.0 C45.5 67.0 43.8 77.7 44.0 82.0 C44.2 86.3 46.7 90.0 48.0 90.0 C49.3 90.0 51.2 86.3 52.0 82.0 C52.8 77.7 53.8 67.0 53.0 64.0 Z"], ["bra", "M111.0 94.0 C112.0 91.7 116.5 90.0 118.0 94.0 C119.5 98.0 120.5 113.0 120.0 118.0 C119.5 123.0 116.3 125.7 115.0 124.0 C113.7 122.3 112.7 113.0 112.0 108.0 C111.3 103.0 110.0 96.3 111.0 94.0 Z"], ["bra", "M49.0 94.0 C48.0 91.7 43.5 90.0 42.0 94.0 C40.5 98.0 39.5 113.0 40.0 118.0 C40.5 123.0 43.7 125.7 45.0 124.0 C46.3 122.3 47.3 113.0 48.0 108.0 C48.7 103.0 50.0 96.3 49.0 94.0 Z"], ["core", "M81.0 67.0 C82.1 65.6 86.3 66.0 87.5 67.5 C88.7 69.0 89.1 74.6 88.0 76.0 C86.9 77.4 82.2 77.5 81.0 76.0 C79.8 74.5 79.9 68.4 81.0 67.0 Z"], ["core", "M79.0 67.0 C77.9 65.6 73.7 66.0 72.5 67.5 C71.3 69.0 70.9 74.6 72.0 76.0 C73.1 77.4 77.8 77.5 79.0 76.0 C80.2 74.5 80.1 68.4 79.0 67.0 Z"], ["core", "M81.0 78.0 C82.1 76.6 86.3 77.0 87.5 78.5 C88.7 80.0 89.1 85.6 88.0 87.0 C86.9 88.4 82.2 88.5 81.0 87.0 C79.8 85.5 79.9 79.4 81.0 78.0 Z"], ["core", "M79.0 78.0 C77.9 76.6 73.7 77.0 72.5 78.5 C71.3 80.0 70.9 85.6 72.0 87.0 C73.1 88.4 77.8 88.5 79.0 87.0 C80.2 85.5 80.1 79.4 79.0 78.0 Z"], ["core", "M81.0 89.0 C82.1 87.6 86.3 88.0 87.5 89.5 C88.7 91.0 89.1 96.6 88.0 98.0 C86.9 99.4 82.2 99.5 81.0 98.0 C79.8 96.5 79.9 90.4 81.0 89.0 Z"], ["core", "M79.0 89.0 C77.9 87.6 73.7 88.0 72.5 89.5 C71.3 91.0 70.9 96.6 72.0 98.0 C73.1 99.4 77.8 99.5 79.0 98.0 C80.2 96.5 80.1 90.4 79.0 89.0 Z"], ["core", "M81.0 100.0 C82.0 97.2 86.2 97.7 87.0 100.0 C87.8 102.3 87.0 111.2 86.0 114.0 C85.0 116.8 81.8 119.3 81.0 117.0 C80.2 114.7 80.0 102.8 81.0 100.0 Z"], ["core", "M79.0 100.0 C78.0 97.2 73.8 97.7 73.0 100.0 C72.2 102.3 73.0 111.2 74.0 114.0 C75.0 116.8 78.2 119.3 79.0 117.0 C79.8 114.7 80.0 102.8 79.0 100.0 Z"], ["core", "M90.0 69.0 C91.2 67.2 95.8 74.0 97.0 79.0 C98.2 84.0 97.8 94.0 97.0 99.0 C96.2 104.0 93.2 110.5 92.0 109.0 C90.8 107.5 89.8 96.7 89.5 90.0 C89.2 83.3 88.8 70.8 90.0 69.0 Z"], ["core", "M70.0 69.0 C68.8 67.2 64.2 74.0 63.0 79.0 C61.8 84.0 62.2 94.0 63.0 99.0 C63.8 104.0 66.8 110.5 68.0 109.0 C69.2 107.5 70.2 96.7 70.5 90.0 C70.8 83.3 71.2 70.8 70.0 69.0 Z"], ["rod", "M84.0 127.0 C85.8 120.5 93.2 119.0 96.0 121.0 C98.8 123.0 100.7 130.2 101.0 139.0 C101.3 147.8 99.7 167.0 98.0 174.0 C96.3 181.0 93.2 183.3 91.0 181.0 C88.8 178.7 86.2 169.0 85.0 160.0 C83.8 151.0 82.2 133.5 84.0 127.0 Z"], ["rod", "M76.0 127.0 C74.2 120.5 66.8 119.0 64.0 121.0 C61.2 123.0 59.3 130.2 59.0 139.0 C58.7 147.8 60.3 167.0 62.0 174.0 C63.7 181.0 66.8 183.3 69.0 181.0 C71.2 178.7 73.8 169.0 75.0 160.0 C76.2 151.0 77.8 133.5 76.0 127.0 Z"], [null, "M88.0 191.0 C89.2 185.8 94.7 185.3 96.0 189.0 C97.3 192.7 96.7 205.5 96.0 213.0 C95.3 220.5 93.2 232.8 92.0 234.0 C90.8 235.2 89.7 227.2 89.0 220.0 C88.3 212.8 86.8 196.2 88.0 191.0 Z"], [null, "M72.0 191.0 C70.8 185.8 65.3 185.3 64.0 189.0 C62.7 192.7 63.3 205.5 64.0 213.0 C64.7 220.5 66.8 232.8 68.0 234.0 C69.2 235.2 70.3 227.2 71.0 220.0 C71.7 212.8 73.2 196.2 72.0 191.0 Z"]], "b": [["tiH", "M80.0 33.0 C83.7 33.0 87.7 37.0 91.0 39.0 C94.3 41.0 100.2 43.0 100.0 45.0 C99.8 47.0 93.3 47.2 90.0 51.0 C86.7 54.8 83.3 68.0 80.0 68.0 C76.7 68.0 73.3 54.8 70.0 51.0 C66.7 47.2 60.2 47.0 60.0 45.0 C59.8 43.0 65.7 41.0 69.0 39.0 C72.3 37.0 76.3 33.0 80.0 33.0 Z"], ["peV", "M99.0 41.0 C100.3 39.8 106.3 41.2 109.0 43.0 C111.7 44.8 114.2 48.7 115.0 52.0 C115.8 55.3 115.3 61.8 114.0 63.0 C112.7 64.2 109.2 61.2 107.0 59.0 C104.8 56.8 102.3 53.0 101.0 50.0 C99.7 47.0 97.7 42.2 99.0 41.0 Z"], ["peV", "M61.0 41.0 C59.7 39.8 53.7 41.2 51.0 43.0 C48.3 44.8 45.8 48.7 45.0 52.0 C44.2 55.3 44.7 61.8 46.0 63.0 C47.3 64.2 50.8 61.2 53.0 59.0 C55.2 56.8 57.7 53.0 59.0 50.0 C60.3 47.0 62.3 42.2 61.0 41.0 Z"], ["bra", "M107.0 64.0 C108.0 61.3 112.5 60.7 114.0 64.0 C115.5 67.3 116.5 79.7 116.0 84.0 C115.5 88.3 112.3 90.7 111.0 90.0 C109.7 89.3 108.7 84.3 108.0 80.0 C107.3 75.7 106.0 66.7 107.0 64.0 Z"], ["bra", "M53.0 64.0 C52.0 61.3 47.5 60.7 46.0 64.0 C44.5 67.3 43.5 79.7 44.0 84.0 C44.5 88.3 47.7 90.7 49.0 90.0 C50.3 89.3 51.3 84.3 52.0 80.0 C52.7 75.7 54.0 66.7 53.0 64.0 Z"], ["bra", "M111.0 94.0 C112.0 91.7 116.5 90.0 118.0 94.0 C119.5 98.0 120.5 113.0 120.0 118.0 C119.5 123.0 116.3 125.7 115.0 124.0 C113.7 122.3 112.7 113.0 112.0 108.0 C111.3 103.0 110.0 96.3 111.0 94.0 Z"], ["bra", "M49.0 94.0 C48.0 91.7 43.5 90.0 42.0 94.0 C40.5 98.0 39.5 113.0 40.0 118.0 C40.5 123.0 43.7 125.7 45.0 124.0 C46.3 122.3 47.3 113.0 48.0 108.0 C48.7 103.0 50.0 96.3 49.0 94.0 Z"], ["tiV", "M87.0 55.0 C89.7 50.8 97.5 49.3 100.0 51.0 C102.5 52.7 102.5 58.5 102.0 65.0 C101.5 71.5 99.2 84.5 97.0 90.0 C94.8 95.5 91.2 100.3 89.0 98.0 C86.8 95.7 84.3 83.2 84.0 76.0 C83.7 68.8 84.3 59.2 87.0 55.0 Z"], ["tiV", "M73.0 55.0 C70.3 50.8 62.5 49.3 60.0 51.0 C57.5 52.7 57.5 58.5 58.0 65.0 C58.5 71.5 60.8 84.5 63.0 90.0 C65.2 95.5 68.8 100.3 71.0 98.0 C73.2 95.7 75.7 83.2 76.0 76.0 C76.3 68.8 75.7 59.2 73.0 55.0 Z"], ["core", "M81.0 90.0 C81.8 86.0 85.0 86.3 86.0 90.0 C87.0 93.7 87.8 108.0 87.0 112.0 C86.2 116.0 82.0 117.7 81.0 114.0 C80.0 110.3 80.2 94.0 81.0 90.0 Z"], ["core", "M79.0 90.0 C78.2 86.0 75.0 86.3 74.0 90.0 C73.0 93.7 72.2 108.0 73.0 112.0 C73.8 116.0 78.0 117.7 79.0 114.0 C80.0 110.3 79.8 94.0 79.0 90.0 Z"], ["cad", "M81.0 117.0 C83.5 113.0 93.7 111.2 97.0 113.0 C100.3 114.8 101.3 123.7 101.0 128.0 C100.7 132.3 98.2 137.5 95.0 139.0 C91.8 140.5 84.3 140.7 82.0 137.0 C79.7 133.3 78.5 121.0 81.0 117.0 Z"], ["cad", "M79.0 117.0 C76.5 113.0 66.3 111.2 63.0 113.0 C59.7 114.8 58.7 123.7 59.0 128.0 C59.3 132.3 61.8 137.5 65.0 139.0 C68.2 140.5 75.7 140.7 78.0 137.0 C80.3 133.3 81.5 121.0 79.0 117.0 Z"], ["cad", "M84.0 143.0 C85.7 139.0 93.7 135.8 96.0 141.0 C98.3 146.2 98.8 167.3 98.0 174.0 C97.2 180.7 93.0 182.5 91.0 181.0 C89.0 179.5 87.2 171.3 86.0 165.0 C84.8 158.7 82.3 147.0 84.0 143.0 Z"], ["cad", "M76.0 143.0 C74.3 139.0 66.3 135.8 64.0 141.0 C61.7 146.2 61.2 167.3 62.0 174.0 C62.8 180.7 67.0 182.5 69.0 181.0 C71.0 179.5 72.8 171.3 74.0 165.0 C75.2 158.7 77.7 147.0 76.0 143.0 Z"], ["gem", "M86.0 189.0 C87.3 185.0 94.0 184.3 96.0 187.0 C98.0 189.7 98.5 198.7 98.0 205.0 C97.5 211.3 94.7 224.0 93.0 225.0 C91.3 226.0 89.2 217.0 88.0 211.0 C86.8 205.0 84.7 193.0 86.0 189.0 Z"], ["gem", "M74.0 189.0 C72.7 185.0 66.0 184.3 64.0 187.0 C62.0 189.7 61.5 198.7 62.0 205.0 C62.5 211.3 65.3 224.0 67.0 225.0 C68.7 226.0 70.8 217.0 72.0 211.0 C73.2 205.0 75.3 193.0 74.0 189.0 Z"]]};
 function bodySVG(d, m="dia"){
   const fig=(ox,v)=>`<g transform="translate(${ox},0)"><path class="sil" d="${BODY.sil}"/><path class="sil" d="${BODY.head}"/>
     ${BODY[v].map(([z,pth])=>`<path class="${z?"z z"+((d[z]||{}).l||0):"nz"}" ${z?`data-bz="${z}"`:""} d="${pth}"><title>${z?FZ_SHORT[z]+": "+((d[z]||{}).st||""):""}</title></path>`).join("")}
@@ -606,6 +626,42 @@ function bindBodyComp(){
     save(); toast("Medición guardada"); render(); };
 }
 
+/* ============ ESTADO DE HOY (disposición, carga, minutos de intensidad) ============ */
+const LOAD_F = {suave:1, media:2, dura:3};
+function entryLoad(x){ // carga = minutos × intensidad (método sRPE simplificado)
+  if(x.k==="s"){ const s=DB.sessions.find(z=>z.id===x.id); const f=s&&s.rpe?(s.rpe>=8?3:s.rpe>=5?2:1):2; return x.min*f; }
+  return x.min*(LOAD_F[x.int]||2);
+}
+function dayList(from,to){ const out=[]; const d=new Date(from+"T12:00"), e=new Date(to+"T12:00"); for(;d<=e;d.setDate(d.getDate()+1)) out.push(isoDate(d)); return out; }
+function statusToday(){
+  const today=isoDate(new Date()), ago=n=>isoDate(new Date(Date.now()-n*864e5));
+  const load=(a,b)=>dayList(a,b).reduce((t,k)=>t+entriesOn(k).reduce((u,x)=>u+entryLoad(x),0),0);
+  const acute=load(ago(6),today), chronic=load(ago(27),today)/4;
+  const first=[...DB.sessions.map(s=>s.date),...DB.acts.map(a=>a.date)].sort()[0];
+  const enough = first && first<=ago(20);
+  let lst={t:"SIN DATOS", d:"necesito 3 semanas de registros"};
+  if(enough && chronic>0){ const r=acute/chronic;
+    lst = r<0.8?{t:"BAJA", d:"menos que tu media: hay margen"}: r<=1.3?{t:"ÓPTIMA", d:"en línea con tu media"}: r<=1.5?{t:"ALTA", d:"por encima de tu media"}:{t:"MUY ALTA", d:"riesgo de sobrecarga: baja el ritmo"};
+    lst.r=r; }
+  // minutos de intensidad (OMS: 150/semana; vigorosa cuenta doble), lunes a hoy
+  let im=0; dayList(mondayOf(new Date()),today).forEach(k=>entriesOn(k).forEach(x=>{ const v = x.k==="s" ? (entryLoad(x)/x.min>=3?2:1) : (x.int==="dura"?2:x.int==="suave"?0.5:1); im+=x.min*v; }));
+  im=Math.round(im);
+  const f=fatigueMap(), main=["rod","cad","peH","peV","tiV","tiH","core"], st=main.map(z=>zoneState(z,f).st);
+  const nOk=st.filter(x=>x==="LISTO").length, nF=st.filter(x=>x==="FATIGADO").length;
+  const disp = nF>=2 || (lst.r&&lst.r>1.5) ? {t:"BAJA", d:"día suave o de movilidad"} : nF===1 || nOk<4 ? {t:"MEDIA", d:"entrena evitando lo fatigado"} : {t:"ALTA", d:"buen día para apretar"};
+  return {disp, nOk, lst, acute, chronic, im};
+}
+function statusHTML(){
+  const s=statusToday(), cls=t=>t==="ALTA"||t==="ÓPTIMA"?"st-ok":t==="BAJA"&&false?"":t==="MUY ALTA"||t==="BAJA"&&0?"st-bad":t==="SIN DATOS"?"st-na":"st-mid";
+  const dCls = s.disp.t==="ALTA"?"st-ok":s.disp.t==="MEDIA"?"st-mid":"st-bad";
+  const lCls = s.lst.t==="ÓPTIMA"?"st-ok":s.lst.t==="SIN DATOS"?"st-na":s.lst.t==="MUY ALTA"?"st-bad":"st-mid";
+  const pct=Math.min(100,Math.round(s.im/150*100));
+  return `<div class="stat3">
+    <div class="${dCls}"><span class="k">Disposición</span><b>${s.disp.t}</b><span class="d">${s.nOk} de 7 zonas listas · ${s.disp.d}</span></div>
+    <div class="${lCls}"><span class="k">Carga 7 días</span><b>${s.lst.t}</b><span class="d">${s.lst.r?Math.round(s.acute)+" frente a "+Math.round(s.chronic)+" de media · ":""}${s.lst.d}</span></div>
+    <div class="${s.im>=150?"st-ok":"st-mid"}"><span class="k">Min. intensidad</span><b>${s.im}<small>/150</small></b><span class="bar2"><i style="width:${pct}%"></i></span><span class="d">esta semana (vigorosa ×2)</span></div></div>`;
+}
+
 /* ============ RESUMEN DE ACTIVIDAD (semana / mes / 8 semanas) ============ */
 function periodEntries(from, to){
   return [...DB.sessions.filter(s=>s.date>=from&&s.date<=to).map(s=>({abbr:"FB", t:"Rutina", min:Math.round((s.durSec||0)/60), date:s.date})),
@@ -769,8 +825,9 @@ function lastHint(e){
 }
 function nextVariant(e){ // siguiente paso con el material de casa (sin más kilos)
   const own = c=>"MBDC".includes(c);
-  const c = LIB.filter(x=>x.z===e.z && x.id!==e.id && !x.iv && x.eq.split("").every(own) && (x.lvl>e.lvl || (x.lvl===e.lvl && (x.tp>e.tp || (x.u && !e.u)))))
-    .sort((a,b)=>a.lvl-b.lvl || (b.u-a.u) || (b.tp-a.tp));
+  const words=w=>new Set(w.toLowerCase().split(/[^a-záéíóúñ0-9]+/).filter(x=>x.length>3)), we=words(e.n), sim=x=>[...words(x.n)].filter(w=>we.has(w)).length;
+  const c = LIB.filter(x=>x.z===e.z && x.id!==e.id && !x.iv && x.eq.split("").every(own) && (x.lvl>e.lvl || (x.lvl===e.lvl && x.tp>e.tp)))
+    .sort((a,b)=>a.lvl-b.lvl || sim(b)-sim(a) || (b.tp-a.tp));   // mismo patrón primero: misma familia de ejercicio
   return c[0] || null;
 }
 function progress(id){
@@ -834,7 +891,7 @@ function render(){
 /* ============ HOY ============ */
 function renderHome(){
   const wi = weekInfo(), today=isoDate(new Date()), e=entriesOn(today);
-  let h = `<div class="card"><h2>Hoy · ${longD(today)}</h2>
+  let h = `${statusHTML()}<div class="card"><h2>Hoy · ${longD(today)}</h2>
     <div class="mute small">Semana ${wi.week} de 4 · ${WEEK[wi.week].txt} · RIR objetivo <b>${rirTarget(wi.week)}</b></div>
     ${e.length?`<ul class="list reg" style="margin-top:6px">${e.map(x=>`<li><span class="tg ${x.abbr}">${x.abbr}</span><span class="grow"><b>${esc(x.t)}</b> · ${x.min}'${x.int?" · "+x.int:""}${x.det?`<br><span class="mute small">${esc(x.det)}</span>`:""}</span>${x.k==="s"?`<button class="sm" data-open="${x.id}">Ver</button>`:""}</li>`).join("")}</ul>`
       :`<div class="mute" style="margin-top:6px">Aún no has registrado nada hoy.</div>`}</div>
@@ -962,15 +1019,31 @@ function renderLib(){
       <select id="fe"><option value="all">Todo el material</option>${Object.entries(EQ).map(([k,v])=>`<option value="${k}" ${k===f.eq?"selected":""}>${v}</option>`).join("")}</select></div>
     <input id="fq" placeholder="Buscar…" value="${esc(f.q)}" style="margin-top:6px"></div>
   <div class="card"><div class="mute small">${list.length} resultados</div><ul class="list">`;
-  list.forEach(e=>{ const p=presc(e,"H"), pr=progress(e.id);
-    h += `<li><b>${esc(e.n)}</b> <span class="mute small">· ${ZONES[e.z]} · ${eqTxt(e)} · ${lvlTxt(e.lvl)}${e.j?" · salto":""}</span><br>
-      <span class="small">${e.iv?ivTxt(e.iv):p.sets+" × "+repTxt(e)}</span> <span class="mute small">— ${esc(e.cue)}</span>
-      ${used[e.id]?`<br><span class="tag ${pr.k}">${esc(pr.t.split(":")[0])}</span> <span class="mute small">hecho hace ${daysAgo(used[e.id])} d</span>`:""}</li>`; });
+  list.slice(0,80).forEach(e=>{ const p=presc(e,"H"), pr=progress(e.id);
+    h += `<li><details class="libx" data-lx="${e.id}"><summary><b>${esc(e.n)}</b><br><span class="mute small">${ZONES[e.z]} · ${eqTxt(e)} · ${lvlTxt(e.lvl)}${e.j?" · salto":""}${used[e.id]?" · hace "+daysAgo(used[e.id])+" d":""}</span></summary><div class="fx"></div></details></li>`; });
+  if(list.length>80) h += `<li class="mute small">… y ${list.length-80} más: afina con el buscador o la zona.</li>`;
   h += `</ul></div>`;
   $("#app").innerHTML = h;
+  document.querySelectorAll("[data-lx]").forEach(dt=>dt.addEventListener("toggle",()=>{ if(dt.open && !dt.querySelector(".fi")) dt.querySelector(".fx").innerHTML=libSheet(LIB_BY[dt.dataset.lx]); }));
   $("#fz").onchange=e=>{ f.z=e.target.value; renderLib(); };
   $("#fe").onchange=e=>{ f.eq=e.target.value; renderLib(); };
   $("#fq").oninput=e=>{ f.q=e.target.value; clearTimeout(renderLib.h); renderLib.h=setTimeout(()=>{ renderLib(); const q=$("#fq"); q.focus(); q.setSelectionRange(q.value.length,q.value.length); },300); };
+}
+
+function libSheet(e){
+  const zs = SPLIT[e.z] ? SPLIT[e.z] : {[e.z]:1}, d={};
+  FZ_SHOW.forEach(z=>{ const v=zs[z]||0; d[z]={l:v>=.5?3:v>0?1:0, st:"", txt:""}; });
+  const L=logsFor(e.id), pr=progress(e.id), nv=nextVariant(e);
+  const best = L.length ? Math.max(...L.flatMap(l=>l.sets.filter(z=>!z.auto).map(z=>+z.reps||0)), 0) : 0;
+  const pres = ["F","H","Q"].map(o=>{ const p=presc(e,o); return OBJ[o]+": "+(e.iv?ivTxt(e.iv):o==="Q"?"en circuito, "+WEEK[weekInfo().week].w+"\" de trabajo":p.sets+" × "+p.lo+"–"+p.hi+(e.iso?" s":e.u?" por lado":"")+" · desc. "+p.rest+"\""); }).join("<br>");
+  const yt = "https://www.youtube.com/results?search_query="+encodeURIComponent(e.n+" ejercicio técnica");
+  return `<div class="fi">${bodySVG(d,"dia").replace('viewBox="0 0 340 300"','viewBox="0 0 340 300" style="max-width:120px"')}
+    <dl><dt>Trabaja</dt><dd>${Object.keys(zs).map(z=>FZ_SHORT[z]||ZONES[z]).join(", ")}${e.c?" · compuesto":""}${e.u?" · unilateral":""}${e.iso?" · isométrico":""}</dd>
+      <dt>Técnica</dt><dd>${esc(e.cue)}</dd>
+      <dt>Prescripción</dt><dd class="small">${pres}</dd>
+      <dt>Tu historial</dt><dd>${L.length?(L.length===1?"1 vez":L.length+" veces")+" · última hace "+daysAgo(L[0].date)+" d"+(best?" · mejor serie "+best+(e.iso?" s":" reps"):"")+"<br><span class=\"tag "+pr.k+"\">"+esc(pr.t)+"</span>":"Aún no lo has hecho"}</dd>
+      ${nv?`<dt>Siguiente nivel</dt><dd>${esc(nv.n)}</dd>`:""}
+      <dd style="margin-top:6px"><a href="${yt}" target="_blank" rel="noopener">▶ Ver vídeos de la técnica</a></dd></dl></div>`;
 }
 
 /* ============ PRE-SESIÓN ============ */
@@ -1334,25 +1407,30 @@ function weeklyReport(){
 
 /* ============ DATOS ============ */
 function renderData(){
-  const h = `<div class="okbox"><b>Versión de la app:</b> ${APP_V}</div><div class="card"><h2>Informe semanal para Claude</h2>
-    <div class="mute">Últimos 7 días: sesiones, series, reps, RIR, esfuerzo, notas, deporte y peso. Cópialo y pégalo en el chat.</div>
-    <button class="pri big" id="copyR" style="margin-top:10px">📋 Copiar informe</button>
-    <button class="big" id="dlR" style="margin-top:8px">⬇ Descargar informe (JSON)</button></div>
-  <div class="card"><h2>Ciclo</h2>
-    <label>Fecha de inicio (lunes de la semana 1)</label><input id="start" type="date" value="${DB.start}">
-    <button id="saveStart" style="margin-top:8px">Guardar fecha</button>
-    <table style="margin-top:10px">${[1,2,3,4].map(w=>`<tr><td><b>Sem ${w}</b></td><td>${WEEK[w].txt}</td></tr>`).join("")}</table></div>
-  <div class="card"><h2>Avisos</h2>
+  const lb=DB.settings.lastBackup, lbd=lb?daysAgo(lb):null;
+  const h = `<div class="card"><h2>Informe para Claude</h2>
+    <div class="mute">Tu semana en un texto. Cópialo y pégalo en el chat para que te la valore.</div>
+    <button class="pri big" id="copyR" style="margin-top:10px">📋 Copiar informe de la semana</button></div>
+  <div class="card"><h2>Copia de seguridad</h2>
+    <div class="${lbd===null||lbd>7?"warn":"okbox"}">${lbd===null?"Aún no has guardado ninguna copia.":lbd===0?"Última copia: hoy.":"Última copia: hace "+lbd+" días."+(lbd>7?" Guarda una ahora.":"")}</div>
+    <div class="row"><button class="pri grow" id="expJ">⬇ Guardar copia</button><label class="btnlike grow" for="imp">⬆ Recuperar copia</label></div>
+    <input id="imp" type="file" accept="application/json,.json" style="display:none">
+    <div class="mute small" style="margin-top:6px">Recuperar suma la copia a lo que ya tienes, sin duplicar. Sirve para pasar los datos de un móvil a otro.</div></div>
+  <div class="card"><h2>Avisos en la sesión</h2>
     <label class="check"><input type="checkbox" id="sound" ${DB.settings.sound?"checked":""}><span><b>Sonido</b> en los cambios</span></label>
-    <label class="check"><input type="checkbox" id="vib" ${DB.settings.vib?"checked":""}><span><b>Vibración</b> en los cambios<br><span class="mute">Android sí; iPhone no la permite en web</span></span></label></div>
-  <div class="card"><h2>Copia de seguridad completa</h2>
-    <div class="mute">Todo: sesiones, plantillas, actividades y peso. Exporta cada semana.</div>
-    <button class="pri big" id="expJ" style="margin-top:10px">Exportar copia (JSON)</button>
-    <div class="row" style="margin-top:8px"><button class="grow" id="expC">Series (CSV)</button><button class="grow" id="expA">Actividades (CSV)</button></div>
-    <label style="margin-top:12px">Importar copia (JSON) · se suma a lo que hay, sin duplicar</label><input id="imp" type="file" accept="application/json,.json"></div>
-  <div class="card"><h2>Empezar de cero</h2>
-    <div class="mute">Borra sesiones, deporte y peso, y reinicia el ciclo en la semana 1 desde este lunes. Las sesiones guardadas del planificador se conservan. Antes descarga una copia automáticamente.</div>
-    <button class="big" id="reset" style="margin-top:10px">Borrar registros y empezar de cero</button></div>`;
+    <label class="check"><input type="checkbox" id="vib" ${DB.settings.vib?"checked":""}><span><b>Vibración</b> en los cambios</span></label></div>
+  <details class="card add"><summary>Más opciones</summary>
+    <h3 style="margin-top:10px">Ciclo de 4 semanas</h3>
+    <label>Lunes de la semana 1</label><input id="start" type="date" value="${DB.start}">
+    <button id="saveStart" style="margin-top:8px">Guardar fecha</button>
+    <table style="margin-top:8px">${[1,2,3,4].map(w=>`<tr><td><b>Sem ${w}</b></td><td>${WEEK[w].txt}</td></tr>`).join("")}</table>
+    <h3 style="margin-top:14px">Exportar a hoja de cálculo</h3>
+    <div class="row"><button class="grow" id="expC">Series (CSV)</button><button class="grow" id="expA">Actividad y cuerpo (CSV)</button></div>
+    <button class="big" id="dlR" style="margin-top:8px">Descargar informe (archivo)</button>
+    <h3 style="margin-top:14px">Empezar de cero</h3>
+    <div class="mute small">Borra sesiones, deporte y mediciones (antes descarga una copia). Las sesiones guardadas del planificador se conservan.</div>
+    <button class="big" id="reset" style="margin-top:8px">Borrar registros</button>
+    <div class="mute small" style="margin-top:12px">Versión ${APP_V}</div></details>`;
   $("#app").innerHTML = h;
   $("#copyR").onclick=async()=>{ const txt=JSON.stringify(weeklyReport(), null, 1);
     try{ await navigator.clipboard.writeText(txt); toast("Informe copiado: pégalo en el chat"); }
@@ -1361,7 +1439,7 @@ function renderData(){
   $("#saveStart").onclick=()=>{ if($("#start").value){ DB.start=$("#start").value; save(); toast("Fecha guardada"); render(); } };
   $("#sound").onchange=e=>{ DB.settings.sound=e.target.checked; save(); if(e.target.checked) beep(); };
   $("#vib").onchange=e=>{ DB.settings.vib=e.target.checked; save(); buzz(80); };
-  $("#expJ").onclick=()=>download("fullbody_jjb_"+isoDate(new Date())+".json", JSON.stringify(Object.assign({}, DB, {live:null}), null, 1), "application/json");
+  $("#expJ").onclick=()=>{ DB.settings.lastBackup=isoDate(new Date()); save(); download("fullbody_jjb_"+isoDate(new Date())+".json", JSON.stringify(Object.assign({}, DB, {live:null}), null, 1), "application/json"); toast("Copia guardada en Descargas"); renderData(); };
   $("#expC").onclick=()=>{ const rows=[["fecha","sesion","semana","ejercicio","zona","modo","prescrito","serie","reps","rir","variante","duracion_sesion_s"]];
     DB.sessions.forEach(s=>s.ex.forEach(x=>x.sets.forEach((z,i)=>rows.push([s.date,sessionName(s),s.week,x.name,ZONES[(LIB_BY[x.id]||{}).z]||"",x.mode||"reps",x.presc||"",z.round||i+1,z.reps,z.rir??"",z.var,s.durSec]))));
     download("series_"+isoDate(new Date())+".csv", toCSV(rows), "text/csv"); };
