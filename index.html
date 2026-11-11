@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#101722">
+<meta name="theme-color" content="#c9cdd3">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>Full Body JJB</title>
 <link rel="manifest" href="manifest.webmanifest">
@@ -11,17 +11,14 @@
 <link rel="apple-touch-icon" href="icon-192.png">
 <style>
 :root{
-  --bg:#f4f1ea; --card:#ffffff; --ink:#151a22; --mute:#5b6270; --line:#d5d0c4;
-  --acc:#0072B2; --acc-ink:#ffffff; --warn:#8a5a00; --warn-bg:#fff2d6;
-  --ok-bg:#e3effa; --radius:14px;
-  /* Paleta Okabe-Ito (apta para daltonismo) */
-  --c-orange:#E69F00; --c-sky:#56B4E9; --c-green:#009E73; --c-yellow:#F0E442;
-  --c-blue:#0072B2; --c-verm:#D55E00; --c-purple:#CC79A7; --c-ink:#111;
-}
-@media (prefers-color-scheme: dark){
-  :root{--bg:#0f141c; --card:#18202c; --ink:#eef1f6; --mute:#a3abb8; --line:#2c3644;
-  --acc:#56B4E9; --acc-ink:#0f141c; --warn:#ffc861; --warn-bg:#3a2e14; --ok-bg:#1b2e40;
-  --c-blue:#2b8fd6;}
+  /* Tema único: gris intermedio (ni oscuro ni blanco) */
+  --bg:#c9cdd3; --card:#e4e7eb; --card2:#d7dbe0; --ink:#1f242b; --mute:#4c5560; --line:#b2b8c0;
+  --acc:#8fc1e6; --acc-ink:#14212c; --warn:#5c3f00; --warn-bg:#f1e1bd;
+  --ok-bg:#d4e5f2; --radius:18px;
+  /* Okabe-Ito en tonos pastel (aptos para daltonismo; el texto manda) */
+  --c-orange:#efbd63; --c-sky:#a6d3ef; --c-green:#86c9b4; --c-yellow:#efe58a;
+  --c-blue:#86b4dc; --c-verm:#e59f78; --c-purple:#dcb0cb; --c-ink:#1f242b;
+  color-scheme: light;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 body{background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
@@ -34,7 +31,7 @@ header h1{font-size:19px;letter-spacing:.2px}
 .chip.dash{border-style:dashed}
 main{padding:12px 16px;max-width:680px;margin:0 auto}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:14px;margin:0 0 12px}
-h2{font-size:17px;margin:4px 0 8px}
+h2{font-size:17px;margin:2px 0 10px;text-align:center;letter-spacing:.2px}
 h3{font-size:15px;margin:0 0 4px}
 .mute{color:var(--mute);font-size:14px}
 .small{font-size:13px}
@@ -67,16 +64,16 @@ nav button{flex:1;border:0;min-height:52px;font-size:14px;border-radius:10px}
 nav button{border-top:4px solid var(--tc);border-radius:0 0 10px 10px;display:flex;flex-direction:column;align-items:center;gap:0;line-height:1.15}
 nav button .ic{font-size:18px}
 nav button[aria-current="true"]{background:var(--tc);color:var(--tk);text-decoration:underline;text-underline-offset:4px}
-nav [data-tab=hoy]{--tc:var(--c-blue);--tk:#fff} nav [data-tab=lib]{--tc:var(--c-green);--tk:#fff}
+nav [data-tab=hoy]{--tc:var(--c-blue);--tk:#1f242b} nav [data-tab=lib]{--tc:var(--c-green);--tk:#1f242b}
 nav [data-tab=hist]{--tc:var(--c-orange);--tk:#111} nav [data-tab=datos]{--tc:var(--c-purple);--tk:#111}
-header{border-bottom:4px solid var(--hc,var(--c-blue))}
+header{border-bottom:4px solid var(--hc,var(--c-blue));background:var(--bg)}
 body[data-tab=lib]{--hc:var(--c-green)} body[data-tab=hist]{--hc:var(--c-orange)} body[data-tab=datos]{--hc:var(--c-purple)}
-.card{border-top:4px solid var(--hc,var(--c-blue))}
+.card{border:0;border-top:3px solid var(--hc,var(--c-blue))}
 /* etiquetas por tipo de actividad: color + texto siempre */
 .tg{display:inline-block;font-size:10px;font-weight:800;border-radius:4px;padding:0 3px;line-height:1.3;border:1px solid var(--c-ink);background:var(--tb);color:var(--tt)}
-.tg.FB{--tb:var(--c-blue);--tt:#fff} .tg.SURF{--tb:var(--c-sky);--tt:#111} .tg.KITE{--tb:var(--c-green);--tt:#fff}
-.tg.PÁD{--tb:var(--c-orange);--tt:#111} .tg.ESQ{--tb:var(--c-purple);--tt:#111} .tg.RUN{--tb:var(--c-verm);--tt:#fff}
-.tg.ELÍP{--tb:var(--c-yellow);--tt:#111} .tg.PAS{--tb:#b9b9b9;--tt:#111} .tg.OTR{--tb:#666;--tt:#fff}
+.tg.FB{--tb:var(--c-blue);--tt:#1f242b} .tg.SURF{--tb:var(--c-sky);--tt:#111} .tg.KITE{--tb:var(--c-green);--tt:#1f242b}
+.tg.PÁD{--tb:var(--c-orange);--tt:#111} .tg.ESQ{--tb:var(--c-purple);--tt:#111} .tg.RUN{--tb:var(--c-verm);--tt:#1f242b}
+.tg.ELÍP{--tb:var(--c-yellow);--tt:#111} .tg.PAS{--tb:#b9b9b9;--tt:#111} .tg.OTR{--tb:#a3a9b1;--tt:#1f242b}
 .kpis .kpi{border-top:4px solid var(--c-sky)} .kpis .kpi:nth-child(2){border-top-color:var(--c-yellow)} .kpis .kpi:nth-child(3){border-top-color:var(--c-orange)} .kpis .kpi:nth-child(4){border-top-color:var(--c-green)}
 .slot{border:2px solid var(--line);border-radius:12px;padding:10px;margin:10px 0}
 .slot .lbl{font-weight:800;font-size:13px;letter-spacing:.5px}
@@ -88,13 +85,13 @@ body[data-tab=lib]{--hc:var(--c-green)} body[data-tab=hist]{--hc:var(--c-orange)
 .live{text-align:center}
 /* ---- estado de hoy ---- */
 .stat3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
-.stat3>div{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 9px;box-shadow:var(--shadow);border-top:5px solid var(--sc);display:flex;flex-direction:column;gap:2px;min-width:0}
+.stat3>div{text-align:center;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 9px;box-shadow:var(--shadow);border-top:5px solid var(--sc);display:flex;flex-direction:column;gap:2px;min-width:0}
 .stat3 .k{font-size:11px;font-weight:800;color:var(--mute);text-transform:uppercase;letter-spacing:.5px}
 .stat3 b{font-size:20px;line-height:1.1;font-weight:900}
 .stat3 b small{font-size:12px;color:var(--mute)}
 .stat3 .d{font-size:11.5px;color:var(--mute);line-height:1.25}
 .stat3 .st-ok{--sc:var(--c-green)} .stat3 .st-mid{--sc:var(--c-orange)} .stat3 .st-bad{--sc:var(--c-verm);border-top-style:dashed} .stat3 .st-na{--sc:var(--line);border-top-style:dotted}
-.bar2{display:block;height:8px;border:1.5px solid var(--ink);border-radius:5px;overflow:hidden;margin:3px 0}
+.bar2{display:block;width:100%;height:8px;border:1.5px solid var(--ink);border-radius:5px;overflow:hidden;margin:3px 0}
 .bar2 i{display:block;height:100%;background:var(--c-sky)}
 /* ---- biblioteca con ficha ---- */
 .libx>summary{list-style:none;cursor:pointer}
@@ -104,16 +101,34 @@ body[data-tab=lib]{--hc:var(--c-green)} body[data-tab=hist]{--hc:var(--c-orange)
 .libx .fi{display:grid;grid-template-columns:120px 1fr;gap:10px;margin-top:8px;align-items:start}
 .libx .fi .body svg{max-width:120px}
 .libx dl{margin:0;font-size:14px}.libx dt{font-weight:800;font-size:12px;color:var(--mute);margin-top:4px}.libx dd{margin:0}
+/* ---- V16 · gris intermedio, pastel, menos carga visual ---- */
+body{background:var(--bg)}
+nav{background:var(--card);border-top:0;box-shadow:0 -2px 12px rgba(30,40,55,.10)}
+button{border-width:1.5px;border-color:color-mix(in srgb,var(--ink) 55%,transparent)}
+button.pri{border-color:color-mix(in srgb,var(--ink) 35%,var(--acc))}
+input,select,textarea{background:#f2f4f6;border-width:1.5px}
+.warn{background:var(--warn-bg);color:var(--warn)}
+.okbox,.hint{background:var(--ok-bg)}
+details.fold{padding:0;overflow:hidden}
+details.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;font-weight:800;font-size:16px}
+details.fold>summary::-webkit-details-marker{display:none}
+details.fold>summary::after{content:"＋";font-size:18px;line-height:1}
+details.fold[open]>summary::after{content:"−"}
+details.fold>.in{padding:0 14px 14px}
+.subtabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:0 0 12px;position:sticky;top:62px;z-index:4;background:var(--bg);padding:4px 0}
+.subtabs button{min-height:44px;font-size:14px;padding:4px;border-radius:999px;background:var(--card);border:0;box-shadow:var(--shadow)}
+.subtabs button[aria-pressed="true"]{background:var(--c-orange);text-decoration:underline;text-underline-offset:3px}
+.center{text-align:center}
 /* ---- V14 · capa visual sport-tech sobria (claro y oscuro) ---- */
-:root{--shadow:0 4px 16px rgba(15,25,40,.08);--radius:16px}
-@media (prefers-color-scheme: dark){:root{--shadow:0 10px 28px rgba(0,0,0,.30)}}
+:root{--shadow:0 2px 10px rgba(30,40,55,.10);--radius:18px}
+
 .card{border-radius:var(--radius);box-shadow:var(--shadow)}
 .card h2{letter-spacing:.01em}
 button{transition:transform .12s ease,background-color .12s ease}
 button:active{transform:scale(.97)}
 :focus-visible{outline:3px solid var(--c-orange)!important;outline-offset:2px}
 .kpi b,.lv-top b,.clock{font-variant-numeric:tabular-nums}
-.kpi{border-radius:12px}
+.kpi{border-radius:12px;text-align:center}
 .slot{border-radius:14px}
 .tag.down{border-width:2px}
 @media (prefers-reduced-motion: reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
@@ -218,7 +233,14 @@ body.livemode main{padding:8px 12px 0;max-width:680px}
 .body.m-sem{--hz:var(--c-verm)} .body.m-sem .z1{fill:var(--c-yellow)} .body.m-sem .z3{fill:var(--c-green)}
 /* ¿Listo hoy?: LISTO verde · CARGADO naranja · FATIGADO bermellón rayado */
 .body.m-rec{--hz:var(--c-verm)} .body.m-rec .z0{fill:var(--c-green)} .body.m-rec .z2{fill:var(--c-orange)}
-.zkey{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;margin:6px 0}
+.zkey{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;margin:8px 0;justify-content:center}
+.seg2{grid-template-columns:1fr 1fr;max-width:320px;margin:4px auto 2px}
+.seg2 button{min-height:36px;border-radius:999px}
+.body .cl{stroke:var(--mute);stroke-width:1}
+.body .cd{fill:var(--ink)}
+.body .cn{font-size:14.5px;font-weight:800;fill:var(--ink);letter-spacing:0}
+.body .cs{font-size:13.5px;font-weight:700;fill:var(--mute);letter-spacing:0}
+.body svg{max-width:460px}
 .zkey span{display:inline-flex;align-items:center;gap:5px}
 .zkey i,.zl i.sw{width:18px;height:14px;border-radius:4px;border:1.5px solid var(--ink);display:inline-block;flex-shrink:0}
 .zkey .l0,.zl .sw.l0{background:color-mix(in srgb,var(--ink) 22%,var(--bg))}
@@ -290,7 +312,7 @@ const WEEK = {1:{w:40,r:20,txt:"Referencias: RIR 3, anota todo"},
 
 /* ============ STORAGE ============ */
 const KEY = "fbjjb_v1";
-const APP_V = "v15 · 11/11/2026";
+const APP_V = "v16 · 11/11/2026";
 let DB = load();
 function blank(){ return {start:null, sessions:[], acts:[], weights:[], tpls:[], live:null, draft:null, settings:{sound:true, vib:true}}; }
 function migrateActs(list){ (list||[]).forEach(a=>{ if(a.type==="Running") a.type="Carrera"; else if(a.type==="Zona 2"){ a.type="Elíptica"; a.modo=a.modo||"continuo"; } else if(a.type==="Intervalos"){ a.type="Elíptica"; a.modo="intervalos"; } }); return list; }
@@ -364,7 +386,7 @@ const ACT_LOAD = { // series equivalentes por hora a intensidad media (estimaci�
   "Elíptica":{rod:2, cad:1}, Paseo:{gem:1} };
 const INT_F = {suave:.6, media:1, dura:1.4};
 const FZ_SHORT = {rod:"Cuádriceps", cad:"Glúteo/isquio", peH:"Pecho", peV:"Hombro", tiV:"Dorsal", tiH:"Espalda media", core:"Core/lumbar", gem:"Gemelo", bra:"Brazos"};
-let HIST = {ym:null, sel:null, mode:"rec"};
+let HIST = {ym:null, sel:null, mode:"rec", sub:"cuerpo"};
 function stay(fn){ const y=window.scrollY; fn(); render(); window.scrollTo(0,y); } // re-pinta sin volver arriba
 
 function fmtD(k){ const [y,m,d]=k.split("-"); return d+"/"+m+"/"+y; }
@@ -402,7 +424,7 @@ const MODES = {
     help:"Calculado con todo lo que has hecho (rutinas, surf, kite, pádel, carrera…). Una sesión normal de pierna tarda ~48 h en recuperarse; tren superior ~36 h."},
   dia:{btn:"Día", q:"¿Qué trabajé ese día?",
     key:[["l0","NADA","no trabajado"],["l1","POCO","1–3 series"],["l2","MEDIO","4–6 series"],["l3","MUCHO","7–9 series"],["l4","MÁXIMO","10 o más"]],
-    help:"Toca un día en el calendario para verlo. El deporte cuenta como series equivalentes (1 h de surf ≈ 4 series de dorsal)."},
+    help:"Elige el día en Historial → Calendario. El deporte cuenta como series equivalentes (1 h de surf ≈ 4 series de dorsal)."},
   sem:{btn:"Semana", q:"¿Voy bien de volumen esta semana? (últimos 7 días)",
     key:[["l0","SIN TRABAJO",""],["l1","BAJO","te faltan series"],["l3","OK","dentro del objetivo"],["l4","ALTO","te pasas"]],
     help:"Series semanales recomendadas por zona para perder grasa manteniendo fuerza."}
@@ -411,15 +433,15 @@ function mapData(mode){
   const out={};
   if(mode==="dia"){ const k=HIST.sel||isoDate(new Date()), v=zoneSets(k,k);
     FZ_SHOW.forEach(z=>{ const n=v[z]||0, r=Math.round(n), l=!n?0:n<4?1:n<7?2:n<10?3:4;
-      out[z]={l, st:MODES.dia.key.find(x=>x[0]==="l"+l)[1], txt:n?r+" series"+(n%1?" (con deporte)":""):"—"}; });
+      out[z]={l, st:MODES.dia.key.find(x=>x[0]==="l"+l)[1], txt:n?r+" series"+(n%1?" (con deporte)":""):"—", sh:n?r+" series":""}; });
   } else if(mode==="sem"){ const v=zoneSets(isoDate(new Date(Date.now()-6*864e5)), isoDate(new Date()));
     FZ_SHOW.forEach(z=>{ const n=Math.round(v[z]||0), t=VOL_TARGET[z];
-      if(!t){ out[z]={l:n?3:0, st:n?"HECHO":"SIN TRABAJO", txt:n+" series · sin objetivo"}; return; }
+      if(!t){ out[z]={l:n?3:0, st:n?"HECHO":"SIN TRABAJO", txt:n+" series · sin objetivo", sh:n?n+" series":""}; return; }
       const l=!n?0:n<t[0]?1:n>t[1]?4:3;
-      out[z]={l, st:l===0?"SIN TRABAJO":l===1?"BAJO":l===3?"OK":"ALTO", txt:n+" de "+t[0]+"–"+t[1]+" series"}; });
+      out[z]={l, st:l===0?"SIN TRABAJO":l===1?"BAJO":l===3?"OK":"ALTO", txt:n+" de "+t[0]+"–"+t[1]+" series", sh:n+"/"+t[0]+"–"+t[1]}; });
   } else { const f=fatigueMap();
     FZ_SHOW.forEach(z=>{ const v=f[z]||0, h=readyIn(z,v), l=v<=.25?0:v<=.5?2:4;
-      out[z]={l, st:l===0?"LISTO":l===2?"CARGADO":"FATIGADO", txt:l===0?"ya recuperado":readyTxt(h).replace("Listo","listo")}; });
+      out[z]={l, st:l===0?"LISTO":l===2?"CARGADO":"FATIGADO", txt:l===0?"ya recuperado":readyTxt(h).replace("Listo","listo"), sh:l===0?"":shortH(h)}; });
   }
   return out;
 }
@@ -432,6 +454,25 @@ function bodySVG(d, m="dia"){
     <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
       <rect width="6" height="6" style="fill:var(--hz)"/><line x1="0" y1="0" x2="0" y2="6" stroke="#111" stroke-width="2.5"/></pattern></defs>
     ${fig(0,"f")}${fig(180,"b")}</svg></div>`;
+}
+function shortH(h){ return !h?"": h<24 ? h+" h" : String(Math.round(h/24*2)/2).replace(".",",")+" d"; }
+/* Una figura grande (delante o detrás) con el estado escrito a los lados, unido a cada músculo */
+const CALL = {
+  f:{L:[["peV","Hombro",48,53,40],["peH","Pecho",67,55,96],["bra","Brazos",44,112,152]], R:[["core","Core",94,88,70],["rod","Cuádriceps",93,150,150]]},
+  b:{L:[["tiH","Espalda media",70,45,40],["tiV","Dorsal",65,72,100]], R:[["core","Lumbar",84,100,62],["cad","Glúteo/isquio",95,130,128],["gem","Gemelo",92,205,200]]}
+};
+function bodyViewSVG(d, m, v){
+  const OX=130, W=420, figs=BODY[v].map(([z,pth])=>`<path class="${z?"z z"+((d[z]||{}).l||0):"nz"}" ${z?`data-bz="${z}"`:""} d="${pth}"/>`).join("");
+  const lab=(side)=>CALL[v][side].map(([z,name,ax,ay,ly])=>{ const x=d[z]||{l:0,st:"",sh:""}, X=OX+ax, left=side==="L";
+    const ex = left?124:276, tx = left?106:294, an = left?"end":"start", rx = left?110:276;
+    return `<line x1="${ex}" y1="${ly-5}" x2="${X}" y2="${ay}" class="cl"/><circle cx="${X}" cy="${ay}" r="2.6" class="cd"/>
+      <rect x="${rx}" y="${ly-12}" width="14" height="14" rx="3" class="z z${x.l}"/>
+      <text x="${tx}" y="${ly}" text-anchor="${an}" class="cn">${name}</text>
+      <text x="${tx}" y="${ly+16}" text-anchor="${an}" class="cs">${x.st}${x.sh?" "+x.sh:""}</text>`; }).join("");
+  return `<div class="body m-${m}"><svg viewBox="0 0 ${W} 270" role="img" aria-label="Estado de los músculos, ${v==="f"?"delante":"detrás"}">
+    <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="6" height="6" style="fill:var(--hz)"/><line x1="0" y1="0" x2="0" y2="6" stroke="#1f242b" stroke-width="2.5"/></pattern></defs>
+    <g transform="translate(${OX},0)"><path class="sil" d="${BODY.sil}"/><path class="sil" d="${BODY.head}"/>${figs}</g>${lab("L")}${lab("R")}</svg></div>`;
 }
 function keyHTML(m){ return `<div class="zkey m-${m}">${MODES[m].key.map(([l,t,d])=>`<span><i class="${l}"></i><b>${t}</b>${d?" "+d:""}</span>`).join("")}</div>`; }
 function zoneListHTML(d, m="dia"){
@@ -446,9 +487,12 @@ function bodyCardHTML(){
     sum = `<div class="${F.length?"warn":"okbox"}">${F.length?`<b>Hoy evita:</b> ${F.join(", ")}.`:"<b>Nada fatigado.</b>"}${C.length?` <b>Suave:</b> ${C.join(", ")}.`:""} <b>Libre:</b> ${g("LISTO").join(", ")||"—"}.</div>`; }
   return `<div class="card"><h2>Mapa del cuerpo</h2>
     <div class="seg">${["rec","dia","sem"].map(k=>`<button data-md="${k}" aria-pressed="${m===k}">${MODES[k].btn}</button>`).join("")}</div>
-    <h3>${esc(MODES[m].q)}${when?" · "+esc(when):""}</h3>${sum}
-    ${bodySVG(d,m)}<div class="hint" id="bzInfo" style="display:none"></div>${keyHTML(m)}${zoneListHTML(d,m)}
-    <div class="mute small" style="margin-top:6px">${MODES[m].help}</div></div>`;
+    <h3 class="center">${esc(MODES[m].q)}${when?" · "+esc(when):""}</h3>${sum}
+    ${(()=>{ const v=HIST.view||"f", cnt=w=>[...CALL[w].L,...CALL[w].R].filter(([z])=>(d[z]||{}).l>=(m==="rec"?2:4)).length;
+      const t=w=>(w==="f"?"Delante":"Detrás")+(m==="rec"&&cnt(w)?` · ${cnt(w)} ⚠`:"");
+      return `<div class="seg seg2"><button data-view="f" aria-pressed="${v==="f"}">${t("f")}</button><button data-view="b" aria-pressed="${v==="b"}">${t("b")}</button></div>${bodyViewSVG(d,m,v)}`; })()}
+    <div class="hint center" id="bzInfo" style="display:none"></div>${keyHTML(m)}
+    <div class="mute small center" style="margin-top:6px">${MODES[m].help}</div></div>`;
 }
 
 /* ---- calendario mensual ---- */
@@ -480,10 +524,11 @@ function addFormHTML(k){
   return `<details class="add" style="margin-top:8px"><summary>Añadir registro a mano</summary>${actFormHTML("m", k, true)}</details>`;
 }
 function bindHistTop(){
-  $("#calP").onclick=()=>{ const [y,m]=(HIST.ym||isoDate(new Date()).slice(0,7)).split("-").map(Number); const d=new Date(y,m-2,1); stay(()=>HIST.ym=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")); };
-  $("#calN").onclick=()=>{ const [y,m]=(HIST.ym||isoDate(new Date()).slice(0,7)).split("-").map(Number); const d=new Date(y,m,1); stay(()=>HIST.ym=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")); };
-  document.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>stay(()=>{ HIST.sel=b.dataset.day; HIST.mode="dia"; }));
+  if($("#calP")) $("#calP").onclick=()=>{ const [y,m]=(HIST.ym||isoDate(new Date()).slice(0,7)).split("-").map(Number); const d=new Date(y,m-2,1); stay(()=>HIST.ym=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")); };
+  if($("#calN")) $("#calN").onclick=()=>{ const [y,m]=(HIST.ym||isoDate(new Date()).slice(0,7)).split("-").map(Number); const d=new Date(y,m,1); stay(()=>HIST.ym=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")); };
+  document.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>stay(()=>{ HIST.sel=b.dataset.day; }));
   document.querySelectorAll("[data-md]").forEach(b=>b.onclick=()=>stay(()=>{ HIST.mode=b.dataset.md; }));
+  document.querySelectorAll("[data-view]").forEach(b=>b.onclick=()=>stay(()=>{ HIST.view=b.dataset.view; }));
   const md=mapData(HIST.mode); document.querySelectorAll("[data-bz]").forEach(p=>p.onclick=()=>{ const z=p.dataset.bz, x=md[z], i=$("#bzInfo"); if(!i||!x) return;
     i.style.display="block"; i.innerHTML=`<b>${FZ_SHORT[z]}: ${x.st}</b> · ${esc(x.txt)}`; });
   document.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{ VIEW={k:"sum", id:b.dataset.open}; render(); });
@@ -606,12 +651,12 @@ function bodyCompHTML(){
 }
 function bodyCompFormHTML(){
   const l=DB.weights.slice().sort((a,b)=>a.date.localeCompare(b.date)).slice(-1)[0];
-  return `<div class="card"><h2>Análisis corporal</h2>
-    <div class="mute small">Cópialo tal cual de Samsung Health. Rellena lo que tengas.</div>
+  return `<details class="card fold"><summary>Análisis corporal</summary><div class="in">
+    <div class="mute small center">Cópialo tal cual de Samsung Health. Rellena lo que tengas.</div>
     <div class="grid2">${BC.map(m=>`<div><label>${m.n}${m.u?" ("+m.u+")":""}</label><input id="bc_${m.k}" type="number" step="${m.int?1:0.1}" inputmode="decimal" placeholder="${m.ph}"></div>`).join("")}</div>
     <label class="check"><input type="checkbox" id="bStd" checked><span>En ayunas, por la mañana (medición fiable)</span></label>
     <button class="pri big" id="bSave">Guardar medición</button>
-    <div class="mute small" style="margin-top:6px">${l?"Última ("+fmtD(l.date)+"): "+BC.filter(m=>l[m.k]!=null).map(m=>bcFmt(m,+l[m.k])+(m.u?" "+m.u:"")+" "+(m.k==="imc"?"IMC":m.n.toLowerCase().replace("índice metabólico basal","basal"))).join(" · ")+". La tendencia está en Historial.":"Mide siempre en las mismas condiciones: en ayunas, tras ir al baño."}</div></div>`;
+    <div class="mute small" style="margin-top:6px">${l?"Última ("+fmtD(l.date)+"): "+BC.filter(m=>l[m.k]!=null).map(m=>bcFmt(m,+l[m.k])+(m.u?" "+m.u:"")+" "+(m.k==="imc"?"IMC":m.n.toLowerCase().replace("índice metabólico basal","basal"))).join(" · ")+". La tendencia está en Historial → Progreso.":"Mide siempre en las mismas condiciones: en ayunas, tras ir al baño."}</div></div></details>`;
 }
 function bindBodyComp(){
   const b=$("#bSave"); if(!b) return;
@@ -649,7 +694,8 @@ function statusToday(){
   const f=fatigueMap(), main=["rod","cad","peH","peV","tiV","tiH","core"], st=main.map(z=>zoneState(z,f).st);
   const nOk=st.filter(x=>x==="LISTO").length, nF=st.filter(x=>x==="FATIGADO").length;
   const disp = nF>=2 || (lst.r&&lst.r>1.5) ? {t:"BAJA", d:"día suave o de movilidad"} : nF===1 || nOk<4 ? {t:"MEDIA", d:"entrena evitando lo fatigado"} : {t:"ALTA", d:"buen día para apretar"};
-  return {disp, nOk, lst, acute, chronic, im};
+  const avoid=main.filter((z,i)=>st[i]==="FATIGADO").map(z=>FZ_SHORT[z]);
+  return {disp, nOk, lst, acute, chronic, im, avoid};
 }
 function statusHTML(){
   const s=statusToday(), cls=t=>t==="ALTA"||t==="ÓPTIMA"?"st-ok":t==="BAJA"&&false?"":t==="MUY ALTA"||t==="BAJA"&&0?"st-bad":t==="SIN DATOS"?"st-na":"st-mid";
@@ -657,7 +703,7 @@ function statusHTML(){
   const lCls = s.lst.t==="ÓPTIMA"?"st-ok":s.lst.t==="SIN DATOS"?"st-na":s.lst.t==="MUY ALTA"?"st-bad":"st-mid";
   const pct=Math.min(100,Math.round(s.im/150*100));
   return `<div class="stat3">
-    <div class="${dCls}"><span class="k">Disposición</span><b>${s.disp.t}</b><span class="d">${s.nOk} de 7 zonas listas · ${s.disp.d}</span></div>
+    <div class="${dCls}"><span class="k">Disposición</span><b>${s.disp.t}</b><span class="d">${s.nOk} de 7 zonas listas · ${s.disp.d}${s.avoid.length?"<br><strong>Evita:</strong> "+s.avoid.join(", "):""}</span></div>
     <div class="${lCls}"><span class="k">Carga 7 días</span><b>${s.lst.t}</b><span class="d">${s.lst.r?Math.round(s.acute)+" frente a "+Math.round(s.chronic)+" de media · ":""}${s.lst.d}</span></div>
     <div class="${s.im>=150?"st-ok":"st-mid"}"><span class="k">Min. intensidad</span><b>${s.im}<small>/150</small></b><span class="bar2"><i style="width:${pct}%"></i></span><span class="d">esta semana (vigorosa ×2)</span></div></div>`;
 }
@@ -895,17 +941,16 @@ function renderHome(){
     <div class="mute small">Semana ${wi.week} de 4 · ${WEEK[wi.week].txt} · RIR objetivo <b>${rirTarget(wi.week)}</b></div>
     ${e.length?`<ul class="list reg" style="margin-top:6px">${e.map(x=>`<li><span class="tg ${x.abbr}">${x.abbr}</span><span class="grow"><b>${esc(x.t)}</b> · ${x.min}'${x.int?" · "+x.int:""}${x.det?`<br><span class="mute small">${esc(x.det)}</span>`:""}</span>${x.k==="s"?`<button class="sm" data-open="${x.id}">Ver</button>`:""}</li>`).join("")}</ul>`
       :`<div class="mute" style="margin-top:6px">Aún no has registrado nada hoy.</div>`}</div>
-  ${fatigueLine()}
   <button class="pri big" id="newS">＋ Crear sesión de hoy</button>
   ${DB.draft?`<button class="big" id="contD" style="margin-top:8px">✎ Seguir con el borrador</button>`:""}
-  <div class="card" style="margin-top:12px"><h2>Mis sesiones guardadas</h2>`;
+  <details class="card fold" style="margin-top:12px" ${DB.tpls.length?"open":""}><summary>Mis sesiones guardadas (${DB.tpls.length})</summary><div class="in">`;
   if(!DB.tpls.length) h += `<div class="mute">Aún no hay sesiones guardadas. Crea una con el planificador.</div>`;
   else { h += `<ul class="list">`; DB.tpls.slice().reverse().forEach(t=>{ const pl=buildPlan(t,[]);
     h += `<li><div class="row"><div class="grow"><b>${esc(t.name)}</b><br><span class="mute small">${OBJ[t.obj]} · ${FMT[t.fmt]} · ${tplItems(t).length} ejercicios · ~${mins(estimate(pl))}</span></div>
       <button class="sm pri" data-go="${t.id}">▶</button><button class="sm icon" data-ed="${t.id}" aria-label="Editar">✎</button><button class="sm icon" data-dl="${t.id}" aria-label="Borrar">✕</button></div></li>`; });
     h += `</ul>`; }
-  h += `</div>
-  <div class="card"><h2>Registrar cardio o deporte</h2>${actFormHTML("a", today, false)}</div>
+  h += `</div></details>
+  <details class="card fold"><summary>Registrar cardio o deporte</summary><div class="in">${actFormHTML("a", today, false)}</div></details>
   ${bodyCompFormHTML()}`;
   $("#app").innerHTML = h;
   $("#newS").onclick=()=>{ if(DB.draft && !confirm("Hay un borrador sin terminar. ¿Empezar uno nuevo?")) return; DB.draft=newDraft(); const d=DB.draft; d.slots.forEach((s,i)=>autoPick(d,s,i)); save(); VIEW={k:"plan"}; render(); };
@@ -1373,15 +1418,19 @@ function renderHist(){
   if(!HIST.sel) HIST.sel=isoDate(new Date());
   const all=[...DB.sessions.map(x=>({k:"s", abbr:"FB", id:x.id, date:x.date, t:entryName(x), min:Math.round((x.durSec||0)/60), sub:x.manual?"a mano":x.ex.reduce((a,e)=>a+e.sets.length,0)+" series"})),
              ...DB.acts.map(a=>({k:"a", abbr:ACT_ABBR[a.type]||"OTR", id:a.id, date:a.date, t:a.type, min:+a.min||0, sub:[a.int, cardioDet(a), a.note].filter(Boolean).join(" · ")}))].sort((a,b)=>b.date.localeCompare(a.date));
-  let h = summaryHTML() + calendarHTML() + dayCardHTML() + bodyCardHTML() + bodyCompHTML() + `<div class="card"><h2>Registro (${all.length})</h2>`;
-  h += all.length ? `<ul class="list reg">${all.slice(0,40).map(x=>`<li><span class="tg ${x.abbr}">${x.abbr}</span><span class="grow"><b>${fmtD(x.date)}</b> · ${esc(x.t)} · ${x.min}'<br><span class="mute small">${esc(x.sub)}</span></span>${x.k==="s"?`<button class="sm" data-open="${x.id}">Ver</button>`:""}<button class="sm icon" data-del="${x.k}:${x.id}" aria-label="Borrar">✕</button></li>`).join("")}</ul>` : `<div class="mute">Aún no hay registros. Añade uno desde el día del calendario.</div>`;
+  const SUBS=[["cuerpo","Cuerpo"],["cal","Calendario"],["prog","Progreso"],["reg","Registro"]], sub=HIST.sub||"cuerpo";
+  let h = `<div class="subtabs">${SUBS.map(([k,t])=>`<button data-sub="${k}" aria-pressed="${sub===k}">${t}</button>`).join("")}</div>`;
+  if(sub==="cuerpo") h += bodyCardHTML();
+  if(sub==="cal") h += calendarHTML() + dayCardHTML();
+  if(sub==="prog") h += summaryHTML() + bodyCompHTML();
+  if(sub==="reg") h += `<div class="card"><h2>Registro (${all.length})</h2>` + (all.length ? `<ul class="list reg">${all.slice(0,40).map(x=>`<li><span class="tg ${x.abbr}">${x.abbr}</span><span class="grow"><b>${fmtD(x.date)}</b> · ${esc(x.t)} · ${x.min}'<br><span class="mute small">${esc(x.sub)}</span></span>${x.k==="s"?`<button class="sm" data-open="${x.id}">Ver</button>`:""}<button class="sm icon" data-del="${x.k}:${x.id}" aria-label="Borrar">✕</button></li>`).join("")}</ul>` : `<div class="mute">Aún no hay registros. Añade uno desde el día del calendario.</div>`) + `</div>`;
   const ids = [...new Set(DB.sessions.flatMap(s=>s.ex.map(x=>x.id)))].filter(id=>LIB_BY[id]);
-  h += `</div>`;
-  if(ids.length){ h += `<div class="card"><h2>Progresión por ejercicio</h2><table><tr><th>Ejercicio</th><th>Últimas</th><th>Decisión</th></tr>`;
+  if(sub==="prog" && ids.length){ h += `<div class="card"><h2>Progresión por ejercicio</h2><table><tr><th>Ejercicio</th><th>Últimas</th><th>Decisión</th></tr>`;
     ids.forEach(id=>{ const L=logsFor(id).slice(0,3), pr=progress(id);
       h+=`<tr><td>${esc(LIB_BY[id].n)}</td><td class="mute">${L.map(l=>l.sets.map(s=>s.reps).join("·")).join("<br>")}</td><td><span class="tag ${pr.k}">${esc(pr.t.split(":")[0])}</span></td></tr>`; });
     h += `</table></div>`; }
   $("#app").innerHTML = h; bindHistTop();
+  document.querySelectorAll("[data-sub]").forEach(b=>b.onclick=()=>{ HIST.sub=b.dataset.sub; render(); });
 }
 
 /* ============ INFORME SEMANAL (para que Claude lo valore) ============ */
