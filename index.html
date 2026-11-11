@@ -90,7 +90,7 @@ body[data-tab=lib]{--hc:var(--c-green)} body[data-tab=hist]{--hc:var(--c-orange)
 body.livemode{overflow:hidden;padding-bottom:0;min-height:0;height:100dvh}
 body.livemode nav{display:none}
 body.livemode main{padding:8px 12px 0;max-width:680px}
-.lv{height:calc(100dvh - 74px);display:flex;flex-direction:column;justify-content:space-between;gap:6px;overflow:hidden}
+.lvw{height:calc(100dvh - 74px);display:flex;flex-direction:column;justify-content:space-between;gap:6px;overflow:hidden}
 .lv-top{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;text-align:center}
 .lv-top div{border:1px solid var(--line);border-radius:10px;padding:4px 2px;background:var(--card)}
 .lv-top div:nth-child(1){border-top:4px solid var(--c-orange)} .lv-top div:nth-child(2){border-top:4px solid var(--c-sky)}
@@ -173,23 +173,31 @@ body.livemode main{padding:8px 12px 0;max-width:680px}
 .body .z{stroke:var(--ink);stroke-width:1.2}
 .body .z0{fill:var(--card)}
 .body{--hz:var(--c-blue)}
-.body .z1{fill:color-mix(in srgb,var(--c-sky) 45%,var(--card))}
-.body .z2{fill:var(--c-sky)}
-.body .z3{fill:var(--c-blue)}
-.body .z4{fill:url(#hatch);stroke-width:2.6}
-/* 7 días: BAJO amarillo · OK verde · ALTO bermellón rayado */
-.body.m-sem{--hz:var(--c-verm)} .body.m-sem .z1{fill:var(--c-yellow)} .body.m-sem .z2,.body.m-sem .z3{fill:var(--c-green)}
-/* Recuperación: listo verde suave · cargado naranja · fatigado bermellón rayado */
-.body.m-rec{--hz:var(--c-verm)} .body.m-rec .z0{fill:color-mix(in srgb,var(--c-green) 35%,var(--card))} .body.m-rec .z2{fill:var(--c-yellow)} .body.m-rec .z3{fill:var(--c-orange)}
-.zl .lv{background:var(--lb,transparent);color:var(--lt,var(--ink))}
-.zl .lv.l1{--lb:color-mix(in srgb,var(--c-sky) 45%,var(--card))} .zl .lv.l2{--lb:var(--c-sky);--lt:#111} .zl .lv.l3{--lb:var(--c-blue);--lt:#fff} .zl .lv.l4{--lb:var(--c-blue);--lt:#fff;border-width:3px}
-.zl.m-sem .lv.l1{--lb:var(--c-yellow);--lt:#111} .zl.m-sem .lv.l2,.zl.m-sem .lv.l3{--lb:var(--c-green);--lt:#fff} .zl.m-sem .lv.l4{--lb:var(--c-verm);--lt:#fff}
-.zl.m-rec .lv.l0{--lb:color-mix(in srgb,var(--c-green) 35%,var(--card));border-style:solid;opacity:1} .zl.m-rec .lv.l2{--lb:var(--c-yellow);--lt:#111} .zl.m-rec .lv.l3{--lb:var(--c-orange);--lt:#111} .zl.m-rec .lv.l4{--lb:var(--c-verm);--lt:#fff}
-.body text{font-size:11px;fill:var(--mute);font-weight:700}
-.zl{display:grid;grid-template-columns:auto 1fr auto;gap:4px 8px;align-items:center;font-size:14px;margin-top:8px}
-.zl .lv{font-weight:800;font-size:12px;border:2px solid var(--ink);border-radius:6px;padding:0 5px;text-align:center;min-width:2.2em}
-.zl .lv.l0{border-style:dotted;opacity:.6}
-.zl .r{text-align:right;font-weight:700;white-space:nowrap}
+.body .sil{fill:color-mix(in srgb,var(--ink) 10%,var(--bg));stroke:var(--mute);stroke-width:1}
+.body .nz{fill:color-mix(in srgb,var(--ink) 16%,var(--bg));stroke:var(--bg);stroke-width:1.2}
+.body .z{stroke:var(--bg);stroke-width:1.4;stroke-linejoin:round}
+.body text{font-size:11px;fill:var(--mute);font-weight:800;letter-spacing:1px}
+/* niveles: Día = de claro a azul intenso */
+.z0,.l0{--f:color-mix(in srgb,var(--ink) 22%,var(--bg))}
+.l1{--f:color-mix(in srgb,var(--c-sky) 45%,var(--bg))} .l2{--f:var(--c-sky)} .l3{--f:var(--c-blue)} .l4{--f:url(#hatch)}
+.body .z0{fill:color-mix(in srgb,var(--ink) 22%,var(--bg))}
+.body .z1{fill:color-mix(in srgb,var(--c-sky) 45%,var(--bg))} .body .z2{fill:var(--c-sky)} .body .z3{fill:var(--c-blue)} .body .z4{fill:url(#hatch);stroke:var(--ink);stroke-width:2}
+/* Semana: BAJO amarillo · OK verde · ALTO bermellón rayado */
+.body.m-sem{--hz:var(--c-verm)} .body.m-sem .z1{fill:var(--c-yellow)} .body.m-sem .z3{fill:var(--c-green)}
+/* ¿Listo hoy?: LISTO verde · CARGADO naranja · FATIGADO bermellón rayado */
+.body.m-rec{--hz:var(--c-verm)} .body.m-rec .z0{fill:var(--c-green)} .body.m-rec .z2{fill:var(--c-orange)}
+.zkey{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:13px;margin:6px 0}
+.zkey span{display:inline-flex;align-items:center;gap:5px}
+.zkey i,.zl i.sw{width:18px;height:14px;border-radius:4px;border:1.5px solid var(--ink);display:inline-block;flex-shrink:0}
+.zkey .l0,.zl .sw.l0{background:color-mix(in srgb,var(--ink) 22%,var(--bg))}
+.zkey .l1,.zl .sw.l1{background:color-mix(in srgb,var(--c-sky) 45%,var(--bg))} .zkey .l2,.zl .sw.l2{background:var(--c-sky)} .zkey .l3,.zl .sw.l3{background:var(--c-blue)}
+.zkey .l4,.zl .sw.l4{background:repeating-linear-gradient(45deg,var(--c-blue) 0 4px,#111 4px 6px);border-width:2px}
+.m-sem .l1,.zl.m-sem .sw.l1{background:var(--c-yellow)} .m-sem .l3,.zl.m-sem .sw.l3{background:var(--c-green)}
+.m-sem .l4,.zl.m-sem .sw.l4{background:repeating-linear-gradient(45deg,var(--c-verm) 0 4px,#111 4px 6px)}
+.m-rec .l0,.zl.m-rec .sw.l0{background:var(--c-green)} .m-rec .l2,.zl.m-rec .sw.l2{background:var(--c-orange)}
+.m-rec .l4,.zl.m-rec .sw.l4{background:repeating-linear-gradient(45deg,var(--c-verm) 0 4px,#111 4px 6px)}
+.zl{display:grid;grid-template-columns:auto auto 1fr;gap:6px 8px;align-items:center;font-size:14px;margin-top:6px}
+.zl .r{text-align:right}
 .reg li{display:flex;gap:8px;align-items:center}
 .fz{display:grid;grid-template-columns:4.4em 1fr auto;gap:8px;align-items:center;font-size:14px;padding:5px 0;border-top:1px solid var(--line)}
 .fz .b{height:14px;border:2px solid var(--ink);border-radius:6px;overflow:hidden;display:block}
@@ -249,7 +257,7 @@ const WEEK = {1:{w:40,r:20,txt:"Referencias: RIR 3, anota todo"},
 
 /* ============ STORAGE ============ */
 const KEY = "fbjjb_v1";
-const APP_V = "v12 · 11/11/2026";
+const APP_V = "v13 · 11/11/2026";
 let DB = load();
 function blank(){ return {start:null, sessions:[], acts:[], weights:[], tpls:[], live:null, draft:null, settings:{sound:false, vib:true}}; }
 function load(){
@@ -311,7 +319,7 @@ const ACT_LOAD = { // series equivalentes por hora a intensidad media (estimaci�
   "Elíptica":{rod:2, cad:1}, Paseo:{gem:1} };
 const INT_F = {suave:.6, media:1, dura:1.4};
 const FZ_SHORT = {rod:"Cuádriceps", cad:"Glúteo/isquio", peH:"Pecho", peV:"Hombro", tiV:"Dorsal", tiH:"Espalda media", core:"Core/lumbar", gem:"Gemelo", bra:"Brazos"};
-let HIST = {ym:null, sel:null, mode:"dia"};
+let HIST = {ym:null, sel:null, mode:"rec"};
 function stay(fn){ const y=window.scrollY; fn(); render(); window.scrollTo(0,y); } // re-pinta sin volver arriba
 
 function fmtD(k){ const [y,m,d]=k.split("-"); return d+"/"+m+"/"+y; }
@@ -339,60 +347,60 @@ function readyIn(z, v){ return v<=.25 ? 0 : Math.ceil(FZ_HL[z]*Math.log2(v/.25))
 function readyTxt(h){ return !h ? "Listo" : h<24 ? "Listo en ~"+h+" h" : "Listo en ~"+Math.round(h/24*2)/2+" días"; }
 
 /* ---- datos de cada modo del mapa: nivel 0–4 + texto por zona ---- */
+/* Cada modo responde a UNA pregunta, con estados en texto. Nivel: 0–4 (relleno) */
+const MODES = {
+  rec:{btn:"¿Listo hoy?", q:"¿Qué puedo entrenar hoy?",
+    key:[["l0","LISTO","entrénalo sin problema"],["l2","CARGADO","solo suave o pocas series"],["l4","FATIGADO","no lo cargues hoy"]],
+    help:"Calculado con todo lo que has hecho (rutinas, surf, kite, pádel, carrera…). Una sesión normal de pierna tarda ~48 h en recuperarse; tren superior ~36 h."},
+  dia:{btn:"Día", q:"¿Qué trabajé ese día?",
+    key:[["l0","NADA","no trabajado"],["l1","POCO","1–3 series"],["l2","MEDIO","4–6 series"],["l3","MUCHO","7–9 series"],["l4","MÁXIMO","10 o más"]],
+    help:"Toca un día en el calendario para verlo. El deporte cuenta como series equivalentes (1 h de surf ≈ 4 series de dorsal)."},
+  sem:{btn:"Semana", q:"¿Voy bien de volumen esta semana? (últimos 7 días)",
+    key:[["l0","SIN TRABAJO",""],["l1","BAJO","te faltan series"],["l3","OK","dentro del objetivo"],["l4","ALTO","te pasas"]],
+    help:"Series semanales recomendadas por zona para perder grasa manteniendo fuerza."}
+};
 function mapData(mode){
   const out={};
   if(mode==="dia"){ const k=HIST.sel||isoDate(new Date()), v=zoneSets(k,k);
-    FZ_SHOW.forEach(z=>{ const n=v[z]||0, r=Math.round(n); out[z]={l:!n?0:n<4?1:n<7?2:n<10?3:4, lv:r||"–", txt:n?r+" series"+(n%1?" (incl. deporte)":""):"sin trabajo"}; });
-  } else if(mode==="sem"){ const to=isoDate(new Date()), v=zoneSets(isoDate(new Date(Date.now()-6*864e5)), to);
+    FZ_SHOW.forEach(z=>{ const n=v[z]||0, r=Math.round(n), l=!n?0:n<4?1:n<7?2:n<10?3:4;
+      out[z]={l, st:MODES.dia.key.find(x=>x[0]==="l"+l)[1], txt:n?r+" series"+(n%1?" (con deporte)":""):"—"}; });
+  } else if(mode==="sem"){ const v=zoneSets(isoDate(new Date(Date.now()-6*864e5)), isoDate(new Date()));
     FZ_SHOW.forEach(z=>{ const n=Math.round(v[z]||0), t=VOL_TARGET[z];
-      if(!t){ out[z]={l:!n?0:n<6?2:3, lv:n||"–", txt:n+" series"}; return; }
-      const st = n<t[0]?"BAJO":n>t[1]?"ALTO":"OK";
-      out[z]={l:!n?0:n<t[0]?1:n>t[1]?4:3, lv:n, txt:n+" de "+t[0]+"–"+t[1]+" · "+st}; });
+      if(!t){ out[z]={l:n?3:0, st:n?"HECHO":"SIN TRABAJO", txt:n+" series · sin objetivo"}; return; }
+      const l=!n?0:n<t[0]?1:n>t[1]?4:3;
+      out[z]={l, st:l===0?"SIN TRABAJO":l===1?"BAJO":l===3?"OK":"ALTO", txt:n+" de "+t[0]+"–"+t[1]+" series"}; });
   } else { const f=fatigueMap();
-    FZ_SHOW.forEach(z=>{ const v=f[z]||0, h=readyIn(z,v);
-      out[z]={l:v<=.25?0:v<.5?2:v<.8?3:4, lv:h?h+"h":"OK", txt:readyTxt(h)}; });
+    FZ_SHOW.forEach(z=>{ const v=f[z]||0, h=readyIn(z,v), l=v<=.25?0:v<=.5?2:4;
+      out[z]={l, st:l===0?"LISTO":l===2?"CARGADO":"FATIGADO", txt:l===0?"ya recuperado":readyTxt(h).replace("Listo","listo")}; });
   }
   return out;
 }
-const MODE_HELP = {
-  dia:"Series hechas ese día por zona. El deporte suma en series equivalentes (1 h de surf ≈ 4 de dorsal).",
-  sem:"Series de los últimos 7 días contra el objetivo semanal. BAJO = te falta, ALTO = te pasas.",
-  rec:"Horas hasta que la zona vuelve a estar fresca. Una sesión normal de pierna (7–8 series) ≈ 48 h; tren superior ≈ 36 h. Si no te cuadra con cómo te notas, dímelo y lo ajusto."};
+const BODY = {"sil": "M86.0 33.0 C90.3 34.2 95.5 38.0 100.0 40.0 C104.5 42.0 109.7 42.3 113.0 45.0 C116.3 47.7 118.5 50.5 120.0 56.0 C121.5 61.5 121.3 70.8 122.0 78.0 C122.7 85.2 123.3 91.8 124.0 99.0 C124.7 106.2 125.5 114.3 126.0 121.0 C126.5 127.7 126.5 134.0 127.0 139.0 C127.5 144.0 129.5 147.5 129.0 151.0 C128.5 154.5 126.0 159.3 124.0 160.0 C122.0 160.7 118.3 158.5 117.0 155.0 C115.7 151.5 116.5 145.2 116.0 139.0 C115.5 132.8 115.0 125.0 114.0 118.0 C113.0 111.0 111.3 104.3 110.0 97.0 C108.7 89.7 107.0 74.8 106.0 74.0 C105.0 73.2 105.0 85.7 104.0 92.0 C103.0 98.3 100.0 106.0 100.0 112.0 C100.0 118.0 102.8 121.3 104.0 128.0 C105.2 134.7 107.2 140.7 107.0 152.0 C106.8 163.3 103.3 184.5 103.0 196.0 C102.7 207.5 105.7 210.0 105.0 221.0 C104.3 232.0 99.3 253.5 99.0 262.0 C98.7 270.5 104.7 269.8 103.0 272.0 C101.3 274.2 91.5 276.7 89.0 275.0 C86.5 273.3 88.5 270.5 88.0 262.0 C87.5 253.5 86.3 234.7 86.0 224.0 C85.7 213.3 86.5 208.3 86.0 198.0 C85.5 187.7 84.0 171.3 83.0 162.0 C82.0 152.7 80.5 145.3 80.0 142.0 C79.5 138.7 80.5 138.7 80.0 142.0 C79.5 145.3 78.0 152.7 77.0 162.0 C76.0 171.3 74.5 187.7 74.0 198.0 C73.5 208.3 74.3 213.3 74.0 224.0 C73.7 234.7 72.5 253.5 72.0 262.0 C71.5 270.5 73.5 273.3 71.0 275.0 C68.5 276.7 58.7 274.2 57.0 272.0 C55.3 269.8 61.3 270.5 61.0 262.0 C60.7 253.5 55.7 232.0 55.0 221.0 C54.3 210.0 57.3 207.5 57.0 196.0 C56.7 184.5 53.2 163.3 53.0 152.0 C52.8 140.7 54.8 134.7 56.0 128.0 C57.2 121.3 60.0 118.0 60.0 112.0 C60.0 106.0 57.0 98.3 56.0 92.0 C55.0 85.7 55.0 73.2 54.0 74.0 C53.0 74.8 51.3 89.7 50.0 97.0 C48.7 104.3 47.0 111.0 46.0 118.0 C45.0 125.0 44.5 132.8 44.0 139.0 C43.5 145.2 44.3 151.5 43.0 155.0 C41.7 158.5 38.0 160.7 36.0 160.0 C34.0 159.3 31.5 154.5 31.0 151.0 C30.5 147.5 32.5 144.0 33.0 139.0 C33.5 134.0 33.5 127.7 34.0 121.0 C34.5 114.3 35.3 106.2 36.0 99.0 C36.7 91.8 37.3 85.2 38.0 78.0 C38.7 70.8 38.5 61.5 40.0 56.0 C41.5 50.5 43.7 47.7 47.0 45.0 C50.3 42.3 55.5 42.0 60.0 40.0 C64.5 38.0 69.7 34.2 74.0 33.0 C78.3 31.8 81.7 31.8 86.0 33.0 Z", "head": "M80 4 C89 4 94 11 94 20 C94 29 88 34 80 34 C72 34 66 29 66 20 C66 11 71 4 80 4 Z", "f": [["peV", "M99.0 42.0 C100.5 40.5 108.5 42.5 112.0 45.0 C115.5 47.5 119.0 52.7 120.0 57.0 C121.0 61.3 119.7 69.5 118.0 71.0 C116.3 72.5 112.5 68.8 110.0 66.0 C107.5 63.2 104.8 58.0 103.0 54.0 C101.2 50.0 97.5 43.5 99.0 42.0 Z"], ["peV", "M61.0 42.0 C59.5 40.5 51.5 42.5 48.0 45.0 C44.5 47.5 41.0 52.7 40.0 57.0 C39.0 61.3 40.3 69.5 42.0 71.0 C43.7 72.5 47.5 68.8 50.0 66.0 C52.5 63.2 55.2 58.0 57.0 54.0 C58.8 50.0 62.5 43.5 61.0 42.0 Z"], ["peH", "M83.0 49.0 C85.7 44.5 95.0 44.7 99.0 46.0 C103.0 47.3 106.0 53.0 107.0 57.0 C108.0 61.0 107.2 66.8 105.0 70.0 C102.8 73.2 97.7 75.5 94.0 76.0 C90.3 76.5 84.8 77.5 83.0 73.0 C81.2 68.5 80.3 53.5 83.0 49.0 Z"], ["peH", "M77.0 49.0 C74.3 44.5 65.0 44.7 61.0 46.0 C57.0 47.3 54.0 53.0 53.0 57.0 C52.0 61.0 52.8 66.8 55.0 70.0 C57.2 73.2 62.3 75.5 66.0 76.0 C69.7 76.5 75.2 77.5 77.0 73.0 C78.8 68.5 79.7 53.5 77.0 49.0 Z"], ["bra", "M109.0 71.0 C110.2 67.3 115.0 67.7 117.0 71.0 C119.0 74.3 121.2 86.2 121.0 91.0 C120.8 95.8 117.8 99.7 116.0 100.0 C114.2 100.3 111.2 97.8 110.0 93.0 C108.8 88.2 107.8 74.7 109.0 71.0 Z"], ["bra", "M51.0 71.0 C49.8 67.3 45.0 67.7 43.0 71.0 C41.0 74.3 38.8 86.2 39.0 91.0 C39.2 95.8 42.2 99.7 44.0 100.0 C45.8 100.3 48.8 97.8 50.0 93.0 C51.2 88.2 52.2 74.7 51.0 71.0 Z"], ["bra", "M114.0 104.0 C115.3 101.2 121.2 99.5 123.0 104.0 C124.8 108.5 125.7 125.5 125.0 131.0 C124.3 136.5 120.7 138.7 119.0 137.0 C117.3 135.3 115.8 126.5 115.0 121.0 C114.2 115.5 112.7 106.8 114.0 104.0 Z"], ["bra", "M46.0 104.0 C44.7 101.2 38.8 99.5 37.0 104.0 C35.2 108.5 34.3 125.5 35.0 131.0 C35.7 136.5 39.3 138.7 41.0 137.0 C42.7 135.3 44.2 126.5 45.0 121.0 C45.8 115.5 47.3 106.8 46.0 104.0 Z"], ["core", "M72.0 79.0 C75.2 73.8 84.8 73.8 88.0 79.0 C91.2 84.2 91.3 101.3 91.0 110.0 C90.7 118.7 88.8 127.5 86.0 131.0 C83.2 134.5 76.8 134.5 74.0 131.0 C71.2 127.5 69.3 118.7 69.0 110.0 C68.7 101.3 68.8 84.2 72.0 79.0 Z"], ["core", "M92.0 80.0 C93.7 78.3 99.5 84.7 101.0 90.0 C102.5 95.3 102.0 106.7 101.0 112.0 C100.0 117.3 96.7 124.0 95.0 122.0 C93.3 120.0 91.5 107.0 91.0 100.0 C90.5 93.0 90.3 81.7 92.0 80.0 Z"], ["core", "M68.0 80.0 C66.3 78.3 60.5 84.7 59.0 90.0 C57.5 95.3 58.0 106.7 59.0 112.0 C60.0 117.3 63.3 124.0 65.0 122.0 C66.7 120.0 68.5 107.0 69.0 100.0 C69.5 93.0 69.7 81.7 68.0 80.0 Z"], ["rod", "M85.0 142.0 C87.8 135.8 98.5 130.7 102.0 133.0 C105.5 135.3 106.0 146.3 106.0 156.0 C106.0 165.7 104.3 184.3 102.0 191.0 C99.7 197.7 94.8 199.5 92.0 196.0 C89.2 192.5 86.2 179.0 85.0 170.0 C83.8 161.0 82.2 148.2 85.0 142.0 Z"], ["rod", "M75.0 142.0 C72.2 135.8 61.5 130.7 58.0 133.0 C54.5 135.3 54.0 146.3 54.0 156.0 C54.0 165.7 55.7 184.3 58.0 191.0 C60.3 197.7 65.2 199.5 68.0 196.0 C70.8 192.5 73.8 179.0 75.0 170.0 C76.2 161.0 77.8 148.2 75.0 142.0 Z"], [null, "M88.0 206.0 C89.8 199.3 98.7 200.3 101.0 204.0 C103.3 207.7 102.7 219.3 102.0 228.0 C101.3 236.7 99.0 253.3 97.0 256.0 C95.0 258.7 91.5 252.3 90.0 244.0 C88.5 235.7 86.2 212.7 88.0 206.0 Z"], [null, "M72.0 206.0 C70.2 199.3 61.3 200.3 59.0 204.0 C56.7 207.7 57.3 219.3 58.0 228.0 C58.7 236.7 61.0 253.3 63.0 256.0 C65.0 258.7 68.5 252.3 70.0 244.0 C71.5 235.7 73.8 212.7 72.0 206.0 Z"]], "b": [["tiH", "M80.0 33.0 C85.0 33.0 91.0 38.7 95.0 41.0 C99.0 43.3 104.7 43.5 104.0 47.0 C103.3 50.5 95.0 55.5 91.0 62.0 C87.0 68.5 83.7 86.0 80.0 86.0 C76.3 86.0 73.0 68.5 69.0 62.0 C65.0 55.5 56.7 50.5 56.0 47.0 C55.3 43.5 61.0 43.3 65.0 41.0 C69.0 38.7 75.0 33.0 80.0 33.0 Z"], ["peV", "M99.0 42.0 C100.5 40.5 108.5 42.5 112.0 45.0 C115.5 47.5 119.0 52.7 120.0 57.0 C121.0 61.3 119.7 69.5 118.0 71.0 C116.3 72.5 112.5 68.8 110.0 66.0 C107.5 63.2 104.8 58.0 103.0 54.0 C101.2 50.0 97.5 43.5 99.0 42.0 Z"], ["peV", "M61.0 42.0 C59.5 40.5 51.5 42.5 48.0 45.0 C44.5 47.5 41.0 52.7 40.0 57.0 C39.0 61.3 40.3 69.5 42.0 71.0 C43.7 72.5 47.5 68.8 50.0 66.0 C52.5 63.2 55.2 58.0 57.0 54.0 C58.8 50.0 62.5 43.5 61.0 42.0 Z"], ["tiV", "M89.0 64.0 C92.3 58.5 101.2 54.8 104.0 57.0 C106.8 59.2 106.7 69.2 106.0 77.0 C105.3 84.8 102.7 98.2 100.0 104.0 C97.3 109.8 92.7 114.3 90.0 112.0 C87.3 109.7 84.2 98.0 84.0 90.0 C83.8 82.0 85.7 69.5 89.0 64.0 Z"], ["tiV", "M71.0 64.0 C67.7 58.5 58.8 54.8 56.0 57.0 C53.2 59.2 53.3 69.2 54.0 77.0 C54.7 84.8 57.3 98.2 60.0 104.0 C62.7 109.8 67.3 114.3 70.0 112.0 C72.7 109.7 75.8 98.0 76.0 90.0 C76.2 82.0 74.3 69.5 71.0 64.0 Z"], ["bra", "M109.0 71.0 C110.3 67.8 115.8 67.3 118.0 71.0 C120.2 74.7 122.5 88.2 122.0 93.0 C121.5 97.8 117.0 100.5 115.0 100.0 C113.0 99.5 111.0 94.8 110.0 90.0 C109.0 85.2 107.7 74.2 109.0 71.0 Z"], ["bra", "M51.0 71.0 C49.7 67.8 44.2 67.3 42.0 71.0 C39.8 74.7 37.5 88.2 38.0 93.0 C38.5 97.8 43.0 100.5 45.0 100.0 C47.0 99.5 49.0 94.8 50.0 90.0 C51.0 85.2 52.3 74.2 51.0 71.0 Z"], ["bra", "M114.0 104.0 C115.3 101.2 121.2 99.5 123.0 104.0 C124.8 108.5 125.7 125.5 125.0 131.0 C124.3 136.5 120.7 138.7 119.0 137.0 C117.3 135.3 115.8 126.5 115.0 121.0 C114.2 115.5 112.7 106.8 114.0 104.0 Z"], ["bra", "M46.0 104.0 C44.7 101.2 38.8 99.5 37.0 104.0 C35.2 108.5 34.3 125.5 35.0 131.0 C35.7 136.5 39.3 138.7 41.0 137.0 C42.7 135.3 44.2 126.5 45.0 121.0 C45.8 115.5 47.3 106.8 46.0 104.0 Z"], ["core", "M71.0 100.0 C74.3 96.2 85.7 96.2 89.0 100.0 C92.3 103.8 92.5 118.2 91.0 123.0 C89.5 127.8 83.7 129.0 80.0 129.0 C76.3 129.0 70.5 127.8 69.0 123.0 C67.5 118.2 67.7 103.8 71.0 100.0 Z"], ["cad", "M81.0 128.0 C84.0 123.2 96.8 120.8 101.0 123.0 C105.2 125.2 106.3 135.7 106.0 141.0 C105.7 146.3 102.8 153.2 99.0 155.0 C95.2 156.8 86.0 156.5 83.0 152.0 C80.0 147.5 78.0 132.8 81.0 128.0 Z"], ["cad", "M79.0 128.0 C76.0 123.2 63.2 120.8 59.0 123.0 C54.8 125.2 53.7 135.7 54.0 141.0 C54.3 146.3 57.2 153.2 61.0 155.0 C64.8 156.8 74.0 156.5 77.0 152.0 C80.0 147.5 82.0 132.8 79.0 128.0 Z"], ["cad", "M85.0 158.0 C87.3 154.0 98.8 150.7 102.0 156.0 C105.2 161.3 105.3 183.3 104.0 190.0 C102.7 196.7 96.7 197.7 94.0 196.0 C91.3 194.3 89.5 186.3 88.0 180.0 C86.5 173.7 82.7 162.0 85.0 158.0 Z"], ["cad", "M75.0 158.0 C72.7 154.0 61.2 150.7 58.0 156.0 C54.8 161.3 54.7 183.3 56.0 190.0 C57.3 196.7 63.3 197.7 66.0 196.0 C68.7 194.3 70.5 186.3 72.0 180.0 C73.5 173.7 77.3 162.0 75.0 158.0 Z"], ["gem", "M88.0 205.0 C90.2 200.2 99.3 199.5 102.0 203.0 C104.7 206.5 105.0 218.7 104.0 226.0 C103.0 233.3 98.5 246.0 96.0 247.0 C93.5 248.0 90.3 239.0 89.0 232.0 C87.7 225.0 85.8 209.8 88.0 205.0 Z"], ["gem", "M72.0 205.0 C69.8 200.2 60.7 199.5 58.0 203.0 C55.3 206.5 55.0 218.7 56.0 226.0 C57.0 233.3 61.5 246.0 64.0 247.0 C66.5 248.0 69.7 239.0 71.0 232.0 C72.3 225.0 74.2 209.8 72.0 205.0 Z"]]};
 function bodySVG(d, m="dia"){
-  const c=z=>`z ${"z"+((d[z]||{}).l||0)}`;
-  const fig=(ox,front)=>`<g transform="translate(${ox},0)">
-    <circle class="n" cx="80" cy="16" r="12"/><rect class="n" x="74" y="27" width="12" height="8" rx="3"/>
-    <ellipse class="${c("peV")}" cx="53" cy="45" rx="13" ry="10"/><ellipse class="${c("peV")}" cx="107" cy="45" rx="13" ry="10"/>
-    <rect class="${c("bra")}" x="34" y="55" width="13" height="42" rx="6"/><rect class="${c("bra")}" x="113" y="55" width="13" height="42" rx="6"/>
-    <rect class="${c("bra")}" x="31" y="99" width="12" height="38" rx="6"/><rect class="${c("bra")}" x="117" y="99" width="12" height="38" rx="6"/>
-    ${front?`<rect class="${c("peH")}" x="58" y="38" width="21" height="28" rx="7"/><rect class="${c("peH")}" x="81" y="38" width="21" height="28" rx="7"/>
-    <rect class="${c("core")}" x="61" y="68" width="38" height="46" rx="8"/>
-    <rect class="n" x="58" y="116" width="44" height="14" rx="6"/>
-    <rect class="${c("rod")}" x="57" y="132" width="21" height="62" rx="9"/><rect class="${c("rod")}" x="82" y="132" width="21" height="62" rx="9"/>
-    <rect class="n" x="60" y="198" width="16" height="44" rx="7"/><rect class="n" x="84" y="198" width="16" height="44" rx="7"/>`
-    :`<path class="${c("tiH")}" d="M64 36 L96 36 L104 58 L80 74 L56 58 Z"/>
-    <path class="${c("tiV")}" d="M55 60 L79 76 L79 100 L62 104 Z"/><path class="${c("tiV")}" d="M105 60 L81 76 L81 100 L98 104 Z"/>
-    <rect class="${c("core")}" x="64" y="102" width="32" height="16" rx="5"/>
-    <ellipse class="${c("cad")}" cx="69" cy="131" rx="12" ry="12"/><ellipse class="${c("cad")}" cx="91" cy="131" rx="12" ry="12"/>
-    <rect class="${c("cad")}" x="57" y="145" width="21" height="50" rx="9"/><rect class="${c("cad")}" x="82" y="145" width="21" height="50" rx="9"/>
-    <ellipse class="${c("gem")}" cx="68" cy="214" rx="9" ry="20"/><ellipse class="${c("gem")}" cx="92" cy="214" rx="9" ry="20"/>`}
-    <text x="80" y="256" text-anchor="middle">${front?"DELANTE":"DETRÁS"}</text></g>`;
-  return `<div class="body m-${m}"><svg viewBox="0 0 340 262" role="img" aria-label="Mapa del cuerpo">
+  const fig=(ox,v)=>`<g transform="translate(${ox},0)"><path class="sil" d="${BODY.sil}"/><path class="sil" d="${BODY.head}"/>
+    ${BODY[v].map(([z,pth])=>`<path class="${z?"z z"+((d[z]||{}).l||0):"nz"}" d="${pth}"><title>${z?FZ_SHORT[z]+": "+((d[z]||{}).st||""):""}</title></path>`).join("")}
+    <text x="80" y="292" text-anchor="middle">${v==="f"?"DELANTE":"DETRÁS"}</text></g>`;
+  return `<div class="body m-${m}"><svg viewBox="0 0 340 300" role="img" aria-label="Mapa del cuerpo">
     <defs><pattern id="hatch" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-      <rect width="6" height="6" style="fill:var(--hz)"/><line x1="0" y1="0" x2="0" y2="6" stroke="var(--ink)" stroke-width="3"/></pattern></defs>
-    ${fig(0,true)}${fig(180,false)}</svg></div>`;
+      <rect width="6" height="6" style="fill:var(--hz)"/><line x1="0" y1="0" x2="0" y2="6" stroke="#111" stroke-width="2.5"/></pattern></defs>
+    ${fig(0,"f")}${fig(180,"b")}</svg></div>`;
 }
+function keyHTML(m){ return `<div class="zkey m-${m}">${MODES[m].key.map(([l,t,d])=>`<span><i class="${l}"></i><b>${t}</b>${d?" "+d:""}</span>`).join("")}</div>`; }
 function zoneListHTML(d, m="dia"){
-  return `<div class="zl m-${m}">${FZ_SHOW.map(z=>{ const x=d[z]; return `<span class="lv l${x.l}">${x.lv}</span><span>${FZ_SHORT[z]}</span><span class="r">${x.txt}</span>`; }).join("")}</div>`;
+  return `<div class="zl m-${m}">${FZ_SHOW.map(z=>{ const x=d[z]; return `<i class="sw l${x.l}"></i><span>${FZ_SHORT[z]}</span><span class="r"><b>${x.st}</b> <span class="mute">${x.txt}</span></span>`; }).join("")}</div>`;
 }
 function bodyCardHTML(){
   const m=HIST.mode, d=mapData(m), sel=HIST.sel||isoDate(new Date());
-  const title = m==="dia" ? (sel===isoDate(new Date())?"Hoy":longD(sel)) : m==="sem" ? "Últimos 7 días" : "Recuperación ahora";
+  const when = m==="dia" ? (sel===isoDate(new Date())?"hoy":longD(sel)) : m==="sem" ? "" : "";
+  let sum="";
+  if(m==="rec"){ const g=k=>FZ_SHOW.filter(z=>d[z].st===k).map(z=>FZ_SHORT[z]);
+    const F=g("FATIGADO"), C=g("CARGADO");
+    sum = `<div class="${F.length?"warn":"okbox"}">${F.length?`<b>Hoy evita:</b> ${F.join(", ")}.`:"<b>Nada fatigado.</b>"}${C.length?` <b>Suave:</b> ${C.join(", ")}.`:""} <b>Libre:</b> ${g("LISTO").join(", ")||"—"}.</div>`; }
   return `<div class="card"><h2>Mapa del cuerpo</h2>
-    <div class="seg"><button data-md="dia" aria-pressed="${m==="dia"}">Día</button><button data-md="sem" aria-pressed="${m==="sem"}">7 días</button><button data-md="rec" aria-pressed="${m==="rec"}">Recuperación</button></div>
-    <h3>${esc(title)}</h3>${bodySVG(d,m)}
-    <div class="mute small">${m==="sem"?"Amarillo = BAJO · verde = OK · rayado y borde grueso = ALTO (te pasas).":m==="rec"?"Verde suave = listo · amarillo/naranja = cargado · rayado y borde grueso = fatigado.":"Más intenso = más series · rayado y borde grueso = 10 series o más."} El texto de la lista manda.</div>
-    ${zoneListHTML(d,m)}<div class="mute small" style="margin-top:6px">${MODE_HELP[m]}</div></div>`;
+    <div class="seg">${["rec","dia","sem"].map(k=>`<button data-md="${k}" aria-pressed="${m===k}">${MODES[k].btn}</button>`).join("")}</div>
+    <h3>${esc(MODES[m].q)}${when?" · "+esc(when):""}</h3>${sum}
+    ${bodySVG(d,m)}${keyHTML(m)}${zoneListHTML(d,m)}
+    <div class="mute small" style="margin-top:6px">${MODES[m].help}</div></div>`;
 }
 
 /* ---- calendario mensual ---- */
@@ -999,7 +1007,7 @@ function renderAuto(){
   const exList = L._ex.map((id,n)=>{ const steps=L.plan.steps.map((x,k)=>({x,k})).filter(o=>o.x.e.id===id), dn=steps.filter(o=>L.done&&L.done[o.k]).length;
     const now = s && s.e.id===id && g.k==="work", st = dn===steps.length?"✓":now?"▶":dn?"◐":"·";
     return `<li class="${now?"now":""} ${dn===steps.length?"ok":""}"><span class="sw" style="background:${RING_C[n%RING_C.length]}">${n+1}</span><span class="nm">${esc(steps[0].x.e.n)}</span><span class="ct">${st} ${dn}/${steps.length}</span></li>`; }).join("");
-  $("#app").innerHTML = `<div class="lv">
+  $("#app").innerHTML = `<div class="lvw">
     <div class="lv-top"><div><b id="lvPct">0%</b><span>hecho</span></div><div><b id="lvEl">0:00</b><span>llevas</span></div><div><b id="lvLeft">0:00</b><span>queda</span></div><div><b id="lvWork">0:00</b><span>trabajo</span></div></div>
     <div class="lv-ring"><svg viewBox="0 0 220 220" id="ring">${ringSVG(L,el)}</svg>
       <div class="lv-c"><span class="ph ${g.k}">${ph}</span><b id="clk">0:00</b><span>${g.k==="warm"?"Calentamiento":esc(serie(g.k==="rest"?ns:s))}</span></div></div>
@@ -1012,7 +1020,7 @@ function renderAuto(){
     <ul class="lv-list">${exList}</ul>
     <div class="lv-btn"><button class="pri" id="pause">${L.paused?"▶ Seguir":"⏸ Pausa"}</button><button id="finish">■ Terminar</button></div></div>`;
   // pantalla fija: ajusta la altura al hueco real bajo la cabecera y el rosco al espacio libre
-  const lv=$(".lv"), hd=document.querySelector("header"); window.scrollTo(0,0);
+  const lv=$(".lvw"), hd=document.querySelector("header"); window.scrollTo(0,0);
   const H=window.innerHeight-(hd?hd.offsetHeight:60)-10; lv.style.height=H+"px";
   const used=[".lv-top",".lv-ex",".lv-list",".lv-btn"].reduce((a,q)=>a+($(q)?$(q).offsetHeight:0),0)+30;
   lv.style.setProperty("--rs", Math.max(170, Math.min(H-used, 420))+"px");
@@ -1204,7 +1212,7 @@ function renderSummary(id){
     <div class="kpis"><div class="kpi"><b>${fmt(s.durSec)}</b><span class="mute">real</span></div>
       ${s.manual?`<div class="kpi"><b>A mano</b><span class="mute">registro manual</span></div>`:`<div class="kpi"><b>${fmt(s.estSec||0)}</b><span class="mute">calculado (${diff>=0?"+":""}${Math.round(diff/60)}')</span></div>`}</div>
     ${s.mods&&s.mods.length?`<div class="mute" style="margin-top:6px">Reglas aplicadas: ${s.mods.map(m=>MODS.find(x=>x.id===m)?.label).join(" · ")}</div>`:""}</div>
-  <div class="card"><h3>Zonas trabajadas</h3>${(()=>{ const per=sessZones(s), d={}; FZ_SHOW.forEach(z=>{ const n=per[z]||0; d[z]={l:!n?0:n<4?1:n<7?2:n<10?3:4, lv:n||"–", txt:n?n+" series":"sin trabajo"}; }); return bodySVG(d)+zoneListHTML(d); })()}</div>
+  <div class="card"><h3>Zonas trabajadas</h3>${(()=>{ const per=sessZones(s), d={}; FZ_SHOW.forEach(z=>{ const n=per[z]||0; const l=!n?0:n<4?1:n<7?2:n<10?3:4; d[z]={l, st:MODES.dia.key[l][1], txt:n?n+" series":"—"}; }); return bodySVG(d)+keyHTML("dia")+zoneListHTML(d); })()}</div>
   ${s.manual?"":`<div class="card"><h3>Registro</h3><table><tr><th>Ejercicio</th><th>Por serie</th><th class="num">Total</th></tr>`}`;
   if(!s.manual) s.ex.forEach(x=>{ const pr = progress(x.id);
     const per = x.sets.map(z=>z.reps+(z.rir!=null?"@"+z.rir:"")).join(" · ");
