@@ -102,6 +102,27 @@ nav button[aria-current="true"]{background:var(--ok-bg);text-decoration:underlin
 .sticky{position:sticky;bottom:calc(70px + env(safe-area-inset-bottom));z-index:4;background:var(--bg);padding:8px 0}
 .sticky button:not(.pri){background:var(--card)}
 .exsel{font-weight:700}
+/* ---- mapa de calor (actividad) · rampa de luminosidad de un solo tono + detalle en texto ---- */
+.hm-wrap{overflow-x:auto;padding-bottom:4px}
+.hm{display:grid;grid-auto-flow:column;grid-template-rows:repeat(7,13px);gap:3px;width:max-content}
+.hm i{width:13px;height:13px;border-radius:3px;border:1px solid var(--line);background:var(--card);display:block}
+.hm i.l1{background:color-mix(in srgb,var(--acc) 22%,var(--card))}
+.hm i.l2{background:color-mix(in srgb,var(--acc) 48%,var(--card))}
+.hm i.l3{background:color-mix(in srgb,var(--acc) 75%,var(--card))}
+.hm i.l4{background:var(--acc);border:2px solid var(--ink)}
+.hm i.mar::after{content:"";display:block;width:5px;height:5px;margin:3px auto 0;border-radius:50%;background:var(--ink)}
+.hm i.hoy{outline:2px dashed var(--ink);outline-offset:1px}
+.hm i.fut{visibility:hidden}
+.hm i.sel{outline:3px solid var(--ink);outline-offset:1px}
+.hm-leg{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--mute);margin-top:6px;flex-wrap:wrap}
+.hm-leg i{width:13px;height:13px;border-radius:3px;border:1px solid var(--line);display:inline-block}
+/* ---- mapa de carga por zona ---- */
+.fz{display:grid;grid-template-columns:7.2em 1fr auto;gap:6px;align-items:center;font-size:14px;padding:4px 0;border-top:1px solid var(--line)}
+.fz:first-of-type{border-top:0}
+.fz .b{height:12px;border:2px solid var(--ink);border-radius:6px;overflow:hidden}
+.fz .b i{display:block;height:100%;background:var(--acc)}
+.fz .st{font-weight:800;font-size:13px;text-align:right;white-space:nowrap}
+.fz .st.f2{text-decoration:underline}
 </style>
 </head>
 <body>
@@ -190,6 +211,86 @@ function weekVolume(){ // series hechas por zona esta semana
   const m=mondayOf(new Date()), v={};
   DB.sessions.filter(s=>s.date>=m).forEach(s=>s.ex.forEach(x=>{ const L=LIB_BY[x.id]; if(L) v[L.z]=(v[L.z]||0)+x.sets.length; }));
   return v;
+}
+
+
+/* ============ MAPA DE CALOR + CARGA POR ZONA ============
+   Idea tomada de openGym (heatmap anual + mapa de fatiga con vida media), reescrita
+   para esta app: cuenta surf/kite/pádel/esquí y nunca transmite información solo por color. */
+const MAR = ["Surf","Kite"];
+function dayAgg(){ // fecha → {min, fb, acts:[...]}
+  const a={};
+  const g=d=>a[d]=a[d]||{min:0, fb:0, acts:[]};
+  DB.sessions.forEach(s=>{ const x=g(s.date); x.min+=Math.round((s.durSec||0)/60); x.fb++; });
+  DB.acts.forEach(t=>{ const x=g(t.date); x.min+=(+t.min||0); x.acts.push(t); });
+  return a;
+}
+function heatmapHTML(weeks=26, sel=null){
+  const agg=dayAgg(), today=isoDate(new Date());
+  const vals=Object.values(agg).map(x=>x.min).filter(v=>v>0).sort((a,b)=>a-b);
+  const q=p=>vals.length?vals[Math.min(vals.length-1,Math.floor(p*vals.length))]:0;
+  const t1=q(.25), t2=q(.5), t3=q(.75);
+  const lvl=m=>!m?0:m>=t3?4:m>=t2?3:m>=t1?2:1;
+  const start=new Date(mondayOf(new Date())); start.setDate(start.getDate()-(weeks-1)*7);
+  let cells="", months="";
+  for(let w=0; w<weeks; w++){
+    const c0=new Date(start); c0.setDate(start.getDate()+w*7);
+    months += `<span style="width:16px;display:inline-block">${c0.getDate()<=7?["E","F","M","A","M","J","J","A","S","O","N","D"][c0.getMonth()]:""}</span>`;
+    for(let d=0; d<7; d++){
+      const day=new Date(c0); day.setDate(c0.getDate()+d); const k=isoDate(day), x=agg[k];
+      const cls=["l"+lvl(x&&x.min)]; if(x&&x.acts.some(t=>MAR.includes(t.type))) cls.push("mar");
+      if(k===today) cls.push("hoy"); if(k>today) cls.push("fut"); if(k===sel) cls.push("sel");
+      cells += `<i class="${cls.join(" ")}" data-hm="${k}" title="${k}${x?" · "+x.min+"'":""}"></i>`;
+    }
+  }
+  const tot=w=>{ const from=isoDate(new Date(Date.now()-w*7*864e5)); return Object.entries(agg).filter(([k])=>k>from).reduce((s,[,x])=>s+x.min,0); };
+  const days=Object.entries(agg).filter(([k,x])=>k>isoDate(new Date(Date.now()-28*864e5))&&x.min>0).length;
+  return `<div class="hm-wrap" id="hmWrap"><div class="small mute" style="white-space:nowrap">${months}</div><div class="hm">${cells}</div></div>
+    <div class="hm-leg">Menos <i></i><i class="l1" style="background:color-mix(in srgb,var(--acc) 22%,var(--card))"></i><i style="background:color-mix(in srgb,var(--acc) 48%,var(--card))"></i><i style="background:color-mix(in srgb,var(--acc) 75%,var(--card))"></i><i style="background:var(--acc);border:2px solid var(--ink)"></i> Más · ● = surf/kite · contorno discontinuo = hoy</div>
+    <div class="kpis" style="margin-top:8px"><div class="kpi"><b>${days}/28</b><span class="mute">días activos (4 sem)</span></div><div class="kpi"><b>${Math.round(tot(1)/6)/10} h</b><span class="mute">últimos 7 días</span></div></div>
+    <div id="hmDet" class="hint" style="display:${sel?"block":"none"}">${sel?hmDetail(sel,agg):""}</div>`;
+}
+function hmDetail(k, agg){
+  const x=agg[k]; if(!x) return `<b>${k}</b> · descanso`;
+  const ss=DB.sessions.filter(s=>s.date===k).map(s=>esc(sessionName(s))+" "+Math.round(s.durSec/60)+"'");
+  const aa=x.acts.map(t=>esc(t.type)+" "+t.min+"' ("+t.int+")");
+  return `<b>${k}</b> · ${x.min}' en total<br>${[...ss,...aa].join(" · ")}`;
+}
+function bindHeatmap(){
+  const w=$("#hmWrap"); if(!w) return; w.scrollLeft=w.scrollWidth;
+  const agg=dayAgg();
+  w.querySelectorAll("[data-hm]").forEach(c=>c.onclick=()=>{ w.querySelectorAll(".sel").forEach(e=>e.classList.remove("sel")); c.classList.add("sel");
+    const d=$("#hmDet"); d.style.display="block"; d.innerHTML=hmDetail(c.dataset.hm, agg); });
+}
+
+/* Carga por zona: series efectivas con vida media exponencial (8 series = 1,0).
+   Las vidas medias y la carga de los deportes son estimaciones iniciales: JJB las corrige con feedback. */
+const FZ_HL = {rod:48, cad:48, core:30, peH:30, tiV:30, tiH:30, peV:24, bra:24, gem:24}; // horas
+const FZ_SHOW = ["rod","cad","peH","peV","tiV","tiH","core","gem"];
+const ACT_LOAD = { // series equivalentes por hora de deporte a intensidad media
+  Surf:{tiV:4, peV:2, core:2, cad:1}, Kite:{cad:3, rod:3, core:3, tiH:1},
+  "Pádel":{rod:3, gem:3, peV:1, core:1}, "Esquí":{rod:5, cad:2, core:1}, Running:{rod:2, gem:3, cad:1},
+  Intervalos:{rod:2, cad:1, gem:1}, "Zona 2":{} };
+const INT_F = {suave:.6, media:1, dura:1.4};
+const FZ_SHORT = {rod:"Cuádriceps", cad:"Glúteo/isquio", peH:"Pecho", peV:"Hombro", tiV:"Dorsal", tiH:"Espalda media", core:"Core/lumbar", gem:"Gemelo/pie", bra:"Brazos"};
+function fatigueMap(now=Date.now()){
+  const f={}, add=(z,sets,t)=>{ if(!FZ_HL[z]||t>now) return; const h=(now-t)/36e5; if(h>24*30) return; f[z]=(f[z]||0)+(sets/8)*Math.pow(.5,h/FZ_HL[z]); };
+  DB.sessions.forEach(s=>{ const per={}; s.ex.forEach(x=>{ const z=(LIB_BY[x.id]||{}).z||x.zone; if(z) per[z]=(per[z]||0)+x.sets.length; });
+    Object.entries(per).forEach(([z,n])=>add(z, Math.min(12,n), s.end||new Date(s.date+"T19:00").getTime())); });
+  DB.acts.forEach(a=>{ const L=ACT_LOAD[a.type]; if(!L) return; const k=(+a.min||0)/60*(INT_F[a.int]||1);
+    Object.entries(L).forEach(([z,n])=>add(z, Math.min(12,n*k), new Date(a.date+"T13:00").getTime())); });
+  return f;
+}
+function fzState(v){ return v>.5?{t:"FATIGADO",c:"f2"}:v>.25?{t:"Cargado",c:"f1"}:{t:"Fresco",c:"f0"}; }
+function fatigueHTML(){
+  const f=fatigueMap();
+  return FZ_SHOW.map(z=>{ const v=f[z]||0, st=fzState(v);
+    return `<div class="fz"><span>${FZ_SHORT[z]}</span><span class="b"><i style="width:${Math.min(100,Math.round(v*100))}%"></i></span><span class="st ${st.c}">${st.t} ${Math.round(v*100)}</span></div>`; }).join("")
+    + `<div class="mute small" style="margin-top:6px">100 = una sesión completa (8 series) aún sin recuperar. Pierna y glúteo se recuperan en ~48 h, el resto en 24–30 h. Surf, kite, pádel y esquí cuentan.</div>`;
+}
+function fatigueLine(){
+  const f=fatigueMap(), bad=FZ_SHOW.filter(z=>(f[z]||0)>.5).map(z=>FZ_SHORT[z]);
+  return bad.length ? `<div class="warn"><b>Hoy evita cargar:</b> ${bad.join(", ")} (fatigado).</div>` : `<div class="okbox">Todas las zonas recuperadas o con carga baja.</div>`;
 }
 
 /* ============ PRESCRIPCIÓN (criterio de entrenador) ============ */
@@ -379,6 +480,7 @@ function renderHome(){
       <div class="kpi"><b>${st.padel}</b><span class="mute">pádel</span></div>
       <div class="kpi"><b>${st.mar}'</b><span class="mute">surf / kite</span></div>
     </div></div>
+  ${fatigueLine()}
   <button class="pri big" id="newS">＋ Crear sesión de hoy</button>
   ${DB.draft?`<button class="big" id="contD" style="margin-top:8px">✎ Seguir con el borrador</button>`:""}
   <div class="card" style="margin-top:12px"><h2>Mis sesiones guardadas</h2>`;
@@ -737,7 +839,9 @@ function renderSummary(id){
 /* ============ HISTORIAL ============ */
 function renderHist(){
   const ss = DB.sessions.slice().sort((a,b)=>b.end-a.end);
-  let h = `<div class="card"><h2>Sesiones (${ss.length})</h2>`;
+  let h = `<div class="card"><h2>Actividad · 6 meses</h2>${heatmapHTML(26)}</div>
+    <div class="card"><h2>Carga por zona ahora</h2>${fatigueHTML()}</div>
+    <div class="card"><h2>Sesiones (${ss.length})</h2>`;
   if(!ss.length) h += `<div class="mute">Aún no hay sesiones.</div>`;
   else { h+=`<ul class="list">`; ss.forEach(s=>{
     h+=`<li><button class="sessbtn" data-id="${s.id}"><span><b>${esc(sessionName(s))}</b> · ${s.date}<br><span class="mute">Sem ${s.week} · ${s.ex.length} ejercicios · ${s.ex.reduce((a,x)=>a+x.sets.length,0)} series${s.rpe?" · esfuerzo "+s.rpe:""}</span></span>
@@ -750,7 +854,7 @@ function renderHist(){
   const aa = DB.acts.slice().reverse().slice(0,30);
   h += aa.length ? `<table>${aa.map(a=>`<tr><td>${a.date.slice(5)}</td><td><b>${esc(a.type)}</b><br><span class="mute">${esc(a.note||"")}</span></td><td class="num">${a.min}'</td><td>${a.int}</td><td><button class="sm" data-da="${a.id}" aria-label="Borrar">✕</button></td></tr>`).join("")}</table>` : `<div class="mute">Sin actividades registradas.</div>`;
   h += `</div>`;
-  $("#app").innerHTML = h;
+  $("#app").innerHTML = h; bindHeatmap();
   document.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>{ VIEW={k:"sum", id:b.dataset.id}; render(); });
   document.querySelectorAll("[data-da]").forEach(b=>b.onclick=()=>{ if(confirm("¿Borrar actividad?")){ DB.acts=DB.acts.filter(a=>a.id!==b.dataset.da); save(); render(); } });
 }
@@ -761,6 +865,7 @@ function weeklyReport(){
   const ss = DB.sessions.filter(s=>s.date>=from).sort((a,b)=>a.start-b.start);
   const vol = {}; ss.forEach(s=>s.ex.forEach(x=>{ const z=(LIB_BY[x.id]||{}).z||x.zone; if(z) vol[ZONES[z]||z]=(vol[ZONES[z]||z]||0)+x.sets.length; }));
   return {
+    carga_por_zona_hoy: Object.fromEntries(FZ_SHOW.map(z=>[FZ_SHORT[z], Math.round((fatigueMap()[z]||0)*100)])),
     tipo:"informe_semanal_fullbody_jjb", generado:new Date().toISOString(), periodo:{desde:from, hasta:to},
     semana_del_ciclo:weekInfo().week, ciclo:weekInfo().cycle, inicio_ciclo:DB.start,
     sesiones: ss.map(s=>({fecha:s.date, nombre:sessionName(s), objetivo:OBJ[s.obj]||s.obj, formato:FMT[s.fmt]||s.fmt,
