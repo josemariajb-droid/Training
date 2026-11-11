@@ -86,6 +86,39 @@ body[data-tab=lib]{--hc:var(--c-green)} body[data-tab=hist]{--hc:var(--c-orange)
 .blk{border-left:4px solid var(--ink);padding-left:10px;margin:12px 0 4px}
 .blk.int{border-left-style:dashed}
 .live{text-align:center}
+/* ---- sesión en vivo: pantalla fija, sin scroll ---- */
+body.livemode{overflow:hidden;padding-bottom:0;min-height:0;height:100dvh}
+body.livemode nav{display:none}
+body.livemode main{padding:8px 12px 0;max-width:680px}
+.lv{height:calc(100dvh - 74px);display:flex;flex-direction:column;justify-content:space-between;gap:6px;overflow:hidden}
+.lv-top{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;text-align:center}
+.lv-top div{border:1px solid var(--line);border-radius:10px;padding:4px 2px;background:var(--card)}
+.lv-top div:nth-child(1){border-top:4px solid var(--c-orange)} .lv-top div:nth-child(2){border-top:4px solid var(--c-sky)}
+.lv-top div:nth-child(3){border-top:4px solid var(--c-purple)} .lv-top div:nth-child(4){border-top:4px solid var(--c-green)}
+.lv-top b{display:block;font-size:19px;font-variant-numeric:tabular-nums} .lv-top span{font-size:11px;color:var(--mute)}
+.lv-ring{position:relative;width:min(82vw,var(--rs,40dvh));aspect-ratio:1;margin:0 auto;flex-shrink:0}
+.lv-ring svg{width:100%;height:100%;display:block}
+.lv-ring .rn{font-size:12px;font-weight:800;fill:#111;paint-order:stroke;stroke:#fff;stroke-width:3px}
+.lv-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.lv-c b{font-size:clamp(40px,11dvh,72px);line-height:1;font-variant-numeric:tabular-nums}
+.lv-c span{font-size:13px;color:var(--mute);font-weight:700}
+.lv-c .ph{font-size:14px;font-weight:900;letter-spacing:1px;border:2px solid var(--ink);border-radius:8px;padding:1px 8px;color:var(--ink)}
+.lv-c .ph.work{background:var(--c-orange);color:#111;border-color:#111} .lv-c .ph.rest{border-style:dashed} .lv-c .ph.warm{border-style:dotted}
+.lv-ex{text-align:center;min-height:0}
+.lv-ex .pre{font-size:12px;font-weight:800;color:var(--mute);text-transform:uppercase;letter-spacing:1px}
+.lv-ex .nm{font-size:22px;font-weight:800;line-height:1.15}
+.lv-ex .tg2{font-size:14px;color:var(--mute);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lv-fix{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:4px;font-size:14px}
+.lv-fix button{min-height:36px;width:44px;padding:0;font-size:20px}
+.lv-list{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:3px 8px;flex:0 0 auto;overflow:hidden;align-content:start}
+.lv-list li{display:flex;align-items:center;gap:5px;font-size:12.5px;min-width:0;border:1px solid var(--line);border-radius:8px;padding:2px 5px}
+.lv-list li.now{border:2px solid var(--ink);font-weight:800}
+.lv-list li.ok .nm{text-decoration:line-through;opacity:.7}
+.lv-list .sw{min-width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#111;border:1px solid #111}
+.lv-list .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lv-list .ct{font-variant-numeric:tabular-nums;white-space:nowrap}
+.lv-btn{display:grid;grid-template-columns:2fr 1fr;gap:8px;padding-bottom:max(8px,env(safe-area-inset-bottom))}
+.lv-btn button{min-height:56px;font-size:19px}
 .phase{display:inline-block;font-weight:800;font-size:14px;letter-spacing:1px;border:2px solid var(--ink);border-radius:8px;padding:2px 10px}
 .phase.rest{border-style:dashed}
 .clock{font-size:80px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1.05;margin:8px 0 2px}
@@ -216,7 +249,7 @@ const WEEK = {1:{w:40,r:20,txt:"Referencias: RIR 3, anota todo"},
 
 /* ============ STORAGE ============ */
 const KEY = "fbjjb_v1";
-const APP_V = "v11 · 11/11/2026";
+const APP_V = "v12 · 11/11/2026";
 let DB = load();
 function blank(){ return {start:null, sessions:[], acts:[], weights:[], tpls:[], live:null, draft:null, settings:{sound:false, vib:true}}; }
 function load(){
@@ -728,7 +761,8 @@ function render(){
   $("#weekChip").className = "chip"+(wi.week===4?" dash":"");
   document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-current", String(b.dataset.tab===TAB && !DB.live)));
   document.body.dataset.tab = DB.live ? "hoy" : TAB;
-  if(DB.live){ renderLive(); return; }
+  if(DB.live){ if(DB.live.auto) renderAuto(); else renderLive(); return; }
+  document.body.classList.remove("livemode");
   stopTick();
   if(VIEW && VIEW.k==="plan") return renderPlanner();
   if(VIEW && VIEW.k==="pre") return renderPre();
@@ -778,7 +812,7 @@ function renderPlanner(){
       <div><label>Formato</label><select id="dFmt">${Object.entries(FMT).map(([k,v])=>`<option value="${k}" ${k===d.fmt?"selected":""}>${v}</option>`).join("")}</select></div></div>
     <div class="grid3"><div><label>Nivel máx.</label><select id="dLvl">${[1,2,3].map(n=>`<option value="${n}" ${n==d.lvl?"selected":""}>${lvlTxt(n)}</option>`).join("")}</select></div>
       <div><label>Calentam. (min)</label><input id="dWarm" type="number" inputmode="numeric" value="${d.warm}"></div>
-      <div><label>Rondas circuito</label><input id="dRounds" type="number" inputmode="numeric" value="${d.rounds}" ${d.fmt!=="circuito"?"disabled":""}></div></div>
+      <div style="${d.fmt!=="circuito"?"display:none":""}"><label>Rondas circuito</label><input id="dRounds" type="number" inputmode="numeric" value="${d.rounds}"></div></div>
     <label>Material disponible hoy</label>
     <div>${["M","B","D","C"].map(c=>`<label class="chk"><input type="checkbox" data-eq="${c}" ${d.eq[c]?"checked":""}>${EQ[c]}</label>`).join("")}</div>
     <div class="row" style="margin-top:6px"><button class="grow" id="auto">⚡ Autocompletar sin repetir</button><button class="grow" id="obj">↻ Recalcular series</button></div>
@@ -901,10 +935,113 @@ function renderPre(){
   $("#go").onclick=()=>{ if(!plan.steps.length){ toast("Con estas reglas no queda ningún ejercicio"); return; } startSession(plan, t); };
 }
 
-/* ============ SESIÓN EN VIVO ============ */
+/* ============ SESIÓN EN VIVO · TIEMPO CORRIDO ============
+   Un único reloj: calentamiento → trabajo → descanso → … se encadenan solos.
+   Solo dos botones: Pausa y Terminar. Cada serie se registra sola con lo de la última vez;
+   durante el descanso puedes corregir las reps sin parar el reloj. */
+const RING_C = ["var(--c-blue)","var(--c-orange)","var(--c-green)","var(--c-purple)","var(--c-sky)","var(--c-verm)","var(--c-yellow)","#8a8a8a"];
+function autoSegs(L){
+  if(L._segs) return L._segs;
+  const segs=[]; let t=0;
+  const push=(o)=>{ o.a=t; t+=o.d; o.b=t; segs.push(o); };
+  if(L.plan.warm>0) push({k:"warm", d:L.plan.warm});
+  L.plan.steps.forEach((s,i)=>{ push({k:"work", i, d:Math.max(10,Math.round(stepWork(s)))}); if(s.rest>0) push({k:"rest", i, d:s.rest}); });
+  const exOrder=[]; L.plan.steps.forEach(s=>{ if(!exOrder.includes(s.e.id)) exOrder.push(s.e.id); });
+  Object.defineProperty(L,"_segs",{value:segs, enumerable:false, writable:true});
+  Object.defineProperty(L,"_tot",{value:t, enumerable:false, writable:true});
+  Object.defineProperty(L,"_ex",{value:exOrder, enumerable:false, writable:true});
+  return segs;
+}
+function autoEl(L){ return Math.max(0, ((L.paused||Date.now()) - L.start - (L.pauseAcc||0))/1000); }
+function autoAt(L, el){ const S=autoSegs(L); let j=S.findIndex(x=>el<x.b); return j<0?S.length:j; }
+function autoLog(L, i){
+  const s=L.plan.steps[i], e=s.e; L.done=L.done||{}; if(L.done[i]) return; L.done[i]=1;
+  const h=logsFor(e.id)[0], hs=h?h.sets[Math.min(s.r, h.sets.length-1)]:null;
+  if(s.kind==="reps"){
+    const rir=parseInt(String(L.plan.rir))||2;
+    logPush(s, {reps: hs? hs.reps : e.hi, rir: hs&&hs.rir!=null? hs.rir : rir, var: hs? (hs.var||"") : "", workSec:Math.round(stepWork(s)), auto:true});
+  } else logPush(s, {reps: hs? hs.reps : (e.iso? s.work : (e.iv?0:10)), var: hs?(hs.var||""):"", workSec:s.work, auto:true});
+  L.last={id:e.id, n:L.logs[e.id].sets.length-1, i};
+}
+function autoCatchUp(L){ // registra todo lo que ya ha pasado (también si se cerró la app)
+  const S=autoSegs(L), j=autoAt(L, autoEl(L));
+  for(let k=0;k<j && k<S.length;k++) if(S[k].k==="work") autoLog(L, S[k].i);
+  return j;
+}
+function ringSVG(L, el){
+  const S=autoSegs(L), T=L._tot, R=88, cx=110, cy=110, sw=22, C=2*Math.PI*R, gap=1.2;
+  const col=i=>RING_C[L._ex.indexOf(L.plan.steps[i].e.id)%RING_C.length];
+  let arcs="", nums="";
+  // un arco por paso (trabajo + su descanso), del color de su ejercicio
+  const spans=[]; S.forEach(x=>{ if(x.k==="warm") spans.push({a:x.a,b:x.b,c:"#8a8a8a",i:-1}); else if(x.k==="work") spans.push({a:x.a,b:x.b,c:col(x.i),i:x.i}); else spans[spans.length-1].b=x.b; });
+  spans.forEach(sp=>{
+    const len=(sp.b-sp.a)/T*C, off=-sp.a/T*C, done=Math.min(Math.max(el-sp.a,0), sp.b-sp.a)/T*C;
+    arcs+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${sp.c}" stroke-opacity=".28" stroke-width="${sw}" stroke-dasharray="${Math.max(0,len-gap)} ${C}" stroke-dashoffset="${off}"/>`;
+    if(done>0) arcs+=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${sp.c}" stroke-width="${sw}" stroke-dasharray="${Math.max(0,Math.min(done,len-gap))} ${C}" stroke-dashoffset="${off}"/>`;
+  });
+  // número de cada ejercicio en el centro de su primer arco
+  L._ex.forEach((id,n)=>{ const i=L.plan.steps.findIndex(s=>s.e.id===id), sg=S.find(x=>x.k==="work"&&x.i===i); if(!sg) return;
+    const ang=((sg.a+sg.b)/2/T)*2*Math.PI-Math.PI/2; nums+=`<text x="${cx+Math.cos(ang)*R}" y="${cy+Math.sin(ang)*R+4}" text-anchor="middle" class="rn">${n+1}</text>`; });
+  const ang=(Math.min(el,T)/T)*2*Math.PI-Math.PI/2;
+  const mk=`<line x1="${cx+Math.cos(ang)*(R-sw/2-4)}" y1="${cy+Math.sin(ang)*(R-sw/2-4)}" x2="${cx+Math.cos(ang)*(R+sw/2+4)}" y2="${cy+Math.sin(ang)*(R+sw/2+4)}" stroke="var(--ink)" stroke-width="4" stroke-linecap="round"/>`;
+  return `<g transform="rotate(-90 ${cx} ${cy})">${arcs}</g>${nums}${mk}`;
+}
+function renderAuto(){
+  const L=DB.live; startTick(); keepAwake(true); document.body.classList.add("livemode");
+  const S=autoSegs(L), el=autoEl(L), j=autoCatchUp(L); save();
+  if(j>=S.length){ finishSession(); return; }
+  L._j=j; const g=S[j], s=g.k==="warm"?null:L.plan.steps[g.i];
+  const nextWork=S.slice(j+1).find(x=>x.k==="work"), ns=nextWork?L.plan.steps[nextWork.i]:null;
+  const ph = L.paused?"PAUSA":g.k==="warm"?"CALENTAR":g.k==="work"?"TRABAJO":"DESCANSO";
+  const showS = g.k==="rest" ? ns : s;   // en descanso, lo importante es lo que viene
+  const serie = x=>x?(x.kind==="reps"?"Serie ":"Ronda ")+(x.r+1)+" de "+x.rounds:"";
+  const lastSet = L.last && L.logs[L.last.id] ? L.logs[L.last.id].sets[L.last.n] : null, lastStep = L.last?L.plan.steps[L.last.i]:null;
+  const exList = L._ex.map((id,n)=>{ const steps=L.plan.steps.map((x,k)=>({x,k})).filter(o=>o.x.e.id===id), dn=steps.filter(o=>L.done&&L.done[o.k]).length;
+    const now = s && s.e.id===id && g.k==="work", st = dn===steps.length?"✓":now?"▶":dn?"◐":"·";
+    return `<li class="${now?"now":""} ${dn===steps.length?"ok":""}"><span class="sw" style="background:${RING_C[n%RING_C.length]}">${n+1}</span><span class="nm">${esc(steps[0].x.e.n)}</span><span class="ct">${st} ${dn}/${steps.length}</span></li>`; }).join("");
+  $("#app").innerHTML = `<div class="lv">
+    <div class="lv-top"><div><b id="lvPct">0%</b><span>hecho</span></div><div><b id="lvEl">0:00</b><span>llevas</span></div><div><b id="lvLeft">0:00</b><span>queda</span></div><div><b id="lvWork">0:00</b><span>trabajo</span></div></div>
+    <div class="lv-ring"><svg viewBox="0 0 220 220" id="ring">${ringSVG(L,el)}</svg>
+      <div class="lv-c"><span class="ph ${g.k}">${ph}</span><b id="clk">0:00</b><span>${g.k==="warm"?"Calentamiento":esc(serie(g.k==="rest"?ns:s))}</span></div></div>
+    <div class="lv-ex">${g.k==="warm"?`<div class="nm">Calentamiento</div><div class="tg2">${esc(L.plan.warmTxt)}</div>`
+      : showS?`<div class="pre">${g.k==="rest"?"Siguiente":"Ahora"}</div><div class="nm">${esc(showS.e.n)}</div>
+        <div class="tg2">${showS.kind==="reps"?"<b>"+repTxt(showS.e)+"</b> · RIR "+esc(L.plan.rir):"<b>"+(showS.work>=120?mins(showS.work):showS.work+"\"")+"</b> "+esc(showS.e.cue)} · ${esc(serie(showS))}</div>`
+      : `<div class="nm">Último descanso</div>`}
+      ${g.k==="rest"&&lastSet&&lastStep?`<div class="lv-fix"><span>${esc(lastStep.e.n.split(" (")[0])}: </span><button id="lm" aria-label="Una rep menos">−</button><b>${lastSet.reps}</b><button id="lp" aria-label="Una rep más">+</button><span>${lastStep.kind==="reps"?"reps":lastStep.e.iso?"s":"reps"}</span></div>`:""}
+    </div>
+    <ul class="lv-list">${exList}</ul>
+    <div class="lv-btn"><button class="pri" id="pause">${L.paused?"▶ Seguir":"⏸ Pausa"}</button><button id="finish">■ Terminar</button></div></div>`;
+  // pantalla fija: ajusta la altura al hueco real bajo la cabecera y el rosco al espacio libre
+  const lv=$(".lv"), hd=document.querySelector("header"); window.scrollTo(0,0);
+  const H=window.innerHeight-(hd?hd.offsetHeight:60)-10; lv.style.height=H+"px";
+  const used=[".lv-top",".lv-ex",".lv-list",".lv-btn"].reduce((a,q)=>a+($(q)?$(q).offsetHeight:0),0)+30;
+  lv.style.setProperty("--rs", Math.max(170, Math.min(H-used, 420))+"px");
+  autoTick(true);
+  $("#pause").onclick=()=>{ if(L.paused){ L.pauseAcc=(L.pauseAcc||0)+(Date.now()-L.paused); L.paused=null; } else L.paused=Date.now(); save(); renderAuto(); };
+  $("#finish").onclick=()=>{ if(confirm("¿Terminar y guardar la sesión?")){ autoCatchUp(L); finishSession(); } };
+  const fix=d=>{ if(!lastSet) return; lastSet.reps=Math.max(0,(+lastSet.reps||0)+d); lastSet.auto=false; save(); renderAuto(); };
+  const lm=$("#lm"), lp=$("#lp"); if(lm) lm.onclick=()=>fix(-1); if(lp) lp.onclick=()=>fix(1);
+}
+function autoTick(force){
+  const L=DB.live; if(!L||!L.auto) return;
+  const S=autoSegs(L), el=autoEl(L), j=autoAt(L, el);
+  if(j!==L._j && !force){
+    beep(S[j]&&S[j].k==="work"?880:520,.3); buzz(S[j]&&S[j].k==="work"?[150,80,150]:200); lastBeepSec=-1;
+    return renderAuto();
+  }
+  const g=S[j]; if(!g) return;
+  const left=Math.ceil(g.b-el); const c=$("#clk"); if(c) c.textContent=fmt(left);
+  if(!L.paused && left<=3 && left>0 && left!==lastBeepSec){ lastBeepSec=left; beep(660,.1); if(left===3) buzz(60); }
+  const T=L._tot, work=S.filter(x=>x.k==="work").reduce((a,x)=>a+Math.min(Math.max(el-x.a,0),x.d),0);
+  const set=(id,v)=>{ const x=$("#"+id); if(x) x.textContent=v; };
+  set("lvPct", Math.floor(el/T*100)+"%"); set("lvEl", fmt(el)); set("lvLeft", fmt(T-el)); set("lvWork", fmt(work));
+  const r=$("#ring"); if(r && Math.floor(el)!==L._lastSec){ L._lastSec=Math.floor(el); r.innerHTML=ringSVG(L,el); }
+}
+
+/* ============ SESIÓN EN VIVO (modo antiguo, por pasos) ============ */
 function startSession(plan, t){
   DB.live = {v:3, id:uid(), name:t.name, tpl:JSON.parse(JSON.stringify(t)), date:isoDate(new Date()), start:Date.now(), plan, est:estimate(plan),
-    ph:"warm", t0:Date.now(), dur:plan.warm, idx:0, logs:{}, pend:null, paused:null};
+    ph:"warm", t0:Date.now(), dur:plan.warm, idx:0, logs:{}, pend:null, paused:null, auto:true, pauseAcc:0, done:{}};
   save(); keepAwake(true); beep(660); buzz(80); render();
 }
 let tickH=null, lastBeepSec=-1;
@@ -913,6 +1050,7 @@ function stopTick(){ if(tickH){ clearInterval(tickH); tickH=null; } }
 function cur(){ const L=DB.live; return L.plan.steps[L.idx]; }
 function tick(){
   const L = DB.live; if(!L) return stopTick();
+  if(L.auto) return autoTick();
   const now = L.paused || Date.now(), el = (now-L.t0)/1000;
   const tot=$("#tot"); if(tot) tot.textContent = fmt((Date.now()-L.start)/1000);
   const c=$("#clk"), bar=$("#bar"), s=cur();
@@ -1054,7 +1192,7 @@ function finishSession(){
   const rec = {id:L.id, v:3, name:L.name, tpl:L.tpl, obj:L.plan.obj, fmt:L.plan.fmt, date:L.date, start:L.start, end:Date.now(),
     durSec:Math.round((Date.now()-L.start)/1000), estSec:L.est, week:L.plan.week, mods:L.plan.mods, rir:L.plan.rir,
     ex:Object.values(L.logs).filter(x=>x.sets.length), notes:"", rpe:null};
-  DB.sessions.push(rec); DB.live=null; save(); keepAwake(false); stopTick(); beep(880,.3); buzz([100,60,100]);
+  DB.sessions.push(rec); DB.live=null; save(); keepAwake(false); stopTick(); document.body.classList.remove("livemode"); beep(880,.3); buzz([100,60,100]);
   VIEW={k:"sum", id:rec.id}; render();
 }
 
