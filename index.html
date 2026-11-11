@@ -211,7 +211,7 @@ const WEEK = {1:{w:40,r:20,txt:"Referencias: RIR 3, anota todo"},
 
 /* ============ STORAGE ============ */
 const KEY = "fbjjb_v1";
-const APP_V = "v8 · 11/11/2026";
+const APP_V = "v9 · 11/11/2026";
 let DB = load();
 function blank(){ return {start:null, sessions:[], acts:[], weights:[], tpls:[], live:null, draft:null, settings:{sound:false, vib:true}}; }
 function load(){
@@ -1004,7 +1004,7 @@ function weeklyReport(){
 
 /* ============ DATOS ============ */
 function renderData(){
-  const h = `<div class="card"><h2>Informe semanal para Claude</h2>
+  const h = `<div class="okbox"><b>Versión de la app:</b> ${APP_V}</div><div class="card"><h2>Informe semanal para Claude</h2>
     <div class="mute">Últimos 7 días: sesiones, series, reps, RIR, esfuerzo, notas, deporte y peso. Cópialo y pégalo en el chat.</div>
     <button class="pri big" id="copyR" style="margin-top:10px">📋 Copiar informe</button>
     <button class="big" id="dlR" style="margin-top:8px">⬇ Descargar informe (JSON)</button></div>
