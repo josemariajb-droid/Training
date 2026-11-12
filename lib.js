@@ -207,6 +207,11 @@ met19|met|C|3|6|10|j|Tuck jump|Rodillas al pecho en el aire.
 met20|met|C|2|6|8|j|Salto horizontal|Salto largo a dos pies, aterriza y vuelve caminando.
 met21|met|C|2|6|8|ju|Salto lateral a 1 pierna|Aterriza y aguanta 1 s. Surf, esquí y pádel.
 met22|met|C|1|8|12||Pop-up de surf|Tumbado boca abajo → de pie en posición de surf en un gesto.
+met23|met|D|3|5|8|j|Burpee + dominada|Burpee bajo la barra, salta a colgarte y haz 1 dominada estricta.
+met24|met|C|2|6|10|j|Burpee con salto largo|Burpee y al subir salto horizontal a dos pies; vuelve caminando.
+met25|met|M|3|4|6||Complejo con mancuernas|Sin soltar: 6 peso muerto, 6 remo, 6 clean, 6 sentadilla frontal y 6 press = 1 ronda.
+met26|met|M|3|5|8||Cluster (clean + thruster)|Clean desde el suelo a los hombros, sentadilla frontal y press al subir.
+met27|met|M|3|2|3|u|Turkish get-up|Del suelo a de pie con la mancuerna arriba y el brazo bloqueado. Lento y controlado.
 mov01|mov|C|1|8|10||Gato-camello|Columna segmento a segmento.
 mov02|mov|C|1|4|6|u|World's greatest stretch|Zancada, codo al suelo, rotación al techo.
 mov03|mov|C|1|8|8|u|Rotación torácica en cuadrupedia|Mano en la nuca, abre el codo al techo.
