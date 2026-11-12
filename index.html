@@ -312,7 +312,7 @@ const WEEK = {1:{w:40,r:20,txt:"Referencias: RIR 3, anota todo"},
 
 /* ============ STORAGE ============ */
 const KEY = "fbjjb_v1";
-const APP_V = "v16 · 11/11/2026";
+const APP_V = "v17 · 12/11/2026";
 let DB = load();
 function blank(){ return {start:null, sessions:[], acts:[], weights:[], tpls:[], live:null, draft:null, settings:{sound:true, vib:true}}; }
 function migrateActs(list){ (list||[]).forEach(a=>{ if(a.type==="Running") a.type="Carrera"; else if(a.type==="Zona 2"){ a.type="Elíptica"; a.modo=a.modo||"continuo"; } else if(a.type==="Intervalos"){ a.type="Elíptica"; a.modo="intervalos"; } }); return list; }
@@ -398,8 +398,19 @@ function entriesOn(k){
 }
 // Combos y animal flow trabajan varias zonas: reparto estimado de cada serie
 const SPLIT = {met:{rod:.4, cad:.3, peV:.15, core:.15}, ani:{core:.4, peV:.3, peH:.15, rod:.15}};
-function sessZones(s){ const per={}; s.ex.forEach(x=>{ const z=(LIB_BY[x.id]||{}).z||x.zone, n=x.sets.length; if(!z) return;
-  if(SPLIT[z]) Object.entries(SPLIT[z]).forEach(([k,f])=>per[k]=(per[k]||0)+n*f); else per[z]=(per[z]||0)+n; }); return per; }
+// Ejercicios que mueven mucho músculo: reparto propio de cada serie (estimación)
+const EXZ = {
+  met01:{rod:.35, peH:.3, core:.2, peV:.15}, met02:{rod:.4, peH:.25, core:.2, peV:.15}, met18:{rod:.4, core:.4, peV:.2},
+  met10:{tiH:.2, peH:.2, peV:.2, rod:.2, cad:.1, core:.1}, met11:{cad:.3, peV:.25, peH:.2, rod:.15, core:.1},
+  met12:{cad:.3, peV:.35, rod:.15, tiH:.1, core:.1}, met13:{cad:.35, peV:.3, rod:.15, core:.2},
+  met23:{tiV:.35, rod:.25, peH:.2, core:.2}, met24:{rod:.45, cad:.25, peH:.2, core:.1},
+  met25:{cad:.25, tiH:.2, rod:.2, peV:.2, core:.15}, met26:{rod:.3, cad:.25, peV:.3, core:.15}, met27:{core:.4, peV:.3, cad:.15, rod:.15},
+  peV14:{rod:.45, peV:.4, core:.15}, cad22:{cad:.5, core:.3, peV:.2} };
+function zonesOf(id){ const e=LIB_BY[id]; if(!e) return {}; return EXZ[id] || SPLIT[e.z] || {[e.z]:1}; }
+const BIG = id => !!EXZ[id] && Object.keys(EXZ[id]).length>=4;   // alto gasto: combo que mueve 4 o más zonas a la vez
+function sessZones(s){ const per={}; s.ex.forEach(x=>{ const n=x.sets.length;
+  const zm = LIB_BY[x.id] ? zonesOf(x.id) : (x.zone ? (SPLIT[x.zone]||{[x.zone]:1}) : null); if(!zm) return;
+  Object.entries(zm).forEach(([k,f])=>per[k]=(per[k]||0)+n*f); }); return per; }
 function actZones(a){ const L=ACT_LOAD[a.type]||{}, k=(+a.min||0)/60*(INT_F[a.int]||1), o={}; Object.entries(L).forEach(([z,n])=>o[z]=n*k); return o; }
 function zoneSets(from, to){ // series por zona entre dos fechas (incluidas); deporte en series equivalentes
   const v={}, add=o=>Object.entries(o).forEach(([z,n])=>v[z]=(v[z]||0)+n);
@@ -772,6 +783,7 @@ function autoPick(d, s, idx){
   const score = e => {
     const da = used[e.id] ? daysAgo(used[e.id]) : 99;
     let sc = Math.min(da, 14)*10;                       // prioriza no repetir en 7–14 días
+    if(d.obj==="Q" && BIG(e.id)) sc += 25;              // Quema: combos que mueven todo el cuerpo
     if(tired && e.c) sc -= 40;                          // zona fatigada: mejor accesorio que compuesto pesado
     if(tired && e.lvl===3) sc -= 30;
     if(da < 7) sc -= 200;                               // repetido esta semana: penaliza fuerte
@@ -1009,7 +1021,7 @@ function renderPlanner(){
     h += `</div>`;
   });
   const miss = fullBodyCheck(d), pl = buildPlan(d, []), est = estimate(pl), vol = weekVolume();
-  const planned = {}; tplItems(d).forEach(e=>{ const n=d.fmt==="circuito"?(+d.rounds||3):e.sets; if(SPLIT[e.z]) Object.entries(SPLIT[e.z]).forEach(([k,f])=>planned[k]=(planned[k]||0)+n*f); else planned[e.z]=(planned[e.z]||0)+n; });
+  const planned = {}; tplItems(d).forEach(e=>{ const n=d.fmt==="circuito"?(+d.rounds||3):e.sets; Object.entries(zonesOf(e.id)).forEach(([k,f])=>planned[k]=(planned[k]||0)+n*f); });
   Object.keys(planned).forEach(z=>planned[z]=Math.round(planned[z]));
   h += `<button class="big" id="add">＋ Añadir ejercicio</button>
   <div class="card" style="margin-top:12px"><h3>Control del entrenador</h3>
@@ -1065,7 +1077,7 @@ function renderLib(){
     <input id="fq" placeholder="Buscar…" value="${esc(f.q)}" style="margin-top:6px"></div>
   <div class="card"><div class="mute small">${list.length} resultados</div><ul class="list">`;
   list.slice(0,80).forEach(e=>{ const p=presc(e,"H"), pr=progress(e.id);
-    h += `<li><details class="libx" data-lx="${e.id}"><summary><b>${esc(e.n)}</b><br><span class="mute small">${ZONES[e.z]} · ${eqTxt(e)} · ${lvlTxt(e.lvl)}${e.j?" · salto":""}${used[e.id]?" · hace "+daysAgo(used[e.id])+" d":""}</span></summary><div class="fx"></div></details></li>`; });
+    h += `<li><details class="libx" data-lx="${e.id}"><summary><b>${esc(e.n)}</b>${BIG(e.id)?' <span class="tag keep">🔥 alto gasto</span>':""}<br><span class="mute small">${ZONES[e.z]} · ${eqTxt(e)} · ${lvlTxt(e.lvl)}${e.j?" · salto":""}${used[e.id]?" · hace "+daysAgo(used[e.id])+" d":""}</span></summary><div class="fx"></div></details></li>`; });
   if(list.length>80) h += `<li class="mute small">… y ${list.length-80} más: afina con el buscador o la zona.</li>`;
   h += `</ul></div>`;
   $("#app").innerHTML = h;
@@ -1076,14 +1088,14 @@ function renderLib(){
 }
 
 function libSheet(e){
-  const zs = SPLIT[e.z] ? SPLIT[e.z] : {[e.z]:1}, d={};
+  const zs = zonesOf(e.id), d={};
   FZ_SHOW.forEach(z=>{ const v=zs[z]||0; d[z]={l:v>=.5?3:v>0?1:0, st:"", txt:""}; });
   const L=logsFor(e.id), pr=progress(e.id), nv=nextVariant(e);
   const best = L.length ? Math.max(...L.flatMap(l=>l.sets.filter(z=>!z.auto).map(z=>+z.reps||0)), 0) : 0;
   const pres = ["F","H","Q"].map(o=>{ const p=presc(e,o); return OBJ[o]+": "+(e.iv?ivTxt(e.iv):o==="Q"?"en circuito, "+WEEK[weekInfo().week].w+"\" de trabajo":p.sets+" × "+p.lo+"–"+p.hi+(e.iso?" s":e.u?" por lado":"")+" · desc. "+p.rest+"\""); }).join("<br>");
   const yt = "https://www.youtube.com/results?search_query="+encodeURIComponent(e.n+" ejercicio técnica");
   return `<div class="fi">${bodySVG(d,"dia").replace('viewBox="0 0 340 300"','viewBox="0 0 340 300" style="max-width:120px"')}
-    <dl><dt>Trabaja</dt><dd>${Object.keys(zs).map(z=>FZ_SHORT[z]||ZONES[z]).join(", ")}${e.c?" · compuesto":""}${e.u?" · unilateral":""}${e.iso?" · isométrico":""}</dd>
+    <dl><dt>Trabaja</dt><dd>${BIG(e.id)?"<b>🔥 Alto gasto · cuerpo completo</b><br>":""}${Object.entries(zs).sort((a,b)=>b[1]-a[1]).map(([z,f])=>(FZ_SHORT[z]||ZONES[z])+(Object.keys(zs).length>1?" "+Math.round(f*100)+"%":"")).join(", ")}${e.c?" · compuesto":""}${e.u?" · unilateral":""}${e.iso?" · isométrico":""}</dd>
       <dt>Técnica</dt><dd>${esc(e.cue)}</dd>
       <dt>Prescripción</dt><dd class="small">${pres}</dd>
       <dt>Tu historial</dt><dd>${L.length?(L.length===1?"1 vez":L.length+" veces")+" · última hace "+daysAgo(L[0].date)+" d"+(best?" · mejor serie "+best+(e.iso?" s":" reps"):"")+"<br><span class=\"tag "+pr.k+"\">"+esc(pr.t)+"</span>":"Aún no lo has hecho"}</dd>
